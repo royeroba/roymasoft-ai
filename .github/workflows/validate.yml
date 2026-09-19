@@ -5,8 +5,9 @@ name: validate
 
 on:
   push:
-    branches: [main]
+    branches: [master, release, dev]
   pull_request:
+    branches: [master, release, dev]
 
 jobs:
   validate:
