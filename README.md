@@ -70,6 +70,62 @@ escribas fuera de esos marcadores se conserva.
 
 ---
 
+## Ramas
+
+```
+dev  ──────►  release  ──────►  master
+trabajo       estabilizar       producción
+diario        y probar          protegida
+```
+
+| Rama | Para qué | Protegida |
+|---|---|---|
+| **`dev`** | Trabajo diario. Aquí se commitea y se itera | no |
+| **`release`** | Antesala: se estabiliza y se prueba antes de producción | no |
+| **`master`** | Producción. Solo entra lo que pasó por `release` | **sí** |
+
+`release` **puede ir por delante de `master`** — es donde vive lo que está listo pero aún no
+liberado, no una copia de producción.
+
+### Reglas de `master`
+
+| | |
+|---|---|
+| PR obligatorio | sí — no se puede empujar directo |
+| Check obligatorio | `validate` en verde |
+| Aprobaciones | 0 (trabajo en solitario; súbelo a 1 si lo comparte un equipo) |
+| Force push · borrar rama | no |
+| Historia lineal | sí |
+| Admins exentos | **no** — la protección también me aplica a mí |
+
+### Flujo
+
+```bash
+# 1. trabajar
+git checkout dev
+# ...commits...
+git push origin dev
+
+# 2. subir a release cuando esté listo para probar
+gh pr create --base release --head dev
+# el CI corre solo → verde → merge
+
+# 3. a producción cuando esté estabilizado
+gh pr create --base master --head release
+# el CI corre otra vez → verde → merge
+```
+
+Un hotfix urgente sale de `master`, y **se mergea a `master` y a `dev`** — si no, el arreglo se
+pierde en el siguiente release.
+
+### Para el agente
+
+Nunca commitea (→ `behavior/_core.md` §9). Cuando prepare un commit con `/commit`, el destino por
+defecto es **`dev`**: entregar trabajo directamente contra `master` o `release` es saltarse el
+flujo, aunque la protección de `master` lo impida técnicamente.
+
+---
+
 ## Estructura
 
 ```
