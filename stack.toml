@@ -1,0 +1,69 @@
+# roymasoft-ai — declaración del stack
+#
+# Fase 1: este archivo es SOLO declarativo. `install.ps1` todavía no instala componentes,
+# únicamente proyecta el harness a los agentes. Los componentes entran en la fase 4.
+
+schema_version = 1
+
+# ── Agentes destino de la proyección ─────────────────────────────────────────
+# Cada uno recibe el mismo comportamiento en su formato nativo.
+
+[[agents]]
+id       = "claude"
+enabled  = true
+strategy = "pointer"          # CLAUDE.md es un puntero de una línea a AGENTS.md
+
+[[agents]]
+id       = "codex"
+enabled  = true
+strategy = "native"           # lee AGENTS.md directamente: nada que generar
+
+[[agents]]
+id       = "cursor"
+enabled  = true
+strategy = "translate"        # .cursor/rules/*.mdc con frontmatter propio
+
+[[agents]]
+id       = "copilot"
+enabled  = true
+strategy = "block"            # bloque idempotente en .github/copilot-instructions.md
+
+[[agents]]
+id       = "antigravity"
+enabled  = true
+strategy = "copy"             # .gemini/GEMINI.md
+
+# ── Componentes externos (fase 4) ────────────────────────────────────────────
+# Los perfiles NO son opcionales: sin ellos, ~45 definiciones de herramienta
+# entran en contexto en cada turno y anulan el ahorro que estos componentes traen.
+
+[components.engram]
+enabled = false               # fase 4
+purpose = "memoria persistente entre sesiones"
+install = "go install github.com/gentleman-programming/engram/cmd/engram@latest"
+mcp_profile = "agent"         # 9 herramientas core en vez de 23
+
+[components.cbm]
+enabled = false               # fase 4
+purpose = "grafo de código: sustituye leer archivos por consultar estructura"
+install = "install.ps1 del propio proyecto"
+tier = "verify"               # tier 2 por defecto (scout | verify | auditor)
+
+[components.context7]
+enabled = false               # fase 4
+purpose = "documentación actualizada de librerías"
+transport = "mcp-remote"
+
+[components.rtk]
+enabled = false               # fase 4
+purpose = "comprime la salida de consola antes de que llegue al contexto"
+install = "winget install rtk-ai.rtk"
+awareness = "default"         # default (8 líneas) | high | full
+
+# ── MCP por cliente ──────────────────────────────────────────────────────────
+# Jira, GitHub y Figma llevan credenciales DISTINTAS por empresa.
+# Activa solo los del cliente en el que estás trabajando: cada servidor conectado
+# que no usas es contexto gastado en cada turno, y un riesgo de cruce de datos.
+
+[mcp.clients]
+active_only = true
