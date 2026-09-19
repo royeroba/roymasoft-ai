@@ -23,6 +23,9 @@ const VENDOR = '.roymasoft';
 const BLOCK_START = '<!-- roymasoft-ai:start -->';
 const BLOCK_END = '<!-- roymasoft-ai:end -->';
 
+/** Files prefixed with this are contracts for the parent, not subagent definitions. */
+const NOT_A_SUBAGENT = '_';
+
 /**
  * Behaviour files that become individually addressable rules, with the description each
  * agent uses to decide when to attach them.
@@ -31,7 +34,7 @@ const BEHAVIOR_RULES = {
 	'evidence.md': 'Never assume. What may be claimed and the proof required. When to stop and ask.',
 	'output.md': 'Response shape: lead with the action, no preamble, no recap, no closers.',
 	'language.md': 'Conversation language vs. technical artifact language.',
-	'routing.md': 'Ceremony ladder: ping-pong vs SDD, and when TDD applies.',
+	'routing.md': 'Ceremony ladder: ping-pong vs SDD, delegation triggers, and when TDD applies.',
 	'search.md': 'Search order: graph, grep, glob, read. Never bash to search.',
 	'memory.md': 'What to persist, with which scope, and client isolation.',
 	'code-style.md': 'SOLID, DRY, KISS, Clean Code. Docstrings on signatures, no comments.',
@@ -68,6 +71,33 @@ function rewritePointers(text) {
 	return text.replace(/(`)(behavior|contracts|agents|skills)\//g, `$1${VENDOR}/$2/`);
 }
 
+/** Minimal frontmatter reader: returns {} when the file has no closed fence. */
+function frontmatter(text) {
+	const lines = text.split(/\r?\n/);
+	if (lines[0]?.trim() !== '---') return {};
+	const end = lines.indexOf('---', 1);
+	if (end === -1) return {};
+	const out = {};
+	for (const line of lines.slice(1, end)) {
+		const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+		if (!match) continue;
+		out[match[1]] = match[2].trim().replace(/^["']|["']$/g, '');
+	}
+	return out;
+}
+
+function listDirs(rel) {
+	const abs = join(HARNESS, rel);
+	if (!existsSync(abs)) return [];
+	return readdirSync(abs).filter((entry) => statSync(join(abs, entry)).isDirectory());
+}
+
+function listFiles(rel, ext = '.md') {
+	const abs = join(HARNESS, rel);
+	if (!existsSync(abs)) return [];
+	return readdirSync(abs).filter((entry) => entry.endsWith(ext) && statSync(join(abs, entry)).isFile());
+}
+
 /** Copies a harness directory into the target's vendor folder. Skips silently if absent. */
 function vendorDir(name) {
 	const src = join(HARNESS, name);
@@ -92,6 +122,43 @@ function vendorDir(name) {
 	return true;
 }
 
+// ── Skill registry ───────────────────────────────────────────────────────────
+
+/**
+ * Index, not summary: name, trigger and the exact path to load. The orchestrator matches
+ * against this table and passes paths to subagents, which read the full SKILL.md themselves.
+ * Summarizing here would distort the skill; an index costs tokens only when one is actually used.
+ */
+function buildRegistry() {
+	const rows = [];
+	for (const name of listDirs('skills')) {
+		if (name.startsWith(NOT_A_SUBAGENT)) continue;
+		const skillPath = join(HARNESS, 'skills', name, 'SKILL.md');
+		if (!existsSync(skillPath)) continue;
+		const meta = frontmatter(readFileSync(skillPath, 'utf8'));
+		rows.push({
+			name: meta.name ?? name,
+			description: meta.description ?? '(no description)',
+			path: `${VENDOR}/skills/${name}/SKILL.md`,
+		});
+	}
+
+	const body = [
+		'# Skill registry',
+		'',
+		'Index of available skills. Match the task against **Trigger**, then read the exact **Path**',
+		'before doing the work. Pass paths to subagents — never a summary.',
+		'',
+		'| Skill | Trigger | Path |',
+		'| --- | --- | --- |',
+		...rows.map((r) => `| \`${r.name}\` | ${r.description} | \`${r.path}\` |`),
+		'',
+	].join('\n');
+
+	write(`${VENDOR}/skills/_registry.md`, body);
+	return rows;
+}
+
 // ── Per-agent projections ────────────────────────────────────────────────────
 
 /** Codex reads AGENTS.md natively — it is the canonical projection the others derive from. */
@@ -102,6 +169,53 @@ function projectCodex(core) {
 /** Claude Code reads both AGENTS.md and CLAUDE.md: a one-line pointer costs nothing. */
 function projectClaude() {
 	write('CLAUDE.md', 'AGENTS.md\n');
+}
+
+/** Claude Code subagents: one file per definition, frontmatter passes through untouched. */
+function projectClaudeAgents() {
+	for (const file of listFiles('agents')) {
+		if (file.startsWith(NOT_A_SUBAGENT)) continue;
+		write(`.claude/agents/${file}`, read(`agents/${file}`));
+	}
+}
+
+/** Every file under a skill directory, including companions in `assets/` and `references/`. */
+function skillFiles(name) {
+	const root = join(HARNESS, 'skills', name);
+	const found = [];
+	const walk = (dir) => {
+		for (const entry of readdirSync(dir)) {
+			const abs = join(dir, entry);
+			if (statSync(abs).isDirectory()) walk(abs);
+			else found.push(relative(root, abs).split('\\').join('/'));
+		}
+	};
+	walk(root);
+	return found;
+}
+
+/** Claude Code and Codex both read skills from a directory of SKILL.md files. */
+function projectSkills() {
+	for (const name of listDirs('skills')) {
+		if (name.startsWith(NOT_A_SUBAGENT)) continue;
+		for (const rel of skillFiles(name)) {
+			const content = readFileSync(join(HARNESS, 'skills', name, rel), 'utf8');
+			write(`.claude/skills/${name}/${rel}`, content);
+			write(`.codex/skills/${name}/${rel}`, content);
+		}
+	}
+}
+
+/**
+ * Session hooks. The command in hooks.json dispatches through `node`, so one implementation
+ * serves Windows, macOS and Linux without a PowerShell and a bash twin that drift apart.
+ */
+function projectHooks() {
+	if (!existsSync(join(HARNESS, 'hooks'))) return;
+	for (const entry of readdirSync(join(HARNESS, 'hooks'))) {
+		if (!statSync(join(HARNESS, 'hooks', entry)).isFile()) continue;
+		write(`.claude/hooks/${entry}`, read(`hooks/${entry}`));
+	}
 }
 
 /** Cursor wants one .mdc per rule, with its own frontmatter. */
@@ -118,6 +232,18 @@ function projectCursor(core) {
 		write(
 			`.cursor/rules/roymasoft-${name}.mdc`,
 			['---', `description: ${description}`, 'alwaysApply: false', '---', '', readFileSync(src, 'utf8')].join('\n'),
+		);
+	}
+
+	for (const name of listDirs('skills')) {
+		if (name.startsWith(NOT_A_SUBAGENT)) continue;
+		const skillPath = join(HARNESS, 'skills', name, 'SKILL.md');
+		if (!existsSync(skillPath)) continue;
+		const content = readFileSync(skillPath, 'utf8');
+		const meta = frontmatter(content);
+		write(
+			`.cursor/rules/roymasoft-skill-${name}.mdc`,
+			['---', `description: ${meta.description ?? name}`, 'alwaysApply: false', '---', '', content].join('\n'),
 		);
 	}
 }
@@ -144,6 +270,12 @@ function projectCopilot(core) {
 
 function projectAntigravity(core) {
 	write('.gemini/GEMINI.md', generatedHeader('node build/project.mjs') + core);
+	for (const name of listDirs('skills')) {
+		if (name.startsWith(NOT_A_SUBAGENT)) continue;
+		for (const rel of skillFiles(name)) {
+			write(`.antigravity/skills/${name}/${rel}`, readFileSync(join(HARNESS, 'skills', name, rel), 'utf8'));
+		}
+	}
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -151,7 +283,7 @@ function projectAntigravity(core) {
 function main() {
 	if (TARGET === HARNESS) {
 		console.error('error: run this against a target repository, not the harness itself.');
-		console.error(`usage: node build/project.mjs <target-repo>`);
+		console.error('usage: node build/project.mjs <target-repo>');
 		process.exit(1);
 	}
 	if (!existsSync(TARGET)) {
@@ -165,14 +297,18 @@ function main() {
 
 	projectCodex(core);
 	projectClaude();
+	projectClaudeAgents();
+	projectSkills();
+	projectHooks();
 	projectCursor(core);
 	projectCopilot(core);
 	projectAntigravity(core);
 
 	console.log('');
-	for (const dir of ['behavior', 'contracts', 'agents', 'skills']) vendorDir(dir);
+	for (const dir of ['behavior', 'contracts', 'agents', 'skills', 'hooks']) vendorDir(dir);
+	const skills = buildRegistry();
 
-	console.log(`\ndone. Restart your agent to pick up the new configuration.`);
+	console.log(`\ndone — ${skills.length} skill(s) indexed. Restart your agent to pick it up.`);
 }
 
 main();

@@ -1,0 +1,6 @@
+# Los scripts de shell tienen que llegar con LF aunque se clonen en Windows.
+*.sh   text eol=lf
+*.mjs  text eol=lf
+*.md   text
+*.toml text
+*.ps1  text eol=crlf

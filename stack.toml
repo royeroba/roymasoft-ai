@@ -1,12 +1,12 @@
 # roymasoft-ai — declaración del stack
 #
-# Fase 1: este archivo es SOLO declarativo. `install.ps1` todavía no instala componentes,
-# únicamente proyecta el harness a los agentes. Los componentes entran en la fase 4.
+# `install.ps1 -Project <ruta>`  proyecta el harness (no instala nada)
+# `install.ps1 -Stack`           instala los componentes marcados enabled
+# `install.ps1 -Doctor`          diagnóstico read-only
 
 schema_version = 1
 
 # ── Agentes destino de la proyección ─────────────────────────────────────────
-# Cada uno recibe el mismo comportamiento en su formato nativo.
 
 [[agents]]
 id       = "claude"
@@ -31,39 +31,70 @@ strategy = "block"            # bloque idempotente en .github/copilot-instructio
 [[agents]]
 id       = "antigravity"
 enabled  = true
-strategy = "copy"             # .gemini/GEMINI.md
+strategy = "copy"             # .gemini/GEMINI.md + .antigravity/skills/
 
-# ── Componentes externos (fase 4) ────────────────────────────────────────────
-# Los perfiles NO son opcionales: sin ellos, ~45 definiciones de herramienta
-# entran en contexto en cada turno y anulan el ahorro que estos componentes traen.
+# ── Componentes externos ─────────────────────────────────────────────────────
+#
+# Los perfiles NO son opcionales. Sin ellos, ~45 definiciones de herramienta entran
+# en contexto en CADA turno y anulan el ahorro que estos componentes traen.
+#
+# Orden de adopción recomendado: engram -> context7 -> rtk -> cbm.
+# Actívalos de uno en uno y mide antes de añadir el siguiente.
 
 [components.engram]
-enabled = false               # fase 4
+enabled = false
 purpose = "memoria persistente entre sesiones"
+why     = "es la única pieza que resuelve contexto perdido entre sesiones"
+check   = "engram --version"
 install = "go install github.com/gentleman-programming/engram/cmd/engram@latest"
-mcp_profile = "agent"         # 9 herramientas core en vez de 23
-
-[components.cbm]
-enabled = false               # fase 4
-purpose = "grafo de código: sustituye leer archivos por consultar estructura"
-install = "install.ps1 del propio proyecto"
-tier = "verify"               # tier 2 por defecto (scout | verify | auditor)
+mcp     = "engram mcp --tools=agent"
+profile = "agent"             # 9 herramientas core en vez de 23
+notes   = "requiere Go. En Windows compilar local evita falsos positivos de Defender."
 
 [components.context7]
-enabled = false               # fase 4
+enabled = false
 purpose = "documentación actualizada de librerías"
-transport = "mcp-remote"
+why     = "con 4 stacks distintos, evita escribir una skill por framework"
+check   = ""                  # no hay binario propio: corre con npx bajo demanda
+install = "(no requiere instalación: se ejecuta con npx)"
+mcp     = "npx -y @upstash/context7-mcp"
+notes   = "~2 herramientas. El componente más barato del stack."
 
 [components.rtk]
-enabled = false               # fase 4
+enabled = false
 purpose = "comprime la salida de consola antes de que llegue al contexto"
+why     = "ataca tokens por una vía que ningún otro componente cubre"
+check   = "rtk --version"
 install = "winget install rtk-ai.rtk"
 awareness = "default"         # default (8 líneas) | high | full
+notes   = "Windows nativo. Su valor es proporcional a cuánto vive el agente en consola."
+
+[components.cbm]
+enabled = false
+purpose = "grafo de código: sustituye leer archivos por consultar estructura"
+why     = "el mayor ahorro potencial, y el componente más pesado"
+check   = "codebase-memory-mcp --version"
+install = "winget install DeusData.codebase-memory-mcp"
+mcp     = "codebase-memory-mcp"
+tier    = "verify"            # scout | verify | auditor
+notes   = """
+El más pesado: daemon de coordinación por cuenta, barreras de admisión, índice por repo.
+Adóptalo el ÚLTIMO y solo si mides que las reglas de búsqueda no bastaron.
+Si da guerra, se saca sin tocar nada más del harness."""
 
 # ── MCP por cliente ──────────────────────────────────────────────────────────
+#
 # Jira, GitHub y Figma llevan credenciales DISTINTAS por empresa.
 # Activa solo los del cliente en el que estás trabajando: cada servidor conectado
 # que no usas es contexto gastado en cada turno, y un riesgo de cruce de datos.
 
 [mcp.clients]
 active_only = true
+
+# ── Presupuesto de contexto ──────────────────────────────────────────────────
+# Referencia para el doctor. Si la base supera el objetivo, algo se está colando.
+
+[budget]
+core_tokens_target   = 1500   # behavior/_core.md
+registry_tokens_max  = 600    # crece con cada skill
+mcp_tokens_warn      = 3000   # suma de definiciones de herramienta activas
