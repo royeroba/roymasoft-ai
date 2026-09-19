@@ -96,5 +96,8 @@ active_only = true
 
 [budget]
 core_tokens_target   = 1500   # behavior/_core.md
-registry_tokens_max  = 600    # crece con cada skill
+registry_tokens_max  = 900    # crece con cada skill: ~78 tokens por descripcion completa.
+                              # Truncar las descripciones rompe el disparo de skills, que es
+                              # justamente para lo que existe el registry. Si esto se dispara,
+                              # sobran skills — no sobran caracteres.
 mcp_tokens_warn      = 3000   # suma de definiciones de herramienta activas

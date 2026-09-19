@@ -1,0 +1,62 @@
+name: validate
+
+# A skill with a vague description never fires, and one over budget is too expensive to load.
+# Both fail silently at runtime — which is why they are caught here.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Frontmatter, budgets and dead references
+        run: node build/validate.mjs
+
+      - name: Projection runs clean
+        run: |
+          mkdir -p /tmp/projection-target
+          node build/project.mjs /tmp/projection-target
+
+      - name: Projection is idempotent
+        run: |
+          node build/project.mjs /tmp/projection-target
+          starts=$(grep -c 'roymasoft-ai:start' /tmp/projection-target/.github/copilot-instructions.md)
+          ends=$(grep -c 'roymasoft-ai:end' /tmp/projection-target/.github/copilot-instructions.md)
+          if [ "$starts" -ne 1 ] || [ "$ends" -ne 1 ]; then
+            echo "::error::the Copilot block was duplicated: $starts start marker(s), $ends end marker(s)"
+            exit 1
+          fi
+
+      - name: Every skill reached every target
+        run: |
+          for skill in skills/*/; do
+            name=$(basename "$skill")
+            case "$name" in _*) continue ;; esac
+            for target in .claude/skills .codex/skills .antigravity/skills .roymasoft/skills; do
+              if [ ! -f "/tmp/projection-target/$target/$name/SKILL.md" ]; then
+                echo "::error::$name is missing from $target"
+                exit 1
+              fi
+            done
+          done
+
+      - name: Guard blocks a secret
+        run: |
+          git config --global user.email ci@example.com
+          git config --global user.name ci
+          mkdir -p /tmp/guard-target && cd /tmp/guard-target
+          git init -q && git commit -q --allow-empty -m init
+          printf 'const k = "sk-abcdefghij1234567890";\n' > leak.ts
+          if node "$GITHUB_WORKSPACE/guards/diff-guard.mjs"; then
+            echo "::error::the guard did not block a hardcoded secret"
+            exit 1
+          fi

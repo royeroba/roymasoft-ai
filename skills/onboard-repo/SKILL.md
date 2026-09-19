@@ -44,80 +44,23 @@ either way.
 
 ---
 
-## Phase 2 — Stack, from manifests
+## Phases 2–5 — Gather the evidence
 
-Read what exists. Do not infer from folder names.
+Lookup tables for all four: `references/detection.md`. Read it now.
 
-| Manifest | Gives you |
-|---|---|
-| `package.json` | runtime deps, dev deps, **scripts**, package manager via the lockfile |
-| `pyproject.toml` · `requirements.txt` · `Pipfile` | Python deps and tooling |
-| `go.mod` · `Cargo.toml` · `composer.json` · `pom.xml` · `build.gradle` · `*.csproj` · `Gemfile` | language, version, deps |
-| lockfile | the actual package manager — `pnpm-lock.yaml` means pnpm, not npm |
-| `tsconfig.json` · `.eslintrc*` · `.prettierrc*` · `ruff.toml` · `.editorconfig` | tooling and style config |
-| `Dockerfile` · `docker-compose*` · `*.tf` | runtime and infra |
+**2. Stack** — from manifests only. Never from folder names. Versions as declared.
 
-Record **versions as declared**, not as remembered. If you need to know what a version implies,
-ask Context7 rather than recalling it.
+**3. Testing capability** — the field that matters most: it decides whether TDD is ever offered
+here. Framework + test files + a runnable command -> `true`. Framework but zero test files ->
+`false`. Test files but no runner you can name -> `unknown`, and **ask for the command**.
+**Never invent a test command.**
 
----
+**4. Commands** — verbatim from `scripts`, the Makefile, CI or the README. Mark where each came
+from. A command nobody wrote down is `unknown`.
 
-## Phase 3 — Testing capability *(the field that matters most)*
-
-This decides whether TDD is ever offered in this repository. Get it right or mark it unknown.
-
-### Look for
-
-1. **A test framework in the manifest** — vitest, jest, pytest, go test, JUnit, RSpec, xUnit…
-2. **Test files that actually exist** — `**/*.{spec,test}.*`, `test_*.py`, `*_test.go`, `src/test/**`. Count them.
-3. **A runner command** — the `test` script, the documented command, or the framework's default.
-4. **CI running them** — a workflow that invokes the runner is strong evidence the command works.
-
-### Decide
-
-| Evidence | `available` | What you write |
-|---|---|---|
-| Framework + test files + a runnable command | `true` | framework, runner, and how you detected it |
-| Framework declared but **zero test files** | `false` | note it: the dependency exists, the practice does not |
-| Test files but no runner you can name | `unknown` | **ask the human for the command** |
-| Nothing | `false` | say so plainly |
-
-**Never invent a test command.** `pnpm test` is a guess unless you saw it in `scripts`.
-
-`tdd.mode` starts at `ask` when `available: true`, and is omitted entirely when it is `false`.
-
----
-
-## Phase 4 — Commands
-
-Take them from `scripts`, the Makefile, the CI workflow or the README — **verbatim**. Do not
-normalize `yarn` to `npm`, and do not invent a `lint` script that does not exist.
-
-Mark each with where you found it. A command nobody wrote down is `unknown`, not a best guess.
-
----
-
-## Phase 5 — Architecture and conventions
-
-Map the real structure: entry points, layers, where routing lives, where data access lives, where
-shared types live.
-
-For each convention you record, **cite at least two occurrences**. One example is a coincidence.
-
-| Convention | How you evidence it |
-|---|---|
-| Naming (files, components, tests) | two paths |
-| Layering and boundaries | two imports that respect it |
-| Error handling | two call sites |
-| Docstring style | two functions |
-| State management, data fetching | two usages |
-
-A pattern you saw once goes in as an observation, not a rule. A pattern you cannot evidence does
-not go in at all.
-
-Four or more files to understand a layer → delegate to `scout` instead of reading them yourself.
-
----
+**5. Architecture and conventions** — map entry points, layers, where routing and data access live.
+**Cite two occurrences** for every convention you record; one is a coincidence. Four or more files
+to understand a layer -> delegate to `scout`.
 
 ## Phase 6 — Write and confirm
 

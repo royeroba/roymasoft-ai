@@ -90,10 +90,17 @@ skills/
   spec/          diseño guiado → specs/NN-slug.md en Draft → PARA
   spec-impl/     valida Approved → rama → paso a paso con pausas
   onboard-repo/  aprende el repo y escribe PROJECT.md (con testing.available)
+  code-review/ security-review/ debug/ commit/
+  skill-creator/ skill-improver/   mantienen el propio harness
+guards/
+  diff-guard.mjs  rutas · secretos · valores del .env · scope de memoria
+evals/
+  rubric.md  cases.jsonl   como saber si el harness mejora
 hooks/
   session-start.mjs  inyecta PROJECT.md + recuperación post-compactación
 build/
   project.mjs   la proyección 1 → 5 + generador del registry
+  validate.mjs  frontmatter · presupuestos · referencias muertas
 stack.toml      qué componentes se instalan y con qué perfil
 install.ps1     instalador
 ```
@@ -125,7 +132,7 @@ código**.
 | **2** | Orquestador · subagentes · pipeline `/hu` · registry | ✅ |
 | **3** | SDD · TDD condicional · ping-pong · estilo de código | ✅ |
 | **4** | Instalador · doctor · hooks · `onboard-repo` · stack.toml | ✅ |
-| 5 | Guards · skills restantes · evals | pendiente |
+| **5** | Guards · skills restantes · validador · evals · CI | ✅ |
 
 Plan completo: `~/.claude/plans/armemos-un-plan-para-logical-neumann.md`
 Análisis de referencia: `../HARNESS-NOTAS.md` · Diseño: `../DISENO-HARNESS.md`

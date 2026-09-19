@@ -305,7 +305,7 @@ function main() {
 	projectAntigravity(core);
 
 	console.log('');
-	for (const dir of ['behavior', 'contracts', 'agents', 'skills', 'hooks']) vendorDir(dir);
+	for (const dir of ['behavior', 'contracts', 'agents', 'skills', 'hooks', 'guards']) vendorDir(dir);
 	const skills = buildRegistry();
 
 	console.log(`\ndone — ${skills.length} skill(s) indexed. Restart your agent to pick it up.`);
