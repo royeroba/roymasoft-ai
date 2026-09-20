@@ -1,0 +1,19 @@
+{
+  "name": "roymasoft-ai",
+  "version": "0.2.0",
+  "description": "Mi harness de IA: una sola fuente de comportamiento, proyectada a los agentes que uso.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "roymasoft": "bin/roymasoft.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "validate": "node build/validate.mjs",
+    "doctor": "node bin/roymasoft.mjs doctor",
+    "sync": "node bin/roymasoft.mjs sync"
+  },
+  "license": "MIT"
+}
