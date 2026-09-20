@@ -254,7 +254,12 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
 	const args = process.argv.slice(2);
 	const agentsFlag = args.indexOf('--agents');
 	const agents = agentsFlag >= 0 ? args[agentsFlag + 1].split(',').map((a) => a.trim()) : ALL_AGENTS;
-	const target = args.find((a) => !a.startsWith('--') && a !== args[agentsFlag + 1]) ?? process.cwd();
+
+	// Skip the flag and the value that belongs to it, by index. Comparing by value would make a
+	// target that happens to equal the flag's value disappear — and with no --agents at all,
+	// `args[-1 + 1]` is args[0], which is the target itself.
+	const consumed = new Set(agentsFlag >= 0 ? [agentsFlag, agentsFlag + 1] : []);
+	const target = args.find((a, i) => !consumed.has(i) && !a.startsWith('--')) ?? process.cwd();
 
 	try {
 		console.log(`roymasoft-ai -> ${resolve(target)}\n`);
