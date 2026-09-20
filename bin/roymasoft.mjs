@@ -21,6 +21,7 @@ import { stdin, stdout } from 'node:process';
 import { project, ALL_AGENTS, HARNESS } from '../build/project.mjs';
 import { detectOS, detectRuntimes, detectAgents, detectComponents } from '../build/lib/detect.mjs';
 import { checkAll } from '../build/lib/versions.mjs';
+import { plan as uninstallPlan, execute as uninstallExecute } from '../build/lib/uninstall.mjs';
 import * as registry from '../build/lib/registry.mjs';
 
 const STACK = join(HARNESS, 'stack.toml');
@@ -276,7 +277,83 @@ async function cmdSync() {
 	}
 }
 
-// ── doctor ───────────────────────────────────────────────────────────────────
+
+// -- uninstall ----------------------------------------------------------------
+
+async function cmdUninstall() {
+	const all = flag('all');
+	const targets = all
+		? registry.list().map((entry) => entry.path)
+		: [resolve(positional ?? process.cwd())];
+
+	console.log(`
+${c.bold('roymasoft-ai uninstall')}${all ? c.dim(' — every registered repository') : ''}
+`);
+
+	if (!targets.length) {
+		step('no registered repositories. Pass a path, or run this inside one.');
+		console.log('');
+		return;
+	}
+
+	// Plan everything first: the human should see the whole blast radius before anything goes.
+	const plans = [];
+	for (const target of targets) {
+		if (!existsSync(target)) {
+			warn(`${target} ${c.dim('— gone, skipping')}`);
+			continue;
+		}
+		const planned = uninstallPlan(target, HARNESS);
+		plans.push(planned);
+
+		const total = planned.remove.length + planned.edit.length;
+		console.log(`${c.bold(target)} ${c.dim(`(${total} item(s))`)}`);
+
+		for (const item of planned.remove) console.log(`  ${c.red('-')} ${item.path}${item.kind === 'dir' ? '/' : ''}`);
+		for (const item of planned.edit) console.log(`  ${c.yellow('~')} ${item.path} ${c.dim(`— ${item.reason}`)}`);
+		for (const item of planned.keep) console.log(`  ${c.dim('=')} ${c.dim(`${item.path} — ${item.reason}`)}`);
+		for (const item of planned.foreign) warn(`${item.path} ${c.dim(`— ${item.reason}`)}`);
+		console.log('');
+	}
+
+	const totalItems = plans.reduce((n, p) => n + p.remove.length + p.edit.length, 0);
+	if (!totalItems) {
+		step('nothing to remove — the harness is not installed here.');
+		console.log('');
+		return;
+	}
+
+	if (flag('dry-run')) {
+		step('dry run: nothing was touched.');
+		console.log('');
+		return;
+	}
+
+	if (!(await confirm(`Remove ${totalItems} item(s) from ${plans.length} repositor${plans.length === 1 ? 'y' : 'ies'}?`))) {
+		warn('cancelled. Nothing was touched.');
+		return;
+	}
+
+	console.log('');
+	for (const planned of plans) {
+		const result = uninstallExecute(planned);
+		ok(`${planned.target} ${c.dim(`(${result.done.length} removed, ${result.pruned.length} empty dir(s) pruned)`)}`);
+		for (const f of result.failed) bad(`${f.path} — ${f.error}`);
+		registry.forget(planned.target);
+	}
+
+	// What the harness cannot undo for you, said plainly rather than left as a surprise.
+	console.log(`
+${c.bold('Left in place, on purpose')}`);
+	step(`the harness clone itself — delete ${c.dim(HARNESS)} by hand if you want it gone`);
+	step(`the registry at ${c.dim(registry.registryPath())}`);
+	step('external components (engram, rtk, cbm) — they are third-party tools you may still use');
+	step('MCP registrations in your agents — remove them with your agent own command');
+	if (!all) step(`PROJECT.md and specs/ — yours, not the harness's`);
+	console.log('');
+}
+
+// -- doctor -------------------------------------------------------------------
 
 function cmdDoctor() {
 	console.log(`\n${c.bold('roymasoft-ai doctor')} ${c.dim('— read-only')}\n`);
@@ -354,15 +431,17 @@ ${c.bold('roymasoft-ai')}
   ${c.cyan('roymasoft sync')}             report upstream versions of external components (read-only)
   ${c.cyan('roymasoft doctor')}           read-only health check
   ${c.cyan('roymasoft project')} [path]   projection only
+  ${c.cyan('roymasoft uninstall')} [path] remove the harness from a repository (--all for every one)
 
 ${c.bold('Flags')}
   --agents a,b   project for these agents instead of the detected ones
   --all          project for all five agents
-  --yes          do not ask before installing
+  --yes          do not ask before installing or removing
+  --dry-run      uninstall: show what would go, touch nothing
 `);
 }
 
-const commands = { init: cmdInit, update: cmdUpdate, sync: cmdSync, doctor: cmdDoctor, project: cmdProject };
+const commands = { init: cmdInit, update: cmdUpdate, sync: cmdSync, doctor: cmdDoctor, project: cmdProject, uninstall: cmdUninstall };
 
 if (!commands[command]) {
 	help();
