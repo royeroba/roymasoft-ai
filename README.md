@@ -29,27 +29,46 @@ en el `PROJECT.md` de su propio repo.
 
 ## Uso
 
-```powershell
+```bash
 # una vez
-git clone <este-repo> C:\Users\royei\roymasoft-ai
+git clone https://github.com/royeroba/roymasoft-ai C:\Users\royei\roymasoft-ai
 
 # en cada repo de cliente
-powershell -File C:\Users\royei\roymasoft-ai\install.ps1 -Project .
+node C:\Users\royei\roymasoft-ai\bin\roymasoft.mjs init
 ```
+
+`init` hace todo el pipeline: detecta SO y runtimes, detecta **qué agentes tienes instalados**,
+reporta qué componentes faltan y **pregunta antes de instalar nada**, proyecta, y registra el repo.
 
 Reinicia el agente. Si el repo no tiene `PROJECT.md`, corre `/onboard-repo`.
 
-### Modos del instalador
+### Comandos
 
 | Comando | Qué hace |
 |---|---|
-| `install.ps1 -Project <ruta>` | Proyecta el harness. **No instala nada** |
-| `install.ps1 -Doctor` | Diagnóstico read-only: entorno, presupuesto, componentes |
-| `install.ps1 -Stack` | Instala los componentes con `enabled = true` en `stack.toml` |
-| `install.ps1 -Stack -WhatIf` | Muestra qué instalaría, sin hacerlo |
+| `roymasoft init [ruta]` | Pipeline completo: detectar -> preguntar -> instalar -> proyectar -> registrar |
+| `roymasoft update` | Actualiza el harness desde origin y **re-proyecta todos los repos registrados** |
+| `roymasoft sync` | Consulta versiones upstream de engram, CBM, rtk y Context7. **Solo reporta** |
+| `roymasoft doctor` | Diagnostico read-only: entorno, agentes, componentes, repos, validacion |
+| `roymasoft project [ruta]` | Solo la proyeccion, sin nada mas |
 
-Los componentes vienen **todos desactivados**. Actívalos de uno en uno en `stack.toml` y mide
-antes de añadir el siguiente. Orden recomendado: `engram` -> `context7` -> `rtk` -> `cbm`.
+| Flag | |
+|---|---|
+| `--agents claude,cursor` | Proyecta para estos en vez de los detectados |
+| `--all` | Proyecta para los cinco |
+| `--yes` | No preguntar antes de instalar |
+
+**Solo se crean las carpetas de los agentes que tienes.** Si no usas Codex ni Antigravity, no
+aparecen sus directorios. Un agente ya proyectado en el repo se sigue manteniendo aunque no este
+instalado en esta maquina -- si no, proyectar desde un segundo equipo borraria la configuracion de
+un companero.
+
+### Componentes externos
+
+Vienen **todos desactivados** en `stack.toml`. Activalos de uno en uno y mide antes de anadir el
+siguiente. Orden recomendado: `engram` -> `context7` -> `rtk` -> `cbm`.
+
+`roymasoft sync` te dice que hay nuevo upstream; **no instala nada**, tu decides que tomar.
 
 ### Qué genera en el repo destino
 
@@ -154,11 +173,16 @@ evals/
   rubric.md  cases.jsonl   como saber si el harness mejora
 hooks/
   session-start.mjs  inyecta PROJECT.md + recuperación post-compactación
+bin/
+  roymasoft.mjs   CLI: init . update . sync . doctor . project
 build/
-  project.mjs   la proyección 1 → 5 + generador del registry
-  validate.mjs  frontmatter · presupuestos · referencias muertas
+  project.mjs     la proyeccion + generador del registry
+  validate.mjs    frontmatter . presupuestos . referencias muertas
+  lib/detect.mjs  SO . runtimes . agentes . componentes
+  lib/registry.mjs   repos proyectados (~/.roymasoft/projects.json)
+  lib/versions.mjs   consulta de versiones upstream
 stack.toml      qué componentes se instalan y con qué perfil
-install.ps1     instalador
+install.ps1     envoltorio de compatibilidad (obsoleto)
 ```
 
 ### Subagentes
