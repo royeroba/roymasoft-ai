@@ -133,8 +133,9 @@ async function cmdInit() {
 		if (await confirm('Install them now?')) {
 			for (const k of missing) {
 				step(`installing ${k.id}…`);
-				const parts = k.install.split(/\s+/);
-				const result = spawnSync(parts[0], parts.slice(1), { stdio: 'inherit', shell: os.isWindows });
+				// Always through a shell: Linux/macOS installers are `curl ... | sh` pipelines,
+				// which only a shell interprets — spawning the bare argv would pass "|" as a literal arg.
+				const result = spawnSync(k.install, { stdio: 'inherit', shell: true });
 				if (result.status === 0) ok(`${k.id} installed`);
 				else bad(`${k.id} failed (exit ${result.status}) — install it by hand`);
 			}
