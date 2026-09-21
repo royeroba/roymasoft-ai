@@ -29,20 +29,36 @@ en el `PROJECT.md` de su propio repo.
 
 ## Uso
 
+Tres pasos, y el tercero solo hace falta una vez por componente por máquina:
+
 ```bash
-# una vez, como hermano de tus repos de cliente (no dentro de ninguno)
+# 1. clonar el harness UNA VEZ, como hermano de tus repos de cliente (no dentro de ninguno)
 git clone https://github.com/royeroba/roymasoft-ai C:\Users\<tu-usuario>\roymasoft-ai
 
-# en cada repo de cliente
+# 2. en cada repo de cliente
 node C:\Users\<tu-usuario>\roymasoft-ai\bin\roymasoft.mjs init
 ```
 
 `init` hace todo el pipeline: detecta SO y runtimes, detecta **qué agentes tienes instalados**,
-reporta qué componentes faltan y **pregunta antes de instalar nada**, proyecta, y registra el repo.
+reporta qué componentes faltan y **pregunta antes de instalar nada**, proyecta, registra el repo, y
+si `cbm` queda activo indexa el repo contra el grafo en el momento.
 
-Reinicia el agente. Si el repo no tiene `PROJECT.md`, corre `/onboard-repo`.
+```bash
+# 3. si init activó un componente NUEVO en esta máquina, registra su MCP en tu agente
+# (comando exacto en la salida de init, bajo "Next" — no siempre hace falta, ver abajo)
+claude mcp add engram -- engram mcp --tools=agent
+```
 
-**Guía paso a paso (Windows/macOS/Linux, comandos completos, FAQ):** [start/startsetup.md](start/startsetup.md)
+**Reinicia el agente y prueba.** Si el repo no tiene `PROJECT.md`, corre `/onboard-repo`.
+
+El paso 3 se corre **en terminal**, nunca dentro de una conversación con el agente — es un
+subcomando del propio CLI de cada agente (`claude`, en el caso de Claude Code). Y solo hace falta
+la **primera** vez que activas un componente en esta máquina: el registro queda global, no por
+proyecto, así que el siguiente repo donde corras `init` ya lo encuentra registrado — ahí el flujo
+completo es solo pasos 2, reiniciar y probar. `cbm` es la excepción: su propio instalador ya se
+registra solo en Claude Code, así que ese paso 3 nunca hace falta para él ahí.
+
+**Guía paso a paso completa (Windows/macOS/Linux, comandos completos, FAQ):** [start/startsetup.md](start/startsetup.md)
 
 ### Comandos
 
@@ -74,8 +90,16 @@ lista bajo "Not active yet" con su costo y proposito antes de preguntar una sola
 e instala. No hace falta editar `stack.toml` a mano; decir que no ahi los deja como estan.
 
 `cbm` es el mas pesado (daemon por cuenta, mas definiciones de herramienta en cada turno) y su nota
-lo dice explicitamente en el propio prompt -- no se activa a ciegas solo por decir "si" una vez.
-Orden recomendado si vas a medir de a uno: `engram` -> `context7` -> `rtk` -> `cbm`.
+lo dice explicitamente en el propio prompt -- no se activa a ciegas solo por decir "si" una vez. Si
+queda activo, `init` tambien indexa el repo actual contra el grafo en el momento -- no hace falta
+pedirselo al agente despues. Orden recomendado si vas a medir de a uno: `engram` -> `context7` ->
+`rtk` -> `cbm`.
+
+Activar un componente **no lo conecta con tu agente todavia** -- eso es un paso aparte, manual, y
+por maquina (no por proyecto): `init` te muestra el comando exacto bajo "Next"
+(`claude mcp add <nombre> -- <comando>` para Claude Code). `cbm` es la unica excepcion: su propio
+instalador ya se registra solo. Corrido una vez por componente en esta maquina, no hace falta
+repetirlo en el siguiente repo donde corras `init`.
 
 `roymasoft sync` te dice que hay nuevo upstream; **no instala nada**, tu decides que tomar.
 

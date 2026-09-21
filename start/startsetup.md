@@ -42,7 +42,8 @@ re-proyecta a **todos** los repos donde hayas corrido `init`, porque los recuerd
 | [Node.js](https://nodejs.org) ≥ 20 | corre el CLI (`bin/roymasoft.mjs`) — es la única dependencia dura | sí |
 | [Git](https://git-scm.com) | clonar el harness y que `update` haga `pull` | sí |
 | Go | compilar `engram` desde fuente | solo si activas `engram` |
-| `winget` (Windows) | instalar `rtk` y `cbm` | solo si los activas en Windows |
+| `winget` (Windows) | instalar `rtk` | solo si lo activas en Windows |
+| PowerShell (Windows) | instalar `cbm` vía su `install.ps1` oficial, sin tocar disco (`iwr \| iex`) | solo si lo activas en Windows |
 | `curl` (Linux/macOS) | instalar `rtk` y `cbm` vía su `install.sh` | solo si los activas fuera de Windows |
 
 `roymasoft doctor` te dice cuáles tienes y cuáles faltan — no hace falta adivinar.
@@ -104,21 +105,45 @@ por ti si las activas.** Distinción de scope:
 | `engram`, `context7`, `rtk`, `cbm` (los binarios) | **máquina** | en tu `PATH` / `~/.local/bin`, no dentro de ningún repo |
 | El registro de proyectos (`~/.roymasoft/projects.json`) | máquina | tu carpeta de usuario, nunca en un repo de cliente |
 | La proyección (`CLAUDE.md`, `AGENTS.md`, `.roymasoft/`, `.cursor/rules/`, …) | **por proyecto** | dentro de cada repo donde corriste `init` |
-| Las MCP del agente (registro de `engram mcp`, `codebase-memory-mcp`, etc.) | depende del agente | **manual** — `init` te dice el comando exacto, pero no lo registra por ti; consulta la doc de tu agente sobre si su config MCP es global o por proyecto |
+| Las MCP del agente (registro de `engram mcp`, `context7`, etc.) | **máquina** (usualmente) | **manual, en terminal** — `init` te dice el comando exacto bajo "Next", pero no lo registra por ti |
 
 En corto: **instalas la herramienta una vez por máquina**, y la activas en el `stack.toml` del
 propio clon del harness — como es un solo clon compartido por todos tus proyectos, activar un
-componente ahí aplica a **todo** `init` futuro, no a un repo puntual. El registro MCP queda a tu
-cargo en cada agente.
+componente ahí aplica a **todo** `init` futuro, no a un repo puntual.
 
 Todos vienen `enabled = false` a propósito. **Ya no hace falta editar `stack.toml` a mano**: `init`
 detecta los cuatro estén o no activos, los lista bajo "Not active yet" con su costo y propósito, y
 con una sola confirmación instala y activa los que aceptes. `cbm` es el más pesado — su nota lo dice
-en el propio prompt, así que decir que sí una vez no lo activa a ciegas. Si prefieres medir de a
-uno, di que no y vuelve a correr `init` cuando quieras el siguiente — orden recomendado:
-`engram` → `context7` → `rtk` → `cbm`.
+en el propio prompt, así que decir que sí una vez no lo activa a ciegas. Si queda activo, `init`
+además indexa el repo actual contra el grafo en el momento — no hay que pedírselo al agente después.
+Si prefieres medir de a uno, di que no y vuelve a correr `init` cuando quieras el siguiente — orden
+recomendado: `engram` → `context7` → `rtk` → `cbm`.
 
 `roymasoft sync` te dice qué hay nuevo upstream de cada uno. **Solo reporta, no instala nada.**
+
+### Registrar el MCP en tu agente — el paso que sí es manual
+
+Activar un componente en `stack.toml` no lo conecta con tu agente. Es un paso aparte:
+
+```bash
+# se corre en TERMINAL, nunca dentro de una conversación con el agente
+claude mcp add engram -- engram mcp --tools=agent
+claude mcp add context7 -- npx -y @upstash/context7-mcp
+```
+
+El comando exacto para cada componente lo imprime `init` al final, bajo "Next" — cópialo de ahí en
+vez de adivinarlo. `rtk` no aparece nunca ahí porque no habla MCP (vive en la consola, no en el
+protocolo del agente).
+
+Dos cosas que confirmé revisando `~/.claude.json` en una máquina real:
+
+1. **El registro queda global**, no por proyecto — una vez que registras `engram` en esta máquina,
+   el siguiente repo donde corras `init` ya lo encuentra registrado. No hay que repetirlo.
+2. **`cbm` es la excepción**: su propio instalador ya registra el MCP en Claude Code solo, sin que
+   corras nada — si `init` te lo sugiere igual bajo "Next" para `cbm`, ya está de más, ignóralo.
+
+Si usas Cursor o Copilot además de Claude Code, cada uno tiene su propio mecanismo de registro de
+MCP (archivo o UI propios) — `init` no lo automatiza para ninguno.
 
 ---
 
@@ -156,8 +181,15 @@ Sin argumento de ruta, `init`, `project` y `uninstall` usan el directorio actual
 
 2. Por cada repo de cliente donde quieras el harness
         node <harness>/bin/roymasoft.mjs init
+        → si activaste un componente NUEVO en esta máquina, registra su MCP
+          (comando exacto bajo "Next" -- se corre en terminal, no en el chat)
         → reinicia el agente
+        → prueba
         → /onboard-repo si no hay PROJECT.md
+
+   El registro de MCP es por máquina, no por proyecto -- solo hace falta la
+   primera vez que activas cada componente. El siguiente repo donde corras
+   init ya lo encuentra listo.
 
 3. Cuando el harness cambie (nuevas reglas, skills, fixes)
         node <harness>/bin/roymasoft.mjs update
@@ -195,12 +227,19 @@ Estás corriéndolo sin terminal interactiva (por ejemplo desde un script o un h
 `init` reporta el comando exacto que intentó y el código de salida, y no bloquea el resto —
 instálalo a mano con el comando que te mostró y vuelve a correr `doctor` para confirmar.
 
-**En Windows, `rtk`/`cbm` usan `winget` y no lo tengo**
-Instala App Installer desde la Microsoft Store (trae `winget`), o instala el componente a mano
-siguiendo su propio README.
+**En Windows, `rtk` usa `winget` y no lo tengo**
+Instala App Installer desde la Microsoft Store (trae `winget`), o instala `rtk` a mano siguiendo su
+propio README. `cbm` en Windows no depende de `winget` — corre el `install.ps1` oficial del proyecto
+directo por PowerShell.
 
 **En Linux/macOS, `rtk`/`cbm` fallan por falta de `curl`**
 Instálalo con tu gestor de paquetes (`apt install curl`, `brew install curl` — en macOS ya viene).
+
+**`cbm` queda activo pero mi repo no aparece indexado**
+Si `init` activó `cbm` en esta misma corrida, ya debería haber indexado el repo actual solo — mira
+la sección "Graph index" en la salida. Si `cbm` ya estaba activo de antes y solo corriste `init` en
+un repo nuevo, también debería indexarlo automáticamente al final. Si por lo que sea falló, corre a
+mano: `codebase-memory-mcp cli --progress index_repository --repo-path <ruta-del-repo>`.
 
 **`update` dice que el harness tiene cambios sin commitear**
 No hace `pull` sobre un working tree sucio. Si esos cambios son tuyos (poco común: el harness no

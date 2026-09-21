@@ -42,7 +42,7 @@ strategy = "copy"             # .gemini/GEMINI.md + .antigravity/skills/
 # Actívalos de uno en uno y mide antes de añadir el siguiente.
 
 [components.engram]
-enabled = false
+enabled = true
 purpose = "memoria persistente entre sesiones"
 why     = "es la única pieza que resuelve contexto perdido entre sesiones"
 check   = "engram --version"
@@ -53,7 +53,7 @@ profile = "agent"             # 9 herramientas core en vez de 23
 notes   = "requiere Go. En Windows compilar local evita falsos positivos de Defender."
 
 [components.context7]
-enabled = false
+enabled = true
 purpose = "documentación actualizada de librerías"
 why     = "con 4 stacks distintos, evita escribir una skill por framework"
 check   = ""                  # no hay binario propio: corre con npx bajo demanda
@@ -63,7 +63,7 @@ mcp     = "npx -y @upstash/context7-mcp"
 notes   = "~2 herramientas. El componente más barato del stack."
 
 [components.rtk]
-enabled = false
+enabled = true
 purpose = "comprime la salida de consola antes de que llegue al contexto"
 why     = "ataca tokens por una vía que ningún otro componente cubre"
 check   = "rtk --version"
@@ -73,13 +73,16 @@ awareness = "default"         # default (8 líneas) | high | full
 notes   = "Windows: winget. Linux/macOS: install.sh oficial del proyecto, a ~/.local/bin."
 
 [components.cbm]
-enabled = false
+enabled = true
 purpose = "grafo de código: sustituye leer archivos por consultar estructura"
 why     = "el mayor ahorro potencial, y el componente más pesado"
 check   = "codebase-memory-mcp --version"
-install_windows = "winget install DeusData.codebase-memory-mcp"
+install_windows = """
+powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.ps1 | iex"
+"""
 install_unix    = "curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash"
 mcp     = "codebase-memory-mcp"
+index   = "codebase-memory-mcp cli --progress index_repository --repo-path"
 tier    = "verify"            # scout | verify | auditor
 notes   = """
 El más pesado: daemon de coordinación por cuenta, barreras de admisión, índice por repo.
