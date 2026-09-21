@@ -30,11 +30,11 @@ en el `PROJECT.md` de su propio repo.
 ## Uso
 
 ```bash
-# una vez
-git clone https://github.com/royeroba/roymasoft-ai C:\Users\royei\roymasoft-ai
+# una vez, como hermano de tus repos de cliente (no dentro de ninguno)
+git clone https://github.com/royeroba/roymasoft-ai C:\Users\<tu-usuario>\roymasoft-ai
 
 # en cada repo de cliente
-node C:\Users\royei\roymasoft-ai\bin\roymasoft.mjs init
+node C:\Users\<tu-usuario>\roymasoft-ai\bin\roymasoft.mjs init
 ```
 
 `init` hace todo el pipeline: detecta SO y runtimes, detecta **qué agentes tienes instalados**,
