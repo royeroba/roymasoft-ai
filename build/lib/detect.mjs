@@ -175,8 +175,9 @@ export function readComponents(stackPath) {
 	const components = {};
 	let current = null;
 
-	for (const line of readFileSync(stackPath, 'utf8').split(/\r?\n/)) {
-		const trimmed = line.trim();
+	const lines = readFileSync(stackPath, 'utf8').split(/\r?\n/);
+	for (let i = 0; i < lines.length; i += 1) {
+		const trimmed = lines[i].trim();
 
 		const table = trimmed.match(/^\[components\.([A-Za-z0-9_-]+)\]$/);
 		if (table) {
@@ -196,7 +197,22 @@ export function readComponents(stackPath) {
 		const raw = pair[2].trim();
 		let value;
 		if (raw.startsWith('"""')) {
-			value = raw.replace(/^"""/, '').trim();
+			const rest = raw.slice(3);
+			if (rest.length >= 3 && rest.endsWith('"""')) {
+				// Opens and closes on the same line: notes = """short"""
+				value = rest.slice(0, -3).trim();
+			} else {
+				// Spans multiple lines, like cbm's notes: collect until a line closes it, so
+				// the whole warning (not just an empty first line) survives the read.
+				const collected = rest ? [rest.trim()] : [];
+				i += 1;
+				while (i < lines.length && !lines[i].trimEnd().endsWith('"""')) {
+					collected.push(lines[i].trim());
+					i += 1;
+				}
+				if (i < lines.length) collected.push(lines[i].trimEnd().slice(0, -3).trim());
+				value = collected.join('\n').trim();
+			}
 		} else if (raw.startsWith('"')) {
 			// A quoted value ends at its closing quote; anything after it is a comment.
 			const close = raw.indexOf('"', 1);
