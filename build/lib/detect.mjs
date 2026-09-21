@@ -236,8 +236,8 @@ export function detectComponents(stackPath) {
 		const bin = onDemand ? null : check.split(/\s+/)[0];
 		const path = bin ? onPath(bin) : null;
 
-		// Windows uses winget where available; Linux/macOS get the project's own install.sh.
-		// `install` (no suffix) is a fallback for a component that only ships one command everywhere.
+		// Each OS gets its own install command (winget-ids don't always exist; a project's own
+		// install script does). `install` (no suffix) is a fallback for a single-command component.
 		const install = (IS_WINDOWS ? config.install_windows : config.install_unix) ?? config.install ?? '';
 
 		return {
@@ -245,6 +245,7 @@ export function detectComponents(stackPath) {
 			enabled: config.enabled === 'true',
 			purpose: config.purpose ?? '',
 			why: config.why ?? '',
+			index: config.index ?? '',
 			install,
 			mcp: config.mcp ?? '',
 			notes: config.notes ?? '',
