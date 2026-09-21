@@ -105,7 +105,7 @@ src/features/export/**
 src/api/export.ts
 
 ## Skills to load before work   ← exact SKILL.md paths, resolved by you from the registry
-.roymasoft/skills/security-review/SKILL.md
+.rai/skills/security-review/SKILL.md
 
 ## Verification                 ← the exact commands the child must run
 pnpm test export.spec.ts

@@ -36,7 +36,7 @@ Tres pasos, y el tercero solo hace falta una vez por componente por máquina:
 git clone https://github.com/royeroba/roymasoft-ai C:\Users\<tu-usuario>\roymasoft-ai
 
 # 2. en cada repo de cliente
-node C:\Users\<tu-usuario>\roymasoft-ai\bin\roymasoft.mjs init
+node C:\Users\<tu-usuario>\roymasoft-ai\bin\rai.mjs init
 ```
 
 `init` hace todo el pipeline: detecta SO y runtimes, detecta **qué agentes tienes instalados**,
@@ -64,12 +64,12 @@ registra solo en Claude Code, así que ese paso 3 nunca hace falta para él ahí
 
 | Comando | Qué hace |
 |---|---|
-| `roymasoft init [ruta]` | Pipeline completo: detectar -> preguntar -> instalar -> proyectar -> registrar |
-| `roymasoft update` | Actualiza el harness desde origin y **re-proyecta todos los repos registrados** |
-| `roymasoft sync` | Consulta versiones upstream de engram, CBM, rtk y Context7. **Solo reporta** |
-| `roymasoft doctor` | Diagnostico read-only: entorno, agentes, componentes, repos, validacion |
-| `roymasoft project [ruta]` | Solo la proyeccion, sin nada mas |
-| `roymasoft uninstall [ruta]` | Quita el harness **de ese proyecto**. `--all` para todos los registrados |
+| `rai init [ruta]` | Pipeline completo: detectar -> preguntar -> instalar -> proyectar -> registrar |
+| `rai update` | Actualiza el harness desde origin y **re-proyecta todos los repos registrados** |
+| `rai sync` | Consulta versiones upstream de engram, CBM, rtk y Context7. **Solo reporta** |
+| `rai doctor` | Diagnostico read-only: entorno, agentes, componentes, repos, validacion |
+| `rai project [ruta]` | Solo la proyeccion, sin nada mas |
+| `rai uninstall [ruta]` | Quita el harness **de ese proyecto**. `--all` para todos los registrados |
 
 | Flag | |
 |---|---|
@@ -101,14 +101,14 @@ por maquina (no por proyecto): `init` te muestra el comando exacto bajo "Next"
 instalador ya se registra solo. Corrido una vez por componente en esta maquina, no hace falta
 repetirlo en el siguiente repo donde corras `init`.
 
-`roymasoft sync` te dice que hay nuevo upstream; **no instala nada**, tu decides que tomar.
+`rai sync` te dice que hay nuevo upstream; **no instala nada**, tu decides que tomar.
 
 ### Desinstalar
 
 ```bash
-node bin/roymasoft.mjs uninstall            # de este proyecto
-node bin/roymasoft.mjs uninstall --all      # de todos los registrados
-node bin/roymasoft.mjs uninstall --dry-run  # solo mostrar
+node bin/rai.mjs uninstall            # de este proyecto
+node bin/rai.mjs uninstall --all      # de todos los registrados
+node bin/rai.mjs uninstall --dry-run  # solo mostrar
 ```
 
 Quita el harness **de un proyecto**, no el clone del harness. Correrlo dentro de `roymasoft-ai`
@@ -137,7 +137,7 @@ Siempre pide confirmacion, salvo `--yes`.
 | Cursor | `.cursor/rules/*.mdc` | Una regla por archivo de comportamiento |
 | Copilot | `.github/copilot-instructions.md` | Bloque idempotente entre marcadores |
 | Antigravity | `.gemini/GEMINI.md` | Copia |
-| *(detalle)* | `.roymasoft/behavior/…` | Archivos lazy, cargados solo cuando aplican |
+| *(detalle)* | `.rai/behavior/…` | Archivos lazy, cargados solo cuando aplican |
 
 Todo se **copia**, nunca se enlaza: los symlinks en Windows exigen elevación o modo desarrollador,
 y se rompen al descargar el repo como ZIP.
@@ -232,12 +232,12 @@ evals/
 hooks/
   session-start.mjs  inyecta PROJECT.md + recuperación post-compactación
 bin/
-  roymasoft.mjs   CLI: init . update . sync . doctor . project
+  rai.mjs   CLI: init . update . sync . doctor . project
 build/
   project.mjs     la proyeccion + generador del registry
   validate.mjs    frontmatter . presupuestos . referencias muertas
   lib/detect.mjs  SO . runtimes . agentes . componentes
-  lib/registry.mjs   repos proyectados (~/.roymasoft/projects.json)
+  lib/registry.mjs   repos proyectados (~/.rai/projects.json)
   lib/versions.mjs   consulta de versiones upstream
 stack.toml      qué componentes se instalan y con qué perfil
 install.ps1     envoltorio de compatibilidad (obsoleto)

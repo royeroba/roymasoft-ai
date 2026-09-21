@@ -1,5 +1,5 @@
 {
-  "description": "roymasoft-ai — injects project context at session start and after compaction. Fail-open: any error exits 0 and injects nothing.",
+  "description": "roymasoft-ai — injects project context at session start, after compaction, nudges the search order on prompts, and nudges proactive memory saves before stopping. Fail-open: any error exits 0 and injects nothing.",
   "hooks": {
     "SessionStart": [
       {
@@ -10,6 +10,30 @@
             "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','session-start.mjs')).href)})().catch(()=>{})\"",
             "timeout": 15,
             "statusMessage": "Loading project context..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','prompt-search-reminder.mjs')).href)})().catch(()=>{})\"",
+            "timeout": 5,
+            "statusMessage": "Checking search order..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','stop-memory-check.mjs')).href)})().catch(()=>{})\"",
+            "timeout": 10,
+            "statusMessage": "Checking for unsaved decisions..."
           }
         ]
       }

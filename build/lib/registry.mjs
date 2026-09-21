@@ -4,7 +4,7 @@
  * `update` needs it: pulling the harness is useless if the client repositories keep running the
  * previous version, and nothing else records where they are.
  *
- * Lives at ~/.roymasoft/projects.json. Never inside a client repository — that would leak one
+ * Lives at ~/.rai/projects.json. Never inside a client repository — that would leak one
  * client's paths into another's git history.
  */
 
@@ -12,7 +12,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { homedir } from 'node:os';
 
-const ROOT = join(homedir(), '.roymasoft');
+const ROOT = join(homedir(), '.rai');
 const FILE = join(ROOT, 'projects.json');
 
 function load() {

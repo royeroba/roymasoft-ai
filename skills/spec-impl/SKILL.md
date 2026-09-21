@@ -1,7 +1,7 @@
 ---
 name: spec-impl
-description: "Implement an approved spec. Trigger: the human runs /spec-impl with a spec name. Refuses unless the state means Approved, creates the branch, then implements step by step pausing for diff review. Never commits."
-disable-model-invocation: true
+description: "Implement an approved spec. Trigger: the human names a spec to implement, confirms in natural language that an already-Approved spec should be built now ('dale', 'implementá esto', 'seguí'), or runs /spec-impl explicitly. Refuses unless the spec's state means Approved, creates the branch, implements step by step pausing for diff review, and ends with a fresh-subagent regression audit before handing off for commit. Never commits."
+disable-model-invocation: false
 argument-hint: "<NN-spec-name>"
 allowed-tools: Read, Glob, Grep, Edit, Write, AskUserQuestion, Task, Bash(git status:*), Bash(git branch:*), Bash(git checkout:*), Bash(git log:*), Bash(git diff:*), Bash(cat:*), Bash(ls:*)
 ---
@@ -179,8 +179,24 @@ and say so.
 ```
 ✅ Todos los pasos del plan están implementados.
 
-Siguiente: verifica los criterios de aceptación uno a uno.
-Si pasan, cambia el estado de la spec a "Implemented" y haz el commit final
+Verificando criterios de aceptación uno a uno...
+```
+
+1. Verify each acceptance criterion from the spec against what was built. Report each as
+   `<criterion>: <observed>` — never "should work."
+2. Delegate to `auditor` (→ `agents/auditor.md`) for a holistic regression check: fresh context, a
+   different question than the acceptance criteria — whether *anything else* broke. Pass it the
+   spec path and note the diff is everything since the branch was created; let it read the diff
+   itself rather than summarizing the implementation for it.
+3. **On `NO PASA`**: show the breakage table as-is. Hand the rows to a `worker` (or fix directly
+   only if it is a single mechanical line, at your judgment), then re-run the auditor after the
+   fix. Do not tell the human it is done.
+4. **On `PASA`**:
+
+```
+✅ Auditoría: PASA. No se detectaron regresiones.
+
+Siguiente: cambia el estado de la spec a "Implemented" y haz el commit final
 antes de mergear esta rama.
 ```
 

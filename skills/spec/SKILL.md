@@ -1,7 +1,7 @@
 ---
 name: spec
-description: "Design a spec before writing code. Trigger: the human accepted a spec for a large feature, or asked for one directly. Asks clarifying questions first, then writes specs/NN-slug.md in Draft and stops. Never writes code."
-disable-model-invocation: true
+description: "Design a spec before writing code. Trigger: the human agrees to the spec route after /hu suggested it ('dale', 'con spec', 'sí'), or asks directly for a spec, design doc or plan for a feature. Asks clarifying questions first, presents the draft via the host agent's native plan-review mode when available, then writes specs/NN-slug.md (Approved if reviewed that way, otherwise Draft) and stops. Never writes code."
+disable-model-invocation: false
 argument-hint: "short feature description"
 allowed-tools: Read, Glob, Grep, Write, AskUserQuestion, Bash(ls:*), Bash(cat:*), Bash(date:*)
 ---
@@ -90,9 +90,8 @@ respect it — and record it in the Decisions section as *"Quick definition, no 
 ## Phase 3 — Write
 
 **If Phase 2 is genuinely complete** — you can answer the three questions without assuming — write
-the **whole spec** and go straight to Phase 4. Do not go section by section, do not show a draft
-for approval first. The human answered everything already; re-asking is friction. They review the
-saved file.
+the **whole spec**, present it for review (see below), and go straight to Phase 4. Do not go
+section by section here. The human answered everything already; re-asking is friction.
 
 **Only if information is still missing** (the human cut Phase 2 short, an answer was vague, a
 section cannot be written without inventing something) develop the sections one at a time, showing
@@ -100,6 +99,23 @@ each and waiting for confirmation.
 
 Either way the order is the same: header · scope · data model · implementation plan · acceptance
 criteria · decisions · risks. Details in `template.md`.
+
+### Presenting the draft for review
+
+Before saving, give the human a real chance to react to the whole spec. The host agent's native
+approval, when one exists, *is* the sign-off — it satisfies Phase 4 step 5 directly.
+
+<!-- plan-mode:claude -->
+Claude Code has native plan mode: `EnterPlanMode`, draft the spec inside the plan, `ExitPlanMode`
+to present it. Approved there → save `Status: Approved` directly. Rejected/changed → adjust, repeat.
+<!-- /plan-mode:claude -->
+<!-- plan-mode:cursor -->
+Cursor has its own Plan mode: present the draft there for inline review. Their approval in that
+mode is the sign-off — save `Status: Approved` directly, no manual file edit after.
+<!-- /plan-mode:cursor -->
+<!-- plan-mode:generic -->
+No native plan-review mode: write straight to `specs/NN-slug.md` in `Draft`, as today.
+<!-- /plan-mode:generic -->
 
 ### Mistakes to avoid
 
@@ -116,7 +132,11 @@ criteria · decisions · risks. Details in `template.md`.
 2. **Slug**: short kebab-case, from the objective.
 3. **Date**: from the session context above. **Never write a date you did not read there.** If it says UNKNOWN, ask.
 4. Write `specs/NN-slug.md`. **Do not ask permission to write it and do not ask whether the filename works** — announce the path. Only ask if the target already exists.
-5. **State is `Draft`.** Never `Approved`. The human changes it after re-reading.
+5. **State reflects how it was reviewed.**
+   - Reviewed and approved through the host agent's native plan-review mode this turn → write
+     `Status: Approved` directly. That approval already is the human's sign-off.
+   - Otherwise (no native plan-review mode, or the human asked to skip straight to a file) →
+     **`Draft`.** Never `Approved`. The human changes it after re-reading — the unchanged default.
 6. If the header lists dependencies, verify each referenced spec exists. Do not write a dangling reference.
 7. If `specs/.spec-config.yml` is **missing**, create it with the default below. If it exists, **leave it untouched**.
 
@@ -131,8 +151,10 @@ AutoCreateBranch: true
 
 8. Confirm, in the human's language:
    - the path written
-   - *"Queda en `Draft`. Cámbialo a `Approved` cuando lo hayas releído."*
-   - *"Cuando esté aprobado: `/spec-impl NN-slug`."*
+   - Saved `Approved` via native plan-review this turn → *"Aprobado vía el modo de plan — ya se
+     puede implementar. `/spec-impl NN-slug` cuando quieras, o decime que sigamos y lo invoco yo."*
+   - Saved `Draft` → *"Queda en `Draft`. Cámbialo a `Approved` cuando lo hayas releído."* and
+     *"Cuando esté aprobado: `/spec-impl NN-slug`."*
    - **Stop there.** Do not propose implementing it, do not write code, do not create a branch.
 
 ---

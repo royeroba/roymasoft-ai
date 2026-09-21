@@ -42,7 +42,7 @@ jobs:
           for skill in skills/*/; do
             name=$(basename "$skill")
             case "$name" in _*) continue ;; esac
-            for target in .claude/skills .codex/skills .antigravity/skills .roymasoft/skills; do
+            for target in .claude/skills .codex/skills .antigravity/skills .rai/skills; do
               if [ ! -f "/tmp/projection-target/$target/$name/SKILL.md" ]; then
                 echo "::error::$name is missing from $target"
                 exit 1

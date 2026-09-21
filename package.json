@@ -5,15 +5,15 @@
   "type": "module",
   "private": true,
   "bin": {
-    "roymasoft": "bin/roymasoft.mjs"
+    "rai": "bin/rai.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "validate": "node build/validate.mjs",
-    "doctor": "node bin/roymasoft.mjs doctor",
-    "sync": "node bin/roymasoft.mjs sync"
+    "doctor": "node bin/rai.mjs doctor",
+    "sync": "node bin/rai.mjs sync"
   },
   "license": "MIT"
 }

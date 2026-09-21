@@ -2,11 +2,11 @@
 /**
  * roymasoft-ai CLI.
  *
- *   roymasoft init [path]     detect, install what is missing (after asking), project
- *   roymasoft update          pull the harness and re-project every registered repository
- *   roymasoft sync            report upstream versions of the external components
- *   roymasoft doctor          read-only health check
- *   roymasoft project [path]  projection only, nothing else
+ *   rai init [path]     detect, install what is missing (after asking), project
+ *   rai update          pull the harness and re-project every registered repository
+ *   rai sync            report upstream versions of the external components
+ *   rai doctor          read-only health check
+ *   rai project [path]  projection only, nothing else
  *
  * Node rather than PowerShell: Node is already a hard dependency of the harness, so one
  * implementation serves Windows, macOS and Linux instead of two that drift apart.
@@ -158,7 +158,7 @@ async function cmdInit() {
 			}
 			components = detectComponents(STACK);
 		} else {
-			warn('skipped. Re-run `roymasoft init` anytime to activate them, one confirmation at a time.');
+			warn('skipped. Re-run `rai init` anytime to activate them, one confirmation at a time.');
 		}
 	}
 
@@ -245,7 +245,7 @@ async function cmdUpdate() {
 	const projects = registry.list();
 	console.log(`\n${c.bold('Registered repositories')}`);
 	if (!projects.length) {
-		step('none yet — run `roymasoft init` inside a repository');
+		step('none yet — run `rai init` inside a repository');
 		console.log('');
 		return;
 	}
@@ -457,12 +457,12 @@ function help() {
 	console.log(`
 ${c.bold('roymasoft-ai')}
 
-  ${c.cyan('roymasoft init')} [path]      detect, offer to install what is missing, project
-  ${c.cyan('roymasoft update')}           pull the harness, re-project every registered repository
-  ${c.cyan('roymasoft sync')}             report upstream versions of external components (read-only)
-  ${c.cyan('roymasoft doctor')}           read-only health check
-  ${c.cyan('roymasoft project')} [path]   projection only
-  ${c.cyan('roymasoft uninstall')} [path] remove the harness from a repository (--all for every one)
+  ${c.cyan('rai init')} [path]      detect, offer to install what is missing, project
+  ${c.cyan('rai update')}           pull the harness, re-project every registered repository
+  ${c.cyan('rai sync')}             report upstream versions of external components (read-only)
+  ${c.cyan('rai doctor')}           read-only health check
+  ${c.cyan('rai project')} [path]   projection only
+  ${c.cyan('rai uninstall')} [path] remove the harness from a repository (--all for every one)
 
 ${c.bold('Flags')}
   --agents a,b   project for these agents instead of the detected ones
