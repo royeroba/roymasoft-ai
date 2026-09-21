@@ -42,6 +42,8 @@ reporta qué componentes faltan y **pregunta antes de instalar nada**, proyecta,
 
 Reinicia el agente. Si el repo no tiene `PROJECT.md`, corre `/onboard-repo`.
 
+**Guía paso a paso (Windows/macOS/Linux, comandos completos, FAQ):** [start/startsetup.md](start/startsetup.md)
+
 ### Comandos
 
 | Comando | Qué hace |

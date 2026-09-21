@@ -220,12 +220,16 @@ export function detectComponents(stackPath) {
 		const bin = onDemand ? null : check.split(/\s+/)[0];
 		const path = bin ? onPath(bin) : null;
 
+		// Windows uses winget where available; Linux/macOS get the project's own install.sh.
+		// `install` (no suffix) is a fallback for a component that only ships one command everywhere.
+		const install = (IS_WINDOWS ? config.install_windows : config.install_unix) ?? config.install ?? '';
+
 		return {
 			id,
 			enabled: config.enabled === 'true',
 			purpose: config.purpose ?? '',
 			why: config.why ?? '',
-			install: config.install ?? '',
+			install,
 			mcp: config.mcp ?? '',
 			notes: config.notes ?? '',
 			onDemand,
