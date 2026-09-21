@@ -162,7 +162,19 @@ async function cmdInit() {
 		}
 	}
 
-	// 4. Project
+	// 4. Graph index — cbm holds one graph per repository; a freshly activated (or already
+	// active) install has never seen *this* repo until it is told to, so index it now instead of
+	// leaving that for the first time the agent happens to ask.
+	const cbm = components.find((k) => k.id === 'cbm');
+	if (cbm?.enabled && cbm.present && cbm.index) {
+		console.log(`\n${c.bold('Graph index')}`);
+		step(`indexing ${target}…`);
+		const result = spawnSync(`${cbm.index} "${target}"`, { stdio: 'inherit', shell: true });
+		if (result.status === 0) ok('cbm graph indexed');
+		else bad(`indexing failed (exit ${result.status}) — run it by hand: ${cbm.index} "${target}"`);
+	}
+
+	// 5. Project
 	console.log(`\n${c.bold('Projection')}`);
 	const result = project({ target, agents: selected, log: () => {} });
 	ok(`${result.files.length} files for ${selected.join(', ')}`);
@@ -171,7 +183,7 @@ async function cmdInit() {
 	registry.record(target, selected);
 	ok(`registered in ${c.dim(registry.registryPath())}`);
 
-	// 5. What is next
+	// 6. What is next
 	console.log(`\n${c.bold('Next')}`);
 	step('restart your agent so it picks up the skills and subagents');
 	if (!existsSync(join(target, 'PROJECT.md'))) step(`run ${c.cyan('/onboard-repo')} to generate PROJECT.md`);
