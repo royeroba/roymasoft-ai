@@ -20,6 +20,7 @@ import { stdin, stdout } from 'node:process';
 
 import { project, ALL_AGENTS, HARNESS } from '../build/project.mjs';
 import { detectOS, detectRuntimes, detectAgents, detectComponents } from '../build/lib/detect.mjs';
+import { enableComponent } from '../build/lib/stack.mjs';
 import { checkAll } from '../build/lib/versions.mjs';
 import { plan as uninstallPlan, execute as uninstallExecute } from '../build/lib/uninstall.mjs';
 import * as registry from '../build/lib/registry.mjs';
@@ -115,32 +116,49 @@ async function cmdInit() {
 		process.exit(1);
 	}
 
-	// 3. Components — report, then ask once
+	// 3. Components — detected regardless of stack.toml, so activating one never means
+	// hand-editing a file first. Still one confirmation, and cbm's weight is shown, not hidden.
 	console.log(`\n${c.bold('Components')}`);
-	const components = detectComponents(STACK);
-	const missing = components.filter((k) => k.enabled && !k.present && k.install && !k.install.startsWith('('));
+	let components = detectComponents(STACK);
 
 	for (const k of components) {
-		if (!k.enabled) step(`${k.id} ${c.dim('— disabled in stack.toml')}`);
-		else if (k.present) ok(`${k.id} ${c.dim(k.onDemand ? '— on demand' : k.path ?? '')}`);
-		else bad(`${k.id} — enabled but not installed`);
+		if (k.enabled && k.present) ok(`${k.id} ${c.dim(k.onDemand ? '— on demand' : k.path ?? '')}`);
+		else if (k.enabled) bad(`${k.id} — enabled but not installed`);
+		else step(`${k.id} ${c.dim(k.present ? '— installed, not active in stack.toml' : '— not active in stack.toml')}`);
 	}
 
-    if (missing.length) {
-		console.log(`\n${c.bold('These would be installed:')}`);
-		for (const k of missing) console.log(`  ${k.id}  ${c.dim(k.install)}`);
+	const candidates = components.filter((k) => !(k.enabled && k.present));
 
-		if (await confirm('Install them now?')) {
-			for (const k of missing) {
-				step(`installing ${k.id}…`);
-				// Always through a shell: Linux/macOS installers are `curl ... | sh` pipelines,
-				// which only a shell interprets — spawning the bare argv would pass "|" as a literal arg.
-				const result = spawnSync(k.install, { stdio: 'inherit', shell: true });
-				if (result.status === 0) ok(`${k.id} installed`);
-				else bad(`${k.id} failed (exit ${result.status}) — install it by hand`);
+	if (candidates.length) {
+		console.log(`\n${c.bold('Not active yet:')}`);
+		for (const k of candidates) {
+			const action = k.onDemand ? 'no install needed — just activates' : k.present ? 'already installed — just activates' : `installs: ${k.install}`;
+			console.log(`  ${c.cyan(k.id)}  ${c.dim(k.purpose)}`);
+			console.log(`    ${c.dim(action)}`);
+			if (k.notes) console.log(`    ${c.dim(k.notes.split('\n')[0])}`);
+		}
+
+		if (await confirm('Activate and install all of the above?')) {
+			for (const k of candidates) {
+				if (!k.present && k.install && !k.install.startsWith('(')) {
+					step(`installing ${k.id}…`);
+					// Always through a shell: Linux/macOS installers are `curl ... | sh` pipelines,
+					// which only a shell interprets — spawning the bare argv would pass "|" as a literal arg.
+					const result = spawnSync(k.install, { stdio: 'inherit', shell: true });
+					if (result.status !== 0) {
+						bad(`${k.id} failed (exit ${result.status}) — install it by hand, left off in stack.toml`);
+						continue;
+					}
+					ok(`${k.id} installed`);
+				}
+				if (!k.enabled) {
+					enableComponent(STACK, k.id);
+					ok(`${k.id} enabled in stack.toml`);
+				}
 			}
+			components = detectComponents(STACK);
 		} else {
-			warn('skipped. The harness works without them; enable later with `roymasoft init --yes`.');
+			warn('skipped. Re-run `roymasoft init` anytime to activate them, one confirmation at a time.');
 		}
 	}
 

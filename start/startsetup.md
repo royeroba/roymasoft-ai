@@ -106,11 +106,17 @@ por ti si las activas.** Distinción de scope:
 | La proyección (`CLAUDE.md`, `AGENTS.md`, `.roymasoft/`, `.cursor/rules/`, …) | **por proyecto** | dentro de cada repo donde corriste `init` |
 | Las MCP del agente (registro de `engram mcp`, `codebase-memory-mcp`, etc.) | depende del agente | **manual** — `init` te dice el comando exacto, pero no lo registra por ti; consulta la doc de tu agente sobre si su config MCP es global o por proyecto |
 
-En corto: **instalas la herramienta una vez por máquina**, pero **decides activarla por proyecto**
-en `stack.toml` (vienen todas `enabled = false` por defecto) y el registro MCP queda a tu cargo.
+En corto: **instalas la herramienta una vez por máquina**, y la activas en el `stack.toml` del
+propio clon del harness — como es un solo clon compartido por todos tus proyectos, activar un
+componente ahí aplica a **todo** `init` futuro, no a un repo puntual. El registro MCP queda a tu
+cargo en cada agente.
 
-Todos vienen desactivados a propósito. Actívalos de uno en uno en `stack.toml` y mide antes de
-sumar el siguiente — orden recomendado: `engram` → `context7` → `rtk` → `cbm`.
+Todos vienen `enabled = false` a propósito. **Ya no hace falta editar `stack.toml` a mano**: `init`
+detecta los cuatro estén o no activos, los lista bajo "Not active yet" con su costo y propósito, y
+con una sola confirmación instala y activa los que aceptes. `cbm` es el más pesado — su nota lo dice
+en el propio prompt, así que decir que sí una vez no lo activa a ciegas. Si prefieres medir de a
+uno, di que no y vuelve a correr `init` cuando quieras el siguiente — orden recomendado:
+`engram` → `context7` → `rtk` → `cbm`.
 
 `roymasoft sync` te dice qué hay nuevo upstream de cada uno. **Solo reporta, no instala nada.**
 
