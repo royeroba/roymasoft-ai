@@ -69,8 +69,13 @@ un companero.
 
 ### Componentes externos
 
-Vienen **todos desactivados** en `stack.toml`. Activalos de uno en uno y mide antes de anadir el
-siguiente. Orden recomendado: `engram` -> `context7` -> `rtk` -> `cbm`.
+Vienen **todos desactivados** en `stack.toml`. `init` los detecta igual -- activos o no -- y los
+lista bajo "Not active yet" con su costo y proposito antes de preguntar una sola vez si los activa
+e instala. No hace falta editar `stack.toml` a mano; decir que no ahi los deja como estan.
+
+`cbm` es el mas pesado (daemon por cuenta, mas definiciones de herramienta en cada turno) y su nota
+lo dice explicitamente en el propio prompt -- no se activa a ciegas solo por decir "si" una vez.
+Orden recomendado si vas a medir de a uno: `engram` -> `context7` -> `rtk` -> `cbm`.
 
 `roymasoft sync` te dice que hay nuevo upstream; **no instala nada**, tu decides que tomar.
 
