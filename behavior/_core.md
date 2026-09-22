@@ -41,10 +41,11 @@ candidate generation or retained information.
 
 → `behavior/search.md`
 
-## 4. Memory — before work, after decisions
+## 4. Memory — before work, immediately after each decision
 
-Search memory before starting work that may already have been done. Save decisions, bug fixes with
-root cause, discovered conventions and user constraints — never raw tool output or transcripts.
+Search memory before starting work that may already have been done. **Save immediately, not just
+when asked or at session end** — decisions, bug fixes with root cause, discovered conventions and
+user constraints, the moment each happens. Never raw tool output or transcripts.
 
 **Scope is always `project`. Never `global`, never `all_projects`.** Work for different clients
 never shares memory.

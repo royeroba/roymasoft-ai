@@ -36,6 +36,43 @@ responding. Repeating work that is already recorded is the cost this exists to a
 
 ---
 
+## Proactive save — non-negotiable
+
+If `engram` (or whatever memory component is active) is connected, its own server instructions
+already say this — do not water it down to "save deliberately at some point":
+
+> **Call `mem_save` immediately after ANY decision, bug fix, discovery, or convention — not just
+> when asked.**
+
+Same source, engram's own docs (`docs/AGENT-SETUP.md`, "Surviving Compaction"): *"Save proactively
+after significant work — don't wait to be asked."*
+
+| Trigger | Do it |
+|---|---|
+| A decision gets made — including a rejected option | `mem_save` before the next step, not batched |
+| A bug gets fixed | `mem_save` with the root cause, right after it is confirmed working |
+| A non-obvious behaviour or gotcha surfaces | `mem_save` on the spot, not deferred to the summary |
+| A convention gets confirmed from the code | `mem_save` once you have two occurrences |
+
+**Waiting to be asked, or saving only in the end-of-session summary, is the failure mode** — a
+session with real decisions and zero `mem_save` calls mid-session is a defect. Catch it while it is
+happening, not in hindsight when the human asks what you saved.
+
+### Alignment check — engram's own rules vs this file
+
+Verified against `github.com/Gentleman-Programming/engram` (README usage-intent table +
+`docs/AGENT-SETUP.md`) so this file never drifts softer than the tool it wraps:
+
+| Engram's rule (source) | Covered here |
+|---|---|
+| Save proactively, immediately, don't wait to be asked (`AGENT-SETUP.md`, server instructions) | `## Proactive save — non-negotiable`, above |
+| Save bugfixes, decisions, discoveries, config changes, patterns, constraints — not raw output or every turn (README) | `## Write deliberately`, below |
+| Stable `topic_key` for evolving knowledge, reused instead of duplicated (README) | `### Evolving topics`, below |
+| `mem_session_summary` — goal, discoveries, work done, next steps, files — before ending (README) | Last bullet of `## Write deliberately` |
+| After compaction: persist the handoff first, then recover recent context (README) | `hooks/session-start.mjs` injects this generically on `source: compact` — it does not name engram's tools, this row is the reminder to use `mem_session_summary` then `mem_context` when engram is what's active |
+
+If engram's own docs change, this table is what to re-check first — it is the drift detector.
+
 ## Write deliberately
 
 Save:
@@ -45,7 +82,9 @@ Save:
 - **Discoveries** — non-obvious behaviour, gotchas, edge cases.
 - **Conventions** found in the code that are not written down anywhere.
 - **Constraints and preferences** the human stated.
-- **Session summary** at the end: goal, discoveries, what was done, next step, relevant files.
+- **Session summary** at the end: goal, discoveries, what was done, next step, relevant files. This
+  is engram's own closing rule (`mem_session_summary` before ending) — the harness inherits it, it
+  does not replace mid-session saves.
 
 Do not save: raw tool output, file contents, conversation turns, or "I read X and then Y".
 

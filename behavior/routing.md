@@ -21,6 +21,7 @@ These eight do not depend on task size or stack. If any fails, the harness is br
 | 2 | Never assume. If the code does not say it, **ask** |
 | 3 | Short, precise answers. No preamble, no recap |
 | 4 | Context7 for current versions and APIs |
+| 4b | If `rtk` is installed (see `stack.toml`), prefer `rtk <cmd>` over raw Bash for git/build/test/lint — it cuts noisy output before it reaches context |
 | 5 | SOLID · DRY · KISS · Clean Code. No comments, docstrings on signatures |
 | 6 | Update memory (decisions, bug fixes, learnings) |
 | 7 | Pause and show. Never dump everything at the end |
@@ -105,7 +106,7 @@ src/features/export/**
 src/api/export.ts
 
 ## Skills to load before work   ← exact SKILL.md paths, resolved by you from the registry
-.roymasoft/skills/security-review/SKILL.md
+.rai/skills/security-review/SKILL.md
 
 ## Verification                 ← the exact commands the child must run
 pnpm test export.spec.ts

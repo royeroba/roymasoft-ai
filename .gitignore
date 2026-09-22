@@ -1,2 +1,5 @@
 node_modules/
 .DS_Store
+
+# codebase-memory-mcp's local graph index — machine-specific state, never shared via git
+.codebase-memory/

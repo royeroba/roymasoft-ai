@@ -27,7 +27,7 @@ That is not a formality: the human is the one who tested it, and the one account
 ## 1. Run the guard
 
 ```bash
-node .roymasoft/guards/diff-guard.mjs
+node .rai/guards/diff-guard.mjs
 ```
 
 Blocking findings → **stop**. Report them and do not draft a message. A commit message for a diff
@@ -47,7 +47,7 @@ Read the diff. One coherent change, or several?
 | One logical change | One commit |
 | Two or more unrelated changes | Propose splitting, with the exact `git add` per commit |
 | A refactor mixed with a behaviour change | **Always propose splitting** — the mix is what makes a revert painful |
-| Generated files (`AGENTS.md`, `.roymasoft/`, …) mixed with source | Say so: they belong with the change that regenerated them, not scattered |
+| Generated files (`AGENTS.md`, `.rai/`, …) mixed with source | Say so: they belong with the change that regenerated them, not scattered |
 
 A commit should be revertible on its own without taking unrelated work with it.
 

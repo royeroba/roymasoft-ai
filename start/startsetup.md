@@ -22,16 +22,16 @@ C:\Users\tu-usuario\Documents\
 ```
 
 Por qué importa: `init` recibe la ruta del **proyecto**, no la del harness, y la ruta del harness
-se resuelve sola desde donde está `bin/roymasoft.mjs`. Si el clon vive fuera de tus carpetas de
+se resuelve sola desde donde está `bin/rai.mjs`. Si el clon vive fuera de tus carpetas de
 proyectos, el comando que corres en cada repo es siempre el mismo, sin relativizar rutas raras:
 
 ```bash
-node C:\Users\tu-usuario\Documents\roymasoft-ai\bin\roymasoft.mjs init
+node C:\Users\tu-usuario\Documents\roymasoft-ai\bin\rai.mjs init
 ```
 
 Un solo clon sirve para todos los proyectos — no se clona uno por cliente. `update` luego
 re-proyecta a **todos** los repos donde hayas corrido `init`, porque los recuerda en
-`~/.roymasoft/projects.json`.
+`~/.rai/projects.json`.
 
 ---
 
@@ -39,27 +39,27 @@ re-proyecta a **todos** los repos donde hayas corrido `init`, porque los recuerd
 
 | Requisito | Para qué | Obligatorio |
 |---|---|---|
-| [Node.js](https://nodejs.org) ≥ 20 | corre el CLI (`bin/roymasoft.mjs`) — es la única dependencia dura | sí |
+| [Node.js](https://nodejs.org) ≥ 20 | corre el CLI (`bin/rai.mjs`) — es la única dependencia dura | sí |
 | [Git](https://git-scm.com) | clonar el harness y que `update` haga `pull` | sí |
 | Go | compilar `engram` desde fuente | solo si activas `engram` |
 | `winget` (Windows) | instalar `rtk` | solo si lo activas en Windows |
 | PowerShell (Windows) | instalar `cbm` vía su `install.ps1` oficial, sin tocar disco (`iwr \| iex`) | solo si lo activas en Windows |
 | `curl` (Linux/macOS) | instalar `rtk` y `cbm` vía su `install.sh` | solo si los activas fuera de Windows |
 
-`roymasoft doctor` te dice cuáles tienes y cuáles faltan — no hace falta adivinar.
+`rai doctor` te dice cuáles tienes y cuáles faltan — no hace falta adivinar.
 
 ---
 
 ## 3. Instalar — por sistema operativo
 
-El CLI es Node puro: el mismo `bin/roymasoft.mjs` corre igual en los tres sistemas. Lo único que
+El CLI es Node puro: el mismo `bin/rai.mjs` corre igual en los tres sistemas. Lo único que
 cambia es cómo se clona y qué instalador usan los componentes externos (`rtk`, `cbm`).
 
 ### Windows (PowerShell)
 
 ```powershell
 git clone https://github.com/royeroba/roymasoft-ai C:\Users\<tu-usuario>\Documents\roymasoft-ai
-node C:\Users\<tu-usuario>\Documents\roymasoft-ai\bin\roymasoft.mjs doctor
+node C:\Users\<tu-usuario>\Documents\roymasoft-ai\bin\rai.mjs doctor
 ```
 
 Si `doctor` marca Node o Git como `fail`, instálalos primero (`winget install OpenJS.NodeJS.LTS`,
@@ -69,7 +69,7 @@ Si `doctor` marca Node o Git como `fail`, instálalos primero (`winget install O
 
 ```bash
 git clone https://github.com/royeroba/roymasoft-ai ~/roymasoft/roymasoft-ai
-node ~/roymasoft/roymasoft-ai/bin/roymasoft.mjs doctor
+node ~/roymasoft/roymasoft-ai/bin/rai.mjs doctor
 ```
 
 Igual que en Windows: si falta Node o Git, instálalos con tu gestor de paquetes (`brew`, `apt`,
@@ -77,12 +77,12 @@ Igual que en Windows: si falta Node o Git, instálalos con tu gestor de paquetes
 
 > **`install.ps1` en la raíz es un envoltorio obsoleto**, solo para Windows y solo por
 > compatibilidad con costumbres viejas de PowerShell. El instalador real es siempre
-> `node bin/roymasoft.mjs <comando>`, en cualquier sistema. Úsalo directo.
+> `node bin/rai.mjs <comando>`, en cualquier sistema. Úsalo directo.
 
 ### Dentro de cada proyecto (los tres sistemas)
 
 ```bash
-node <ruta-al-harness>/bin/roymasoft.mjs init
+node <ruta-al-harness>/bin/rai.mjs init
 ```
 
 Esto: detecta el SO y los runtimes, detecta qué agentes tienes instalados, reporta qué componentes
@@ -103,8 +103,8 @@ por ti si las activas.** Distinción de scope:
 |---|---|---|
 | El clon de `roymasoft-ai` | máquina | una sola vez, donde tú lo clonaste |
 | `engram`, `context7`, `rtk`, `cbm` (los binarios) | **máquina** | en tu `PATH` / `~/.local/bin`, no dentro de ningún repo |
-| El registro de proyectos (`~/.roymasoft/projects.json`) | máquina | tu carpeta de usuario, nunca en un repo de cliente |
-| La proyección (`CLAUDE.md`, `AGENTS.md`, `.roymasoft/`, `.cursor/rules/`, …) | **por proyecto** | dentro de cada repo donde corriste `init` |
+| El registro de proyectos (`~/.rai/projects.json`) | máquina | tu carpeta de usuario, nunca en un repo de cliente |
+| La proyección (`CLAUDE.md`, `AGENTS.md`, `.rai/`, `.cursor/rules/`, …) | **por proyecto** | dentro de cada repo donde corriste `init` |
 | Las MCP del agente (registro de `engram mcp`, `context7`, etc.) | **máquina** (usualmente) | **manual, en terminal** — `init` te dice el comando exacto bajo "Next", pero no lo registra por ti |
 
 En corto: **instalas la herramienta una vez por máquina**, y la activas en el `stack.toml` del
@@ -119,7 +119,7 @@ además indexa el repo actual contra el grafo en el momento — no hay que pedí
 Si prefieres medir de a uno, di que no y vuelve a correr `init` cuando quieras el siguiente — orden
 recomendado: `engram` → `context7` → `rtk` → `cbm`.
 
-`roymasoft sync` te dice qué hay nuevo upstream de cada uno. **Solo reporta, no instala nada.**
+`rai sync` te dice qué hay nuevo upstream de cada uno. **Solo reporta, no instala nada.**
 
 ### Registrar el MCP en tu agente — el paso que sí es manual
 
@@ -151,12 +151,12 @@ MCP (archivo o UI propios) — `init` no lo automatiza para ninguno.
 
 | Comando | Qué hace |
 |---|---|
-| `roymasoft init [ruta]` | Pipeline completo: detectar → preguntar → instalar → proyectar → registrar |
-| `roymasoft update` | `git pull` del harness + re-proyecta **todos** los repos registrados |
-| `roymasoft sync` | Consulta versiones upstream de `engram`, `context7`, `rtk`, `cbm`. Solo reporta, no instala |
-| `roymasoft doctor` | Diagnóstico read-only: entorno, agentes detectados, componentes, repos registrados, validación del harness |
-| `roymasoft project [ruta]` | Solo la proyección (sin detectar componentes ni preguntar nada) |
-| `roymasoft uninstall [ruta]` | Quita el harness **de ese proyecto** (no borra el clon) |
+| `rai init [ruta]` | Pipeline completo: detectar → preguntar → instalar → proyectar → registrar |
+| `rai update` | `git pull` del harness + re-proyecta **todos** los repos registrados |
+| `rai sync` | Consulta versiones upstream de `engram`, `context7`, `rtk`, `cbm`. Solo reporta, no instala |
+| `rai doctor` | Diagnóstico read-only: entorno, agentes detectados, componentes, repos registrados, validación del harness |
+| `rai project [ruta]` | Solo la proyección (sin detectar componentes ni preguntar nada) |
+| `rai uninstall [ruta]` | Quita el harness **de ese proyecto** (no borra el clon) |
 
 ### Flags
 
@@ -180,7 +180,7 @@ Sin argumento de ruta, `init`, `project` y `uninstall` usan el directorio actual
         git clone ... roymasoft-ai
 
 2. Por cada repo de cliente donde quieras el harness
-        node <harness>/bin/roymasoft.mjs init
+        node <harness>/bin/rai.mjs init
         → si activaste un componente NUEVO en esta máquina, registra su MCP
           (comando exacto bajo "Next" -- se corre en terminal, no en el chat)
         → reinicia el agente
@@ -192,19 +192,19 @@ Sin argumento de ruta, `init`, `project` y `uninstall` usan el directorio actual
    init ya lo encuentra listo.
 
 3. Cuando el harness cambie (nuevas reglas, skills, fixes)
-        node <harness>/bin/roymasoft.mjs update
+        node <harness>/bin/rai.mjs update
         → hace pull y re-proyecta TODOS los repos registrados de una vez
 
 4. Para saber si engram/rtk/cbm/context7 tienen versión nueva
-        node <harness>/bin/roymasoft.mjs sync
+        node <harness>/bin/rai.mjs sync
         → solo reporta, decides tú qué tomar
 
 5. Si algo no cuadra
-        node <harness>/bin/roymasoft.mjs doctor
+        node <harness>/bin/rai.mjs doctor
 
 6. Si quieres quitarlo de un repo puntual
-        node <harness>/bin/roymasoft.mjs uninstall --dry-run   # primero mira qué se iría
-        node <harness>/bin/roymasoft.mjs uninstall              # confirma y borra
+        node <harness>/bin/rai.mjs uninstall --dry-run   # primero mira qué se iría
+        node <harness>/bin/rai.mjs uninstall              # confirma y borra
 ```
 
 ---
@@ -247,7 +247,7 @@ debería editarse por proyecto), commitéalos o guárdalos en un stash; si no re
 revisa qué los generó antes de descartarlos.
 
 **Un repo de cliente quedó desactualizado tras un `update`**
-`update` re-proyecta todo lo que está en `~/.roymasoft/projects.json`. Si el repo no aparece ahí
+`update` re-proyecta todo lo que está en `~/.rai/projects.json`. Si el repo no aparece ahí
 (por ejemplo lo moviste de carpeta), `update` lo reporta como "gone" y lo saltea — corre `init`
 de nuevo ahí para volver a registrarlo con la ruta nueva.
 
@@ -259,9 +259,9 @@ archivo a mano o el nombre ya no está en el harness, lo deja y te dice por qué
 
 **Quiero desinstalar y reinstalar para probar la experiencia de cero**
 ```bash
-node <harness>/bin/roymasoft.mjs uninstall --dry-run   # revisa el plan
-node <harness>/bin/roymasoft.mjs uninstall              # confirma
-node <harness>/bin/roymasoft.mjs init                    # vuelve a instalar
+node <harness>/bin/rai.mjs uninstall --dry-run   # revisa el plan
+node <harness>/bin/rai.mjs uninstall              # confirma
+node <harness>/bin/rai.mjs init                    # vuelve a instalar
 ```
 `uninstall` nunca toca `PROJECT.md`, `specs/`, el clon del harness, los binarios de los
 componentes externos ni las MCP registradas en tu agente — eso lo dice explícitamente al terminar
@@ -277,5 +277,5 @@ mano como cualquier carpeta.
 ## 8. Ver también
 
 - [README.md](../README.md) — resumen, estructura del repo, modelo de ramas
-- `roymasoft doctor` — el diagnóstico real de tu máquina, siempre más confiable que esta guía si
+- `rai doctor` — el diagnóstico real de tu máquina, siempre más confiable que esta guía si
   algo cambió desde que se escribió

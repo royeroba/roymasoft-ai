@@ -1,6 +1,6 @@
 ---
 name: hu
-description: "Analyze a user story before writing any code. Trigger: the human brings a ticket, HU, feature request or acceptance criteria and asks for help with it. Consults graph, memory and code in that order, then returns a short analysis and stops."
+description: "Analyze a task before writing any code. Trigger: the human brings a ticket, HU, feature request or acceptance criteria and asks for help with it, or explicitly says 'SDD', 'TDD' or 'hagamos con SDD' about the task. Consults graph, memory and code in that order — always, regardless of the eventual route — then returns a short analysis and stops."
 disable-model-invocation: false
 argument-hint: "ticket URL or ID, or paste the story"
 allowed-tools: Read, Grep, Glob, AskUserQuestion, Task
@@ -10,6 +10,9 @@ allowed-tools: Read, Grep, Glob, AskUserQuestion, Task
 
 Four stages. **You stop at stage 4.** Writing code is a separate decision the human makes after
 reading your analysis.
+
+**Entry**: a ticket/HU/feature request, or the human explicitly saying "SDD"/"TDD"/"hagamos con
+SDD". Either way, stages 1–3 (graph → memory → code) always run before stage 4 decides anything.
 
 ---
 
@@ -64,24 +67,7 @@ Four or more files needed to understand it → delegate to `scout`.
 
 ## Stage 4 — Analysis, then stop
 
-Short. Precise. Structured like this, and no longer than it needs to be:
-
-```
-**Entiendo:** <one line>
-
-**Estado actual**
-- <what exists today, each with file:line>          [verified]
-- <what you deduced>                                 [inferred: from X]
-
-**Lo que haría**
-1. <step>
-2. <step>
-
-**Falta decidir**
-- <question with 2-4 options and a recommendation>
-
-**Tamaño:** ~N archivos · <ping-pong | conviene spec>
-```
+Short. Precise. Format: `references/analysis-template.md` — no longer than it needs to be.
 
 ### Confidence labels are mandatory
 
@@ -101,7 +87,7 @@ Judge size from what you actually found.
 
 | They say | Next |
 |---|---|
-| "con spec" | Hand off to `/spec` with the objective you distilled |
+| "con spec", "dale", "sí" (affirming the suggestion) | Invoke `/spec` yourself, with the objective you distilled |
 | "directo" | Ping-pong: propose, pause and show, let them commit |
 
 Do not mention TDD here — it is resolved at implementation time (→ `behavior/verification.md`).

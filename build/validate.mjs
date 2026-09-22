@@ -20,6 +20,10 @@ const SKILL_BUDGET = 1000;        // auto-invocable: puede dispararse en cualqui
 const SKILL_BUDGET_EXPLICIT = 2000; // disable-model-invocation: true — solo la lanza el humano
 const SKILL_WARN = 700;
 
+/** Auto-invocable, but the trigger is a narrow, rare SDD-phase hand-off — not "any task" — so
+ *  these keep the larger, explicit-only budget even with disable-model-invocation: false. */
+const NARROW_TRIGGER_SKILLS = new Set(['spec', 'spec-impl']);
+
 const errors = [];
 const warnings = [];
 
@@ -94,7 +98,7 @@ function checkSkills() {
 			warn(`${label}: grants unscoped Bash. Prefer Bash(cmd:*)`);
 		}
 
-		const explicitOnly = meta['disable-model-invocation'] === 'true';
+		const explicitOnly = meta['disable-model-invocation'] === 'true' || NARROW_TRIGGER_SKILLS.has(name);
 		const ceiling = explicitOnly ? SKILL_BUDGET_EXPLICIT : SKILL_BUDGET;
 		const size = tokens(meta.__body);
 		if (size > ceiling) fail(`${label}: ~${size} tokens, over the ${ceiling} ceiling`);
@@ -136,7 +140,7 @@ function checkAgents() {
 			if (!meta[key]) fail(`${label}: frontmatter has no ${key}`);
 		}
 		if (meta.name && `${meta.name}.md` !== file) fail(`${label}: name "${meta.name}" does not match the filename`);
-		if (meta.tools && /\bWrite\b|\bEdit\b/.test(meta.tools) && /review|verif|scout/i.test(file)) {
+		if (meta.tools && /\bWrite\b|\bEdit\b/.test(meta.tools) && /review|verif|scout|audit/i.test(file)) {
 			fail(`${label}: a read-only role must not be granted Write or Edit`);
 		}
 	}

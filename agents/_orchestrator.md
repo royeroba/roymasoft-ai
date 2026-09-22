@@ -37,6 +37,7 @@ situation genuinely requires it.
 | `worker` | Bounded implementation, 2+ non-trivial files | Leave its edit surfaces. Commit |
 | `verifier` | Running tests, build, lint and reporting | Modify code. Fix what it finds |
 | `reviewer` | Reviewing a finished change | Modify code |
+| `auditor` | Fresh-context regression audit at the end of `/spec-impl` | Modify code. Fix what it finds. Re-check acceptance criteria |
 
 Delegation triggers, edit surfaces and the delegation payload: `behavior/routing.md`.
 Return envelope: `contracts/result.md`.
