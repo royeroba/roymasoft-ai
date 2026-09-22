@@ -38,7 +38,7 @@ strategy = "copy"             # .gemini/GEMINI.md + .antigravity/skills/
 # Los perfiles NO son opcionales. Sin ellos, ~45 definiciones de herramienta entran
 # en contexto en CADA turno y anulan el ahorro que estos componentes traen.
 #
-# Orden de adopción recomendado: engram -> context7 -> rtk -> cbm.
+# Orden de adopción recomendado: engram -> context7 -> cbm.
 # Actívalos de uno en uno y mide antes de añadir el siguiente.
 
 [components.engram]
@@ -61,16 +61,6 @@ install_windows = "(no requiere instalación: se ejecuta con npx)"
 install_unix    = "(no requiere instalación: se ejecuta con npx)"
 mcp     = "npx -y @upstash/context7-mcp"
 notes   = "~2 herramientas. El componente más barato del stack."
-
-[components.rtk]
-enabled = true
-purpose = "comprime la salida de consola antes de que llegue al contexto"
-why     = "ataca tokens por una vía que ningún otro componente cubre"
-check   = "rtk --version"
-install_windows = "winget install rtk-ai.rtk"
-install_unix    = "curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh"
-awareness = "default"         # default (8 líneas) | high | full
-notes   = "Windows: winget. Linux/macOS: install.sh oficial del proyecto, a ~/.local/bin."
 
 [components.cbm]
 enabled = true

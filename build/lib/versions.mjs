@@ -11,7 +11,6 @@ import { execFileSync } from 'node:child_process';
 const SOURCES = {
 	engram: { kind: 'github', repo: 'Gentleman-Programming/engram' },
 	cbm: { kind: 'github', repo: 'DeusData/codebase-memory-mcp' },
-	rtk: { kind: 'github', repo: 'rtk-ai/rtk' },
 	context7: { kind: 'npm', pkg: '@upstash/context7-mcp' },
 };
 
@@ -64,7 +63,6 @@ async function latestNpm(pkg) {
 export function installedVersion(component) {
 	const probes = {
 		engram: ['engram', ['--version']],
-		rtk: ['rtk', ['--version']],
 		cbm: ['codebase-memory-mcp', ['--version']],
 		context7: null,
 	};

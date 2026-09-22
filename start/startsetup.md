@@ -42,9 +42,8 @@ re-proyecta a **todos** los repos donde hayas corrido `init`, porque los recuerd
 | [Node.js](https://nodejs.org) ≥ 20 | corre el CLI (`bin/rai.mjs`) — es la única dependencia dura | sí |
 | [Git](https://git-scm.com) | clonar el harness y que `update` haga `pull` | sí |
 | Go | compilar `engram` desde fuente | solo si activas `engram` |
-| `winget` (Windows) | instalar `rtk` | solo si lo activas en Windows |
 | PowerShell (Windows) | instalar `cbm` vía su `install.ps1` oficial, sin tocar disco (`iwr \| iex`) | solo si lo activas en Windows |
-| `curl` (Linux/macOS) | instalar `rtk` y `cbm` vía su `install.sh` | solo si los activas fuera de Windows |
+| `curl` (Linux/macOS) | instalar `cbm` vía su `install.sh` | solo si lo activas fuera de Windows |
 
 `rai doctor` te dice cuáles tienes y cuáles faltan — no hace falta adivinar.
 
@@ -53,7 +52,7 @@ re-proyecta a **todos** los repos donde hayas corrido `init`, porque los recuerd
 ## 3. Instalar — por sistema operativo
 
 El CLI es Node puro: el mismo `bin/rai.mjs` corre igual en los tres sistemas. Lo único que
-cambia es cómo se clona y qué instalador usan los componentes externos (`rtk`, `cbm`).
+cambia es cómo se clona y qué instalador usan los componentes externos (`cbm`).
 
 ### Windows (PowerShell)
 
@@ -94,7 +93,7 @@ corre `/onboard-repo` dentro del agente.
 
 ---
 
-## 4. Componentes externos (`engram`, `context7`, `rtk`, `cbm`)
+## 4. Componentes externos (`engram`, `context7`, `cbm`)
 
 **Importante — no son parte del harness, son herramientas de terceros que `init` puede instalar
 por ti si las activas.** Distinción de scope:
@@ -102,7 +101,7 @@ por ti si las activas.** Distinción de scope:
 | | Nivel | Dónde vive |
 |---|---|---|
 | El clon de `roymasoft-ai` | máquina | una sola vez, donde tú lo clonaste |
-| `engram`, `context7`, `rtk`, `cbm` (los binarios) | **máquina** | en tu `PATH` / `~/.local/bin`, no dentro de ningún repo |
+| `engram`, `context7`, `cbm` (los binarios) | **máquina** | en tu `PATH` / `~/.local/bin`, no dentro de ningún repo |
 | El registro de proyectos (`~/.rai/projects.json`) | máquina | tu carpeta de usuario, nunca en un repo de cliente |
 | La proyección (`CLAUDE.md`, `AGENTS.md`, `.rai/`, `.cursor/rules/`, …) | **por proyecto** | dentro de cada repo donde corriste `init` |
 | Las MCP del agente (registro de `engram mcp`, `context7`, etc.) | **máquina** (usualmente) | **manual, en terminal** — `init` te dice el comando exacto bajo "Next", pero no lo registra por ti |
@@ -112,12 +111,12 @@ propio clon del harness — como es un solo clon compartido por todos tus proyec
 componente ahí aplica a **todo** `init` futuro, no a un repo puntual.
 
 Todos vienen `enabled = false` a propósito. **Ya no hace falta editar `stack.toml` a mano**: `init`
-detecta los cuatro estén o no activos, los lista bajo "Not active yet" con su costo y propósito, y
+detecta los tres estén o no activos, los lista bajo "Not active yet" con su costo y propósito, y
 con una sola confirmación instala y activa los que aceptes. `cbm` es el más pesado — su nota lo dice
 en el propio prompt, así que decir que sí una vez no lo activa a ciegas. Si queda activo, `init`
 además indexa el repo actual contra el grafo en el momento — no hay que pedírselo al agente después.
 Si prefieres medir de a uno, di que no y vuelve a correr `init` cuando quieras el siguiente — orden
-recomendado: `engram` → `context7` → `rtk` → `cbm`.
+recomendado: `engram` → `context7` → `cbm`.
 
 `rai sync` te dice qué hay nuevo upstream de cada uno. **Solo reporta, no instala nada.**
 
@@ -132,8 +131,7 @@ claude mcp add context7 -- npx -y @upstash/context7-mcp
 ```
 
 El comando exacto para cada componente lo imprime `init` al final, bajo "Next" — cópialo de ahí en
-vez de adivinarlo. `rtk` no aparece nunca ahí porque no habla MCP (vive en la consola, no en el
-protocolo del agente).
+vez de adivinarlo.
 
 Dos cosas que confirmé revisando `~/.claude.json` en una máquina real:
 
@@ -153,7 +151,7 @@ MCP (archivo o UI propios) — `init` no lo automatiza para ninguno.
 |---|---|
 | `rai init [ruta]` | Pipeline completo: detectar → preguntar → instalar → proyectar → registrar |
 | `rai update` | `git pull` del harness + re-proyecta **todos** los repos registrados |
-| `rai sync` | Consulta versiones upstream de `engram`, `context7`, `rtk`, `cbm`. Solo reporta, no instala |
+| `rai sync` | Consulta versiones upstream de `engram`, `context7`, `cbm`. Solo reporta, no instala |
 | `rai doctor` | Diagnóstico read-only: entorno, agentes detectados, componentes, repos registrados, validación del harness |
 | `rai project [ruta]` | Solo la proyección (sin detectar componentes ni preguntar nada) |
 | `rai uninstall [ruta]` | Quita el harness **de ese proyecto** (no borra el clon) |
@@ -195,7 +193,7 @@ Sin argumento de ruta, `init`, `project` y `uninstall` usan el directorio actual
         node <harness>/bin/rai.mjs update
         → hace pull y re-proyecta TODOS los repos registrados de una vez
 
-4. Para saber si engram/rtk/cbm/context7 tienen versión nueva
+4. Para saber si engram/cbm/context7 tienen versión nueva
         node <harness>/bin/rai.mjs sync
         → solo reporta, decides tú qué tomar
 
@@ -223,16 +221,11 @@ quieras con `--agents claude,cursor` o `--all`.
 Estás corriéndolo sin terminal interactiva (por ejemplo desde un script o un hook). En ese caso
 `init` no pregunta — te avisa y sigue. Pasa `--yes` si quieres que instale sin confirmar.
 
-**Un componente (`rtk`, `cbm`) falla al instalar**
+**Un componente (`cbm`) falla al instalar**
 `init` reporta el comando exacto que intentó y el código de salida, y no bloquea el resto —
 instálalo a mano con el comando que te mostró y vuelve a correr `doctor` para confirmar.
 
-**En Windows, `rtk` usa `winget` y no lo tengo**
-Instala App Installer desde la Microsoft Store (trae `winget`), o instala `rtk` a mano siguiendo su
-propio README. `cbm` en Windows no depende de `winget` — corre el `install.ps1` oficial del proyecto
-directo por PowerShell.
-
-**En Linux/macOS, `rtk`/`cbm` fallan por falta de `curl`**
+**En Linux/macOS, `cbm` falla por falta de `curl`**
 Instálalo con tu gestor de paquetes (`apt install curl`, `brew install curl` — en macOS ya viene).
 
 **`cbm` queda activo pero mi repo no aparece indexado**

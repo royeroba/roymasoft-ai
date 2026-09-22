@@ -66,7 +66,7 @@ registra solo en Claude Code, así que ese paso 3 nunca hace falta para él ahí
 |---|---|
 | `rai init [ruta]` | Pipeline completo: detectar -> preguntar -> instalar -> proyectar -> registrar |
 | `rai update` | Actualiza el harness desde origin y **re-proyecta todos los repos registrados** |
-| `rai sync` | Consulta versiones upstream de engram, CBM, rtk y Context7. **Solo reporta** |
+| `rai sync` | Consulta versiones upstream de engram, CBM y Context7. **Solo reporta** |
 | `rai doctor` | Diagnostico read-only: entorno, agentes, componentes, repos, validacion |
 | `rai project [ruta]` | Solo la proyeccion, sin nada mas |
 | `rai uninstall [ruta]` | Quita el harness **de ese proyecto**. `--all` para todos los registrados |
@@ -93,7 +93,7 @@ e instala. No hace falta editar `stack.toml` a mano; decir que no ahi los deja c
 lo dice explicitamente en el propio prompt -- no se activa a ciegas solo por decir "si" una vez. Si
 queda activo, `init` tambien indexa el repo actual contra el grafo en el momento -- no hace falta
 pedirselo al agente despues. Orden recomendado si vas a medir de a uno: `engram` -> `context7` ->
-`rtk` -> `cbm`.
+`cbm`.
 
 Activar un componente **no lo conecta con tu agente todavia** -- eso es un paso aparte, manual, y
 por maquina (no por proyecto): `init` te muestra el comando exacto bajo "Next"
@@ -124,7 +124,7 @@ Lo dificil no es borrar, es **no borrar lo que no es tuyo**:
 | `PROJECT.md` y `specs/` | **No se tocan** — son del proyecto, no del harness |
 
 Deja a proposito, y lo dice: el clone del harness, el registro, los componentes externos
-(engram, rtk, cbm son de terceros) y las registraciones MCP de tu agente.
+(engram, cbm son de terceros) y las registraciones MCP de tu agente.
 
 Siempre pide confirmacion, salvo `--yes`.
 
