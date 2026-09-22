@@ -12,59 +12,10 @@
  * defeats the point.
  */
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readStdin, parsePayload, readTranscriptLines, parseEntry, entryText } from './lib/transcript.mjs';
 
 const DECISION_SIGNALS = /\b(decid[ií]|arregl[ée]|fix(ed|ing)?|root cause|discovered|descubr|convention|bug fix|gotcha)\b/i;
 const MEM_SAVE_TOOL = /mem_save/;
-
-function readStdin() {
-	try {
-		return readFileSync(0, 'utf8');
-	} catch {
-		return '';
-	}
-}
-
-function parsePayload(raw) {
-	try {
-		return JSON.parse(raw);
-	} catch {
-		return {};
-	}
-}
-
-/** Reads the transcript's recent lines. JSONL, one message per line — best-effort, never throws. */
-function readRecentTranscriptLines(path, maxLines = 60) {
-	try {
-		if (!path || !existsSync(path)) return [];
-		const text = readFileSync(path, 'utf8');
-		const lines = text.split('\n').filter((l) => l.trim());
-		return lines.slice(-maxLines);
-	} catch {
-		return [];
-	}
-}
-
-/** Best-effort text extraction across whatever shape a transcript entry turns out to have. */
-function entryText(entry) {
-	try {
-		const content = entry?.message?.content;
-		if (typeof content === 'string') return content;
-		if (Array.isArray(content)) {
-			return content
-				.map((block) => {
-					if (typeof block === 'string') return block;
-					if (block?.type === 'text') return block.text ?? '';
-					if (block?.type === 'tool_use') return block.name ?? '';
-					return '';
-				})
-				.join(' ');
-		}
-	} catch {
-		// fall through
-	}
-	return '';
-}
 
 function main() {
 	const payload = parsePayload(readStdin());
@@ -75,19 +26,15 @@ function main() {
 		return;
 	}
 
-	const lines = readRecentTranscriptLines(payload.transcript_path);
+	const lines = readTranscriptLines(payload.transcript_path, 60);
 	if (!lines.length) return;
 
 	let sawDecisionSignal = false;
 	let sawMemSave = false;
 
 	for (const line of lines) {
-		let entry;
-		try {
-			entry = JSON.parse(line);
-		} catch {
-			continue;
-		}
+		const entry = parseEntry(line);
+		if (!entry) continue;
 		const text = entryText(entry);
 		if (MEM_SAVE_TOOL.test(text)) sawMemSave = true;
 		if (DECISION_SIGNALS.test(text)) sawDecisionSignal = true;

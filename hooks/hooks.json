@@ -1,5 +1,5 @@
 {
-  "description": "roymasoft-ai — injects project context at session start, after compaction, nudges the search order on prompts, and nudges proactive memory saves before stopping. Fail-open: any error exits 0 and injects nothing.",
+  "description": "roymasoft-ai — injects project context at session start, after compaction, nudges the search order on prompts, gates the first code edit and spec approval on real evidence, and blocks stopping without proactive memory saves or a real auditor delegation. Fail-open: any error exits 0 and allows/injects nothing.",
   "hooks": {
     "SessionStart": [
       {
@@ -26,6 +26,30 @@
         ]
       }
     ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','pretooluse-search-gate.mjs')).href)})().catch(()=>{})\"",
+            "timeout": 10,
+            "statusMessage": "Checking search order before this edit..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','pretooluse-spec-approval-gate.mjs')).href)})().catch(()=>{})\"",
+            "timeout": 10,
+            "statusMessage": "Checking spec approval evidence..."
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
@@ -34,6 +58,12 @@
             "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','stop-memory-check.mjs')).href)})().catch(()=>{})\"",
             "timeout": 10,
             "statusMessage": "Checking for unsaved decisions..."
+          },
+          {
+            "type": "command",
+            "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','stop-spec-impl-gate.mjs')).href)})().catch(()=>{})\"",
+            "timeout": 10,
+            "statusMessage": "Checking for a real auditor delegation..."
           }
         ]
       }
