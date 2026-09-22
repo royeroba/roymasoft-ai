@@ -118,7 +118,8 @@ export function plan(target, harness) {
 	{
 		const text = readIf(join(target, 'CLAUDE.md'));
 		if (text !== null) {
-			if (text.trim() === 'AGENTS.md') {
+			// `AGENTS.md` (no `@`) was the pointer before the `@`-import fix; `@AGENTS.md` is current.
+			if (text.trim() === 'AGENTS.md' || text.trim() === '@AGENTS.md') {
 				remove.push({ path: 'CLAUDE.md', kind: 'file' });
 			} else if (text.includes(BLOCK_START) && text.includes(BLOCK_END)) {
 				const before = text.slice(0, text.indexOf(BLOCK_START));
