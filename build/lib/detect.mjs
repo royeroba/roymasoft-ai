@@ -63,7 +63,6 @@ const RUNTIME_PROBES = [
 	{ id: 'node', bin: 'node', args: ['--version'], required: true, why: 'the harness itself' },
 	{ id: 'git', bin: 'git', args: ['--version'], required: true, why: 'projection and update' },
 	{ id: 'go', bin: 'go', args: ['version'], required: false, why: 'building engram from source' },
-	{ id: 'winget', bin: 'winget', args: ['--version'], required: false, why: 'installing rtk and cbm on Windows' },
 ];
 
 function onPath(bin) {

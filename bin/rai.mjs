@@ -378,7 +378,7 @@ ${c.bold('roymasoft-ai uninstall')}${all ? c.dim(' — every registered reposito
 ${c.bold('Left in place, on purpose')}`);
 	step(`the harness clone itself — delete ${c.dim(HARNESS)} by hand if you want it gone`);
 	step(`the registry at ${c.dim(registry.registryPath())}`);
-	step('external components (engram, rtk, cbm) — they are third-party tools you may still use');
+	step('external components (engram, cbm) — they are third-party tools you may still use');
 	step('MCP registrations in your agents — remove them with your agent own command');
 	if (!all) step(`PROJECT.md and specs/ — yours, not the harness's`);
 	console.log('');
