@@ -1,7 +1,7 @@
 {
   "name": "roymasoft-ai",
   "description": "Mi harness de IA para Claude Code: flujos de trabajo, memoria y exploración de código.",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "author": {
     "name": "Anibal Royero"
   },
