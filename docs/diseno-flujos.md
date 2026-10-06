@@ -120,7 +120,7 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 - Ambas validan que el plugin o MCP exista (si no, piden el texto o capturas y lo marcan como contexto manual), solo leen, analizan lo que traen y preguntan los huecos con opciones cerradas.
 - `/consult-figma-roy` además cruza los nodos con el proyecto: tokens, componentes existentes, responsive y estados, apoyándose en las skills de estilos que existan (del proyecto, del plugin o globales). Si no existe ninguna, valida contra el código y lo dice.
 - Un ticket que enlaza Figma ofrece encadenar `/consult-figma-roy`. `/create-pr-roy` reutiliza el contexto del ticket.
-- Pendiente: skill de CSS y front del plugin (depende del stack del cliente).
+- `styles-roy` (CSS/SCSS/Sass con BEM, CSS moderno, Tailwind al día, responsive validado contra los breakpoints del proyecto) es la skill de estilos del plugin: la usan `/hu-roy`, `/spec-roy` y `/consult-figma-roy`. Es un despachador con `references/` (bem, modern-css, tailwind, responsive) y detecta el enfoque del proyecto sin suponerlo.
 
 ## 12. Lo que no se toma
 

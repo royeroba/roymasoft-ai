@@ -33,7 +33,7 @@ Take the file identifier and the node identifier from the URL, as the tool asks 
 ## 3. Validate against the project
 
 1. **Conventions.** Read `CLAUDE.md`, `AGENTS.md` or `README.md`, `package.json` and the styling configuration (CSS tokens, theme, `tailwind.config`, SCSS). Using the rules' search order (memory, CodeGraph, grep).
-2. **Styling skills.** Look for an applicable CSS, styles or design system skill: from the project (`.claude/skills`), from this plugin, or a global one such as `design:design-system`. If it exists, **use it to validate**. If it does not exist, validate against the code and say so.
+2. **Styling skills.** Use `styles-roy` from this plugin to validate (approach, modern CSS, BEM or Tailwind, responsive). Also look for a project skill (`.claude/skills`) or a global one such as `design:design-system`. If none applies, validate against the code and say so.
 3. **Tokens.** Match the design's colors, typography, spacing, radii and shadows with the project's variables. Each one is: **matches**, **close** (say which and the difference) or **does not exist**. Do not hardcode values without warning.
 4. **Components.** Match every relevant node with the components that already exist (find them with CodeGraph): **reuse**, **extend** or **new**.
 5. **Responsive.** Get the project's breakpoints. See which sizes the design has (mobile, tablet, desktop). Translate auto-layout and constraints (fill, hug, wrap) to flex or grid. Check long content and the states: hover, focus, disabled, loading, error and empty.

@@ -45,7 +45,7 @@ With the approval, write `specs/NN-slug.md` (next number, two digits; slug in ke
 
 Before the first phase, the **base** (verification.md §1) in the `## Log`. For each phase:
 
-1. TDD if there is a stack (verification.md §2), minimal change, only what the phase says.
+1. TDD if there is a stack (verification.md §2), minimal change, only what the phase says. If the phase touches styles, follow `styles-roy`.
 2. Tick its checkbox **only with observed evidence** (command and result) and note the evidence in the `## Log`.
 3. Summarize what you did and which files you touched, and offer E2E if the phase touches UI.
 4. Say "Phase N ready" and wait for "continue" (or the equivalent in natural language, in the user's language). The human reviews at each phase.

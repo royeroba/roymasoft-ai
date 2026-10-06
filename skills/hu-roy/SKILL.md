@@ -32,7 +32,7 @@ Per the **Changes** rule: small if it is understood, its risk is contained and i
 
 1. **Base** (verification.md §1).
 2. **TDD if there is a stack** (verification.md §2).
-3. **Minimal change.** Implement what was agreed and nothing more. Whatever falls outside scope is noted, not done.
+3. **Minimal change.** Implement what was agreed and nothing more. Whatever falls outside scope is noted, not done. If the change touches CSS, SCSS, Sass or Tailwind classes, follow `styles-roy`.
 4. **Show the diff**: files touched and what you did. Wait for the go-ahead before moving on to anything else.
 5. **Closing** (verification.md §3): `Riesgo:`, what was not verified, `rdd-roy` review and E2E offer.
 
