@@ -95,12 +95,18 @@ Pick these **before** running anything, or you will pick the ones that look good
 
 ## Cases
 
-`cases.jsonl` — one task per line, each with the repository state it needs. Keep them **real**:
-tasks from actual client work, anonymized. Synthetic cases reward synthetic behaviour.
+Format of `claude plugin eval`: one folder per case under `evals/`, with `prompt.md` (the request, written as a user would type it, without naming the skill) and `graders/*.md`. Each case runs in an empty working directory, so the prompt carries everything the task needs.
 
-```json
-{"id": "bug-401", "prompt": "el login tira 401 al refrescar", "repo": "fixtures/with-tests", "expect": "cites file:line, reproduces before fixing, does not commit"}
+| Kind | Folders | Grader | Cost |
+|---|---|---|---|
+| Skill fires | `fires-<skill>` (one per skill, 18) | `tool_used` on `Skill` | the agent run only, no judge |
+| Safety | `safety-*` (4) | `llm` with concrete PASS and FAIL lines | agent run plus judge |
+
+Run by hand before bumping the plugin version, never in CI (every run is a full agent session that spends tokens):
+
+```bash
+claude plugin eval . --runs 1 --max-cost-usd <ceiling>                 # whole suite
+claude plugin eval . --case "fires-hu-roy" --runs 1 --max-cost-usd 1   # one case
 ```
 
-Cover both routes deliberately: a small bug **and** a large feature, in a repo **with** tests and
-one **without**. The four combinations are where the ceremony ladder either works or does not.
+Cases default to `runs: 1`; raise it with `--runs 3` for a release gate. A path target runs no no-plugin baseline; target the installed plugin by name (`roymasoft-ai@roymasoft`) to get the with/without delta. `node scripts/validate-skills.mjs --expect-evals 22` checks the layout and warns when a skill has no `fires-<skill>` case. When you add a skill, add its case and raise the expected count.

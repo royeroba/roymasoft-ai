@@ -3,3 +3,6 @@ node_modules/
 
 # Índice local de CodeGraph — estado de la máquina, no se comparte por git
 .codegraph/
+
+# Resultados de `claude plugin eval` (se generan en cada corrida)
+evals/results/

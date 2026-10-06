@@ -2,14 +2,17 @@
 /**
  * Validates the objective rules of the plugin's skills (SPEC 01).
  *
- * Usage: node scripts/validate-skills.mjs [--root <skills-dir>] [--evals <cases.jsonl>] [--expect-evals <n>]
+ * Usage: node scripts/validate-skills.mjs [--root <skills-dir>] [--evals <evals-dir>] [--expect-evals <n>]
  *
  * All skills: name = folder, kebab-case ending in `-roy`, description <= 1024 chars, third person,
  * has a `Trigger:`, SKILL.md < 200 lines, no Spanish text.
  * Engineering skills (ENGINEERING_SKILLS): plus `references/` one level deep, each reference <= 100 lines,
  * every non-checklist reference has a `Last verified: YYYY-MM-DD` line and every `##` section a `Source: <URL>` line, and `references/checklist.md`
  * has at least 5 `- [ ]` items.
- * Exit code 1 when any error is found. Warnings (version-like numbers in references) do not fail.
+ * Evals (`claude plugin eval` layout): each folder under evals/ (except results/) has a non-empty `prompt.md`
+ * and `graders/` with at least one .md grader whose frontmatter `type` is a known grader type.
+ * Warns when a skill has no `fires-<skill>` case.
+ * Exit code 1 when any error is found. Warnings (version-like numbers in references, skills without an eval) do not fail.
  */
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -22,7 +25,7 @@ const opt = (name, fallback) => {
   return i >= 0 ? args[i + 1] : fallback;
 };
 const ROOT = opt('--root', join(HERE, '..', 'skills'));
-const EVALS = opt('--evals', join(HERE, '..', 'evals', 'cases.jsonl'));
+const EVALS = opt('--evals', join(HERE, '..', 'evals'));
 const EXPECT_EVALS = opt('--expect-evals', null);
 
 const ENGINEERING_SKILLS = new Set([
@@ -105,24 +108,36 @@ if (!existsSync(ROOT) || !statSync(ROOT).isDirectory()) {
 const skillDirs = readdirSync(ROOT).filter((d) => !d.startsWith('_') && !d.startsWith('.') && statSync(join(ROOT, d)).isDirectory());
 for (const dir of skillDirs) checkSkill(dir);
 const evalsRequested = args.includes('--evals') || EXPECT_EVALS !== null;
-if (!existsSync(EVALS)) {
-  if (evalsRequested) err('evals', `file not found: ${EVALS}`);
-} else {
-  const rows = readFileSync(EVALS, 'utf8').replace(/\r\n/g, '\n').split('\n');
+const GRADER_TYPES = new Set(['regex', 'tool_used', 'tool_order', 'file_exists', 'llm', 'baseline']);
+
+const promptBody = (text) => text.replace(/\r\n/g, '\n').replace(/^---\n[\s\S]*?\n---\n/, '').trim();
+
+function checkEvals() {
+  if (!existsSync(EVALS) || !statSync(EVALS).isDirectory()) {
+    if (evalsRequested) err('evals', `folder not found: ${EVALS}`);
+    return;
+  }
+  const cases = readdirSync(EVALS).filter((d) => d !== 'results' && !d.startsWith('.') && statSync(join(EVALS, d)).isDirectory());
   let valid = 0;
-  const ids = [];
-  rows.forEach((row, i) => {
-    if (!row.trim()) return;
-    try {
-      const o = JSON.parse(row);
-      for (const k of ['id', 'route', 'repo', 'prompt', 'expect']) if (typeof o[k] !== 'string' || !o[k]) throw new Error(`missing "${k}"`);
-      valid++;
-      ids.push(o.id);
-    } catch (e) { err(`evals/cases.jsonl:${i + 1}`, e.message); }
-  });
-  if (new Set(ids).size !== ids.length) err('evals/cases.jsonl', 'duplicate ids');
-  if (EXPECT_EVALS !== null && valid !== Number(EXPECT_EVALS)) err('evals/cases.jsonl', `expected ${EXPECT_EVALS} valid cases, found ${valid}`);
+  for (const c of cases) {
+    const where = `evals/${c}`;
+    const before = errors.length;
+    const promptFile = join(EVALS, c, 'prompt.md');
+    if (!existsSync(promptFile)) err(where, 'missing prompt.md');
+    else if (!promptBody(readFileSync(promptFile, 'utf8'))) err(where, 'prompt.md has no prompt body');
+    const gradersDir = join(EVALS, c, 'graders');
+    const graders = existsSync(gradersDir) ? readdirSync(gradersDir).filter((n) => n.endsWith('.md')) : [];
+    if (graders.length === 0) err(where, 'needs at least one graders/*.md');
+    for (const g of graders) {
+      const type = frontmatter(readFileSync(join(gradersDir, g), 'utf8'))?.type;
+      if (!GRADER_TYPES.has(type)) err(`${where}/graders/${g}`, `frontmatter type "${type}" must be one of ${[...GRADER_TYPES].join(', ')}`);
+    }
+    if (errors.length === before) valid++;
+  }
+  if (EXPECT_EVALS !== null && valid !== Number(EXPECT_EVALS)) err('evals', `expected ${EXPECT_EVALS} valid cases, found ${valid}`);
+  if (evalsRequested) for (const s of skillDirs) if (!cases.includes(`fires-${s}`)) warn('evals', `skill ${s} has no fires-${s} case`);
 }
+checkEvals();
 
 for (const w of warnings) console.warn(`warn  ${w}`);
 if (errors.length) {

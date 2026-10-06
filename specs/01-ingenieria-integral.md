@@ -1,6 +1,6 @@
 # SPEC 01 — Skills y reglas de ingeniería integral (8 skills)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** ninguno
 > **Fecha:** 2026-10-06
 > **Objetivo:** Añadir al plugin 8 skills (testing, security, typescript, database, frontend, backend, performance, delivery) con checklists verificables, una regla mínima de enrutado, un hook de secretos y evals, basados solo en fuentes oficiales ya verificadas.
@@ -119,3 +119,5 @@ Cada fase deja el plugin funcionando, sube versión y se detiene para tu revisi�
 - 2026-10-06 — Fase 4 hecha (0.12.0): `delivery-roy` (docker, ci, checklist); `hooks/pretooluse-secrets.mjs` registrado en `hooks.json` (grupo Edit|Write|MultiEdit) y `scripts/test-secrets-hook.mjs` (21 casos); 3 casos de evals (36); sección 11d en `docs/diseno-flujos.md`; "Dominios" enruta a las 8 skills y a `styles-roy` (7.196 bytes). Evidencia: hook en RED (10 FAIL, no existía) y GREEN; `node scripts/validate-skills.mjs --expect-evals 36` → OK (18 skills); `claude plugin validate .` → pasa; `claude plugin update` → 0.12.0 con las 8 skills y el hook en la caché.
 - 2026-10-06 — Revisión `rdd-roy` de la fase 4: primera pasada NO PASA (1 bloqueo: la llave de Google que termina en `-` no se detectaba por el `\b` final). Corregido en un lote (lookahead negativo) junto con `ENCRYPTED PRIVATE KEY`, tokens `xapp-` y `xoxe-`, 11 pruebas nuevas (todas con RED previo para los 3 casos que fallaban) y la consulta a Context7 en `delivery-roy`. Segunda pasada acotada: PASA. Avisos que quedan: una llave de Google pegada a `-` o a `_`/alfanumérico por delante no se detecta (limitación de los límites de palabra); `FROM node:<exact-version>` es un placeholder; falta cubrir Slack/Stripe en payloads de Bash (el hook solo mira Write/Edit/MultiEdit).
 - 2026-10-06 — Todas las fases hechas. Criterios del spec verificados: 8 carpetas con `SKILL.md` + `references/` + `checklist.md`; validador OK; hook con 21 casos OK; evals 36 válidos; manifiestos 0.12.0; plugin actualizado. Pendiente del usuario: reiniciar Claude Code y decidir si el estado pasa a `Implementado`.
+- 2026-10-06 — el usuario reinició Claude Code (y la PC) y aprobó el cierre: estado `Implementado`.
+- 2026-10-06 — nota posterior (0.13.0): los evals pasaron de `evals/cases.jsonl` (36 casos propios, sin runner) al formato de `claude plugin eval` (22 casos: 18 `fires-<skill>` y 4 `safety-*`). Las menciones a `cases.jsonl` de este spec son históricas.

@@ -37,6 +37,8 @@ Esta regla se aplica con tu criterio en cada sesión y prompt, no como un guion 
 
 **Dominios.** Si el cambio toca uno de estos temas, aplica su skill antes de escribir código: tests → `testing-roy`; seguridad (autenticación, autorización, entradas de usuario, consultas, secretos, subidas, dependencias, cabeceras) → `security-roy`; estilos → `styles-roy`; TypeScript → `typescript-roy`; bases de datos (esquemas, consultas, índices, migraciones; SQL y NoSQL) → `database-roy`; componentes React o Vue, accesibilidad y rendimiento de front → `frontend-roy`; endpoints, servicios Node y observabilidad → `backend-roy`; cualquier pedido de rendimiento → `performance-roy` (medir antes de optimizar); Dockerfile, CI y GitHub Actions → `delivery-roy`. Todo dato externo es no confiable: valídalo en el borde. Nunca escribas ni registres secretos, tokens o datos personales.
 
+**Diseño.** Sigue las convenciones del código existente y no refactorices lo que no te pidieron. DRY: una sola fuente para cada regla de negocio o dato; no unifiques código que solo se parece y puede cambiar por motivos distintos. SOLID: una responsabilidad por módulo; depende de una abstracción solo si ya hay dos implementaciones reales. Si la regla choca con la convención del repo, gana el repo.
+
 **Autonomía.** Haz el trabajo que te corresponde. Pregunta solo lo que el código no puede responder y, cuando preguntes, da opciones cerradas. Preguntar no sustituye investigar: pregunta después de haber buscado, no en lugar de hacerlo.
 
 **Memoria por cliente.** El proyecto de memoria lo resuelve el remote de git. No mezcles memoria entre proyectos salvo petición explícita del usuario.

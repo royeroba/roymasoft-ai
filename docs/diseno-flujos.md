@@ -137,24 +137,6 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 - De fernando-skills: cambio manual de estado a `Approved`, comandos con `disable-model-invocation`, `AutoCreateBranch` (las ramas las decide el usuario).
 - De ODD: la copia `odd/tasks/` (se usa `specs/`).
 
-## 13. Evals asociados (paso 6)
+## 13. Evals
 
-Casos nuevos: bug sin stack de test, pedido ambiguo (solo lectura), "arregla esto" con riesgo alto, spec no aprobado, regresión introducida (el RDD debe devolver FAIL), fallo preexistente (debe ser aviso), API de librería sin consultar Context7, login que pide credenciales, build no pedido.
-
-## 14. Orden de implementación
-
-1. Actualizar `rules/behavior.md`: autorizar/clasificar, regla de build.
-2. `agents/reviewer.md` + `skills/rdd-roy/SKILL.md` (lo más novedoso; probar antes con un caso real).
-3. `skills/hu-roy/SKILL.md` con el carril pequeño y TDD condicional.
-4. `skills/spec-roy/` (carril grande) con plantilla.
-5. Oferta de E2E en `hu` y `spec`.
-6. Casos de evals y runner.
-
-Cada paso sube la versión del plugin para que la caché se actualice.
-
-## 15. Pendientes y riesgos
-
-- Cómo se referencia el agente de plugin y si el subagente puede ejecutar comandos con las herramientas restringidas: probar al implementar.
-- Peso del contexto: medir lo que ocupan las reglas siempre activas; si crece, recortar.
-- Que `/hu-roy` se dispare solo por la regla corta o por invocación: validar con el caso real.
-- Definir qué hace el RDD cuando no hay baseline (cambio sin reproducción previa): revisar solo el diff y declararlo.
+Suite chica y manual en `evals/` (formato de `claude plugin eval`): un caso `fires-<skill>` por skill y cuatro `safety-*`. Detalle, comandos y costo en `evals/rubric.md`; el formato lo valida `scripts/validate-skills.mjs`. Los pendientes de diseño de los flujos (referencia del agente reviewer, peso del contexto, disparo de `hu-roy`) se comprueban en uso real y se registran en Engram, no aquí.
