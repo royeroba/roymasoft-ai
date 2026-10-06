@@ -1,0 +1,18 @@
+{
+  "description": "roymasoft-ai: instala/cablea Engram y aplica su protocolo (estilo gentle-ai)",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/engram-bootstrap.mjs\"",
+            "timeout": 90,
+            "statusMessage": "Verificando Engram..."
+          }
+        ]
+      }
+    ]
+  }
+}
