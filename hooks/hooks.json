@@ -1,5 +1,5 @@
 {
-  "description": "roymasoft-ai: instala/cablea Engram y aplica su protocolo (estilo gentle-ai)",
+  "description": "roymasoft-ai: instala/cablea Engram y CodeGraph y aplica sus reglas (estilo gentle-ai)",
   "hooks": {
     "SessionStart": [
       {
@@ -7,9 +7,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/engram-bootstrap.mjs\"",
-            "timeout": 90,
-            "statusMessage": "Verificando Engram..."
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/bootstrap.mjs\"",
+            "timeout": 300,
+            "statusMessage": "Verificando Engram y CodeGraph..."
           }
         ]
       }

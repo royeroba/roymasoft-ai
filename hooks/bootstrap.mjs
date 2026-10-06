@@ -1,16 +1,17 @@
 #!/usr/bin/env node
-// SessionStart: deja Engram instalado y cableado como lo hace gentle-ai,
-// e inyecta su protocolo slim como contexto. Idempotente y fail-open (siempre exit 0).
-//   1. Binario `engram` (descarga verificada con checksums.txt si falta)
-//   2. MCP de usuario `engram mcp --tools=agent` en ~/.claude.json
-//   3. Plugin `engram@engram` (hooks + protocolo completo)
-//   4. stdout = reglas de rules/engram-protocol.md (+ avisos de lo que se instaló)
-import { spawnSync } from 'node:child_process';
+// SessionStart: deja Engram y CodeGraph instalados y cableados como lo hace gentle-ai,
+// e inyecta sus reglas como contexto. Idempotente y fail-open (siempre exit 0).
+// Todo en un solo proceso y en orden: dos hooks en paralelo se pisarían al editar ~/.claude.json.
+//   Engram:    binario (descarga verificada o go install) -> MCP de usuario -> plugin engram@engram
+//   CodeGraph: CLI (npm) -> `codegraph install` (MCP + hook + permiso) -> ver ./codegraph.mjs
+//   stdout =   avisos de lo instalado + rules/engram-protocol.md + rules/codegraph-guidance.md
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync, copyFileSync } from 'node:fs';
 import { homedir, tmpdir, platform, arch } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { codegraphGuidance, ensureCodegraph } from './codegraph.mjs';
+import { run as spawn } from './run.mjs';
 
 const ROOT = process.env.CLAUDE_PLUGIN_ROOT || join(dirname(fileURLToPath(import.meta.url)), '..');
 const WIN = platform() === 'win32';
@@ -21,8 +22,7 @@ const INSTALL_DIR = process.env.RAI_ENGRAM_DIR
 const REPO = 'Gentleman-Programming/engram';
 const notes = [];
 
-const run = (cmd, args, opts = {}) =>
-  spawnSync(cmd, args, { encoding: 'utf8', timeout: 60_000, shell: WIN && /\.(cmd|bat)$/i.test(cmd), ...opts });
+const run = (cmd, args, opts = {}) => spawn(cmd, args, opts);
 
 function findEngram() {
   const onPath = run('engram', ['version'], { timeout: 5_000 });
@@ -139,6 +139,12 @@ try {
   notes.push(`Bootstrap de Engram incompleto: ${err.message}`);
 }
 
-if (notes.length) console.log(`## roymasoft-ai: configuración de Engram\n${notes.map(n => `- ${n}`).join('\n')}\n`);
+let codegraphReady = false;
+try { codegraphReady = ensureCodegraph(notes); }
+catch (err) { notes.push(`Bootstrap de CodeGraph incompleto: ${err.message}`); }
+
+if (notes.length) console.log(`## roymasoft-ai: configuración de Engram y CodeGraph\n${notes.map(n => `- ${n}`).join('\n')}\n`);
 try { console.log(readFileSync(join(ROOT, 'rules', 'engram-protocol.md'), 'utf8')); } catch { /* sin reglas: no bloquear */ }
+// Sin CLI no se inyectan las reglas de CodeGraph: mandarían al agente a una herramienta inexistente.
+if (codegraphReady) { try { console.log(codegraphGuidance(ROOT)); } catch { /* idem */ } }
 process.exit(0);
