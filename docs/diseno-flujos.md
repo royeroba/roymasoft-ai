@@ -106,11 +106,12 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 
 ## 11b. Modelos (sugerencia, el humano elige)
 
+- **Por defecto:** `sonnet` al delegar. La distribución de abajo es solo una sugerencia que se ofrece si el usuario quiere activarla; la decisión es suya y el agente no la activa por su cuenta.
 - **opus:** planear, razonar y decidir (preguntas y plan del carril grande, el RDD).
 - **sonnet:** ejecutar (implementar, explorar, correr comandos).
 - **haiku:** tareas triviales que no tocan lógica de negocio (textos, descripciones de PR, formato).
 - Se usan los **alias** (`opus`, `sonnet`, `haiku`), que apuntan a la versión disponible, no ids con versión.
-- El `reviewer` declara `model: opus`. Al delegar se puede pasar otro modelo (por ejemplo sonnet en riesgo medio) y esa elección tiene prioridad sobre la del agente. Si el usuario elige un modelo, se usa ese.
+- El `reviewer` declara `model: sonnet`. Si el usuario activa la distribución sugerida o elige otro modelo (por ejemplo opus), se pasa al delegar y esa elección tiene prioridad sobre la del agente.
 - El modelo de la sesión principal lo elige el usuario; el plugin no lo cambia.
 
 ## 12. Lo que no se toma

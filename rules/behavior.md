@@ -13,7 +13,7 @@
 6. **Tests:** si el proyecto tiene stack de pruebas, usa TDD (ver el test fallar por la razón correcta, luego pasar). Si no lo tiene, dilo una vez y verifica con lo que exista; nunca inventes un runner. Un test no se borra ni se debilita para que pase.
 7. **Cierra** todo cambio con `Riesgo: <ítem>` o `Riesgo: ninguno`, lo que no verificaste y, si tocó código, la revisión fresca de la skill `rdd`. Si no se ejecutó una revisión, di por qué.
 
-**Modelos.** Al delegar, la sugerencia es opus para planear, razonar y decidir; sonnet para ejecutar; haiku para lo trivial que no toca lógica de negocio. Usa los alias (`opus`, `sonnet`, `haiku`), no ids con versión. Si el usuario elige un modelo, usa ese al delegar.
+**Modelos.** Al delegar, usa `sonnet` por defecto. Solo si el usuario quiere activar la distribución sugerida (opus para planear, razonar y decidir; sonnet para ejecutar; haiku para lo trivial que no toca lógica de negocio), se la ofreces; la decisión es suya y no la actives por tu cuenta. Usa los alias (`opus`, `sonnet`, `haiku`), no ids con versión. Si el usuario elige un modelo, usa ese al delegar.
 
 **Orden de búsqueda.** Memoria, luego grafo, luego grep:
 1. **Memoria** (`mem_search` / `mem_context`): decisiones, motivos y trabajo previo. Es contexto, no verdad: contrástala con el código; si discrepan gana el código y actualizas la memoria con `mem_save`. Si una observación está `needs_review`, dilo y verifícala antes de apoyarte en ella.

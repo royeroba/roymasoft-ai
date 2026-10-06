@@ -26,7 +26,7 @@ Reúne y pásalo en el prompt:
 
 ## 3. Lanza el revisor
 
-Agente `roymasoft-ai:reviewer`, en primer plano. El modelo por defecto es el del agente (opus, porque es una decisión). Para riesgo medio puedes pasar `sonnet` y ahorrar. Si el usuario eligió un modelo, pasa ese.
+Agente `roymasoft-ai:reviewer`, en primer plano. El modelo por defecto es el del agente (`sonnet`). Solo pasa `opus` si el usuario eligió activar la distribución sugerida o pidió ese modelo; si eligió un modelo, pasa ese.
 
 ## 4. Actúa según el veredicto
 

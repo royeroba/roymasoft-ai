@@ -2,7 +2,7 @@
 name: reviewer
 description: Revisión fresca (RDD) de un cambio terminado. Compara contra la evidencia base y devuelve PASA o NO PASA con tabla de hallazgos. Solo lee y corre los comandos autorizados; nunca edita. Úsalo al cerrar un cambio con código, vía la skill rdd.
 tools: Read, Grep, Glob, Bash
-model: opus
+model: sonnet
 ---
 
 # Reviewer — revisión fresca
