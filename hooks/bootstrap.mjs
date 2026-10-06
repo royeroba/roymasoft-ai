@@ -4,7 +4,7 @@
 // Todo en un solo proceso y en orden: dos hooks en paralelo se pisarían al editar ~/.claude.json.
 //   Engram:    binario (descarga verificada o go install) -> MCP de usuario -> plugin engram@engram
 //   CodeGraph: CLI (npm) -> `codegraph install` (MCP + hook + permiso) -> ver ./codegraph.mjs
-//   stdout =   avisos de lo instalado + rules/engram-protocol.md + rules/codegraph-guidance.md
+//   stdout =   avisos de lo instalado + rules/behavior.md + rules/engram-protocol.md + rules/codegraph-guidance.md
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync, copyFileSync } from 'node:fs';
 import { homedir, tmpdir, platform, arch } from 'node:os';
@@ -144,7 +144,9 @@ try { codegraphReady = ensureCodegraph(notes); }
 catch (err) { notes.push(`Bootstrap de CodeGraph incompleto: ${err.message}`); }
 
 if (notes.length) console.log(`## roymasoft-ai: configuración de Engram y CodeGraph\n${notes.map(n => `- ${n}`).join('\n')}\n`);
-try { console.log(readFileSync(join(ROOT, 'rules', 'engram-protocol.md'), 'utf8')); } catch { /* sin reglas: no bloquear */ }
+for (const rules of ['behavior.md', 'engram-protocol.md']) {
+  try { console.log(readFileSync(join(ROOT, 'rules', rules), 'utf8')); } catch { /* sin reglas: no bloquear */ }
+}
 // Sin CLI no se inyectan las reglas de CodeGraph: mandarían al agente a una herramienta inexistente.
 if (codegraphReady) { try { console.log(codegraphGuidance(ROOT)); } catch { /* idem */ } }
 process.exit(0);

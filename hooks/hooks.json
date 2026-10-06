@@ -1,5 +1,5 @@
 {
-  "description": "roymasoft-ai: instala/cablea Engram y CodeGraph y aplica sus reglas (estilo gentle-ai)",
+  "description": "roymasoft-ai: instala/cablea Engram y CodeGraph y aplica sus reglas (estilo gentle-ai); bloquea commit/stage y exige memoria + grafo antes del primer edit de código",
   "hooks": {
     "SessionStart": [
       {
@@ -10,6 +10,29 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/bootstrap.mjs\"",
             "timeout": 300,
             "statusMessage": "Verificando Engram y CodeGraph..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell|mcp__.*__git_(add|commit|commit_composer)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pretooluse-no-commit.mjs\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pretooluse-search-gate.mjs\"",
+            "timeout": 10,
+            "statusMessage": "Verificando orden de búsqueda..."
           }
         ]
       }
