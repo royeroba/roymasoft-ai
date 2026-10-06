@@ -1,0 +1,11 @@
+{
+  "name": "roymasoft-ai",
+  "description": "Mi harness de IA para Claude Code: flujos de trabajo, memoria y exploración de código.",
+  "version": "0.13.0",
+  "author": {
+    "name": "Anibal Royero"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/royeroba/roymasoft-ai",
+  "homepage": "https://github.com/royeroba/roymasoft-ai"
+}

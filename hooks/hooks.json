@@ -1,69 +1,43 @@
 {
-  "description": "roymasoft-ai — injects project context at session start, after compaction, nudges the search order on prompts, gates the first code edit and spec approval on real evidence, and blocks stopping without proactive memory saves or a real auditor delegation. Fail-open: any error exits 0 and allows/injects nothing.",
+  "description": "roymasoft-ai: instala/cablea Engram y CodeGraph y aplica sus reglas (estilo gentle-ai); pide confirmación en commit/stage y ante secretos evidentes, y exige memoria + grafo antes del primer edit de código",
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "startup|resume|clear|fork|compact",
+        "matcher": "startup|resume|clear|compact",
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','session-start.mjs')).href)})().catch(()=>{})\"",
-            "timeout": 15,
-            "statusMessage": "Loading project context..."
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','prompt-search-reminder.mjs')).href)})().catch(()=>{})\"",
-            "timeout": 5,
-            "statusMessage": "Checking search order..."
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/bootstrap.mjs\"",
+            "timeout": 300,
+            "statusMessage": "Verificando Engram y CodeGraph..."
           }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "Edit|Write|MultiEdit",
+        "matcher": "Bash|PowerShell|mcp__.*__git_(add|commit|commit_composer)",
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','pretooluse-search-gate.mjs')).href)})().catch(()=>{})\"",
-            "timeout": 10,
-            "statusMessage": "Checking search order before this edit..."
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pretooluse-no-commit.mjs\"",
+            "timeout": 5
           }
         ]
       },
       {
-        "matcher": "Write|Edit",
+        "matcher": "Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','pretooluse-spec-approval-gate.mjs')).href)})().catch(()=>{})\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pretooluse-search-gate.mjs\"",
             "timeout": 10,
-            "statusMessage": "Checking spec approval evidence..."
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','stop-memory-check.mjs')).href)})().catch(()=>{})\"",
-            "timeout": 10,
-            "statusMessage": "Checking for unsaved decisions..."
+            "statusMessage": "Verificando orden de búsqueda..."
           },
           {
             "type": "command",
-            "command": "node -e \"(async()=>{const r=process.env.CLAUDE_PLUGIN_ROOT||process.env.PLUGIN_ROOT;if(!r)return;const{pathToFileURL}=require('node:url');const{join}=require('node:path');await import(pathToFileURL(join(r,'hooks','stop-spec-impl-gate.mjs')).href)})().catch(()=>{})\"",
-            "timeout": 10,
-            "statusMessage": "Checking for a real auditor delegation..."
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pretooluse-secrets.mjs\"",
+            "timeout": 5
           }
         ]
       }

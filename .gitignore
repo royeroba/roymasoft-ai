@@ -1,5 +1,8 @@
 node_modules/
 .DS_Store
 
-# codebase-memory-mcp's local graph index — machine-specific state, never shared via git
-.codebase-memory/
+# Índice local de CodeGraph — estado de la máquina, no se comparte por git
+.codegraph/
+
+# Resultados de `claude plugin eval` (se generan en cada corrida)
+evals/results/

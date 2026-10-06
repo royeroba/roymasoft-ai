@@ -1,94 +1,74 @@
 #!/usr/bin/env node
 /**
- * PreToolUse hook — asks for confirmation before the session's first code edit if nothing in the
- * graph/memory family was ever called this session.
+ * PreToolUse (Edit|Write|MultiEdit) — antes del PRIMER edit de código de la sesión, pide
+ * confirmación si no hubo búsqueda en memoria Y en CodeGraph (orden: memoria, grafo, grep).
  *
- * `behavior/routing.md` invariant #1 ("graph → memory → targeted code, in every route") was only
- * reinforced with a `UserPromptSubmit` reminder (`prompt-search-reminder.mjs`) — text the model can
- * read and still skip. A live session proved it: after the first two graph searches, the rest of a
- * whole feature was plain Read/Grep. This is the mechanical follow-up, on the one moment that
- * actually matters — before code gets written, not before every prompt.
- *
- * Deliberately narrow: fires once per session (the first code edit only), and only asks — it does
- * not deny. `permissionDecision: "ask"` opens Claude Code's real permission prompt, which the model
- * cannot silently talk past, without hard-blocking a legitimate edit the human wants to approve
- * anyway. Fail-open on anything ambiguous: an unrecognized payload, an unreadable transcript, or an
- * internal error all mean "allow", never "ask" — a gate that misfires becomes noise, and noise gets
- * ignored (same lesson already applied in stop-memory-check.mjs).
+ * Adaptado del gate del harness anterior. Solo pregunta (`ask`), no deniega: abre el prompt de
+ * permisos real, que el modelo no puede esquivar, sin bloquear una edición legítima. Dispara una
+ * sola vez por sesión y es fail-open: payload raro, transcript ilegible o error = permitir.
+ * Límite conocido: no ve lo que ocurre en transcripts de subagentes.
  */
-
 import { readStdin, parsePayload, readTranscriptLines, parseEntry, entryToolUses } from './lib/transcript.mjs';
 
 const EDIT_TOOLS = new Set(['Edit', 'Write', 'MultiEdit']);
-
+const SHELL_TOOLS = new Set(['Bash', 'PowerShell']);
 const CODE_EXTENSIONS = new Set([
-	'.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.go', '.py', '.rb', '.java', '.kt', '.swift',
-	'.rs', '.vue', '.svelte', '.c', '.cc', '.cpp', '.h', '.hpp', '.cs', '.php', '.scala', '.dart',
+  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.go', '.py', '.rb', '.java', '.kt', '.swift',
+  '.rs', '.vue', '.svelte', '.c', '.cc', '.cpp', '.h', '.hpp', '.cs', '.php', '.scala', '.dart',
 ]);
 
-const GRAPH_MEMORY_TOOL = /search_graph|trace_path|query_graph|get_architecture|search_code|get_code_snippet|mem_search|mem_context/;
+// mcp__engram__mem_search, mcp__plugin_engram_engram__mem_context, ...
+const MEMORY_TOOL = /^mcp__.*engram.*__mem_(search|context|get_observation)$/;
+// mcp__codegraph__codegraph_explore, ... (o el CLI por shell cuando el MCP no está)
+const GRAPH_TOOL = /^mcp__codegraph__/;
+const GRAPH_CLI = /(^|[\s;&|])codegraph(\.cmd)?\s+(explore|query|node|context|callers|callees|impact|files|affected)\b/;
 
-function extensionOf(filePath) {
-	const match = /\.[a-zA-Z0-9]+$/.exec(filePath ?? '');
-	return match ? match[0].toLowerCase() : '';
-}
-
-function isCodeEdit(name, input) {
-	if (!EDIT_TOOLS.has(name)) return false;
-	return CODE_EXTENSIONS.has(extensionOf(input?.file_path));
-}
-
-function allow() {
-	// No output = Claude Code's default: proceed as normal.
-}
+const extensionOf = (p) => /\.[a-zA-Z0-9]+$/.exec(p ?? '')?.[0].toLowerCase() ?? '';
+const isCodeEdit = (name, input) => EDIT_TOOLS.has(name) && CODE_EXTENSIONS.has(extensionOf(input?.file_path));
 
 function ask(reason) {
-	process.stdout.write(
-		JSON.stringify({
-			hookSpecificOutput: {
-				hookEventName: 'PreToolUse',
-				permissionDecision: 'ask',
-				permissionDecisionReason: reason,
-			},
-		}),
-	);
+  process.stdout.write(JSON.stringify({
+    hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'ask', permissionDecisionReason: reason },
+  }));
 }
 
 function main() {
-	const payload = parsePayload(readStdin());
-	if (payload.hook_event_name !== 'PreToolUse') return allow();
-	if (!isCodeEdit(payload.tool_name, payload.tool_input)) return allow();
+  const payload = parsePayload(readStdin());
+  if (payload.hook_event_name !== 'PreToolUse') return;
+  if (!isCodeEdit(payload.tool_name, payload.tool_input)) return;
 
-	const lines = readTranscriptLines(payload.transcript_path);
-	if (!lines.length) return allow();
+  const lines = readTranscriptLines(payload.transcript_path);
+  if (!lines.length) return;
 
-	let sawPriorCodeEdit = false;
-	let sawGraphOrMemory = false;
+  let priorCodeEdit = false;
+  let sawMemory = false;
+  let sawGraph = false;
 
-	for (const line of lines) {
-		const entry = parseEntry(line);
-		if (!entry) continue;
-		for (const use of entryToolUses(entry)) {
-			if (GRAPH_MEMORY_TOOL.test(use.name)) sawGraphOrMemory = true;
-			if (isCodeEdit(use.name, use.input)) sawPriorCodeEdit = true;
-		}
-	}
+  for (const line of lines) {
+    const entry = parseEntry(line);
+    if (!entry) continue;
+    for (const use of entryToolUses(entry)) {
+      if (payload.tool_use_id && use.id === payload.tool_use_id) continue; // el propio edit, si ya está en el transcript
+      if (MEMORY_TOOL.test(use.name)) sawMemory = true;
+      if (GRAPH_TOOL.test(use.name)) sawGraph = true;
+      if (SHELL_TOOLS.has(use.name) && GRAPH_CLI.test(use.input?.command ?? '')) sawGraph = true;
+      if (isCodeEdit(use.name, use.input)) priorCodeEdit = true;
+    }
+  }
 
-	// Already past the first code edit this session — the gate already had its one chance.
-	if (sawPriorCodeEdit) return allow();
-	if (sawGraphOrMemory) return allow();
+  if (priorCodeEdit) return; // el gate ya tuvo su única oportunidad en esta sesión
+  const missing = [!sawMemory && 'memoria (mem_search / mem_context)', !sawGraph && 'CodeGraph (codegraph_explore)'].filter(Boolean);
+  if (!missing.length) return;
 
-	ask(
-		'Todavía no se ve ninguna búsqueda de grafo o memoria en esta sesión (search_graph, trace_path, ' +
-			'query_graph, get_architecture, search_code, get_code_snippet, mem_search, mem_context) antes ' +
-			'de este primer edit de código. behavior/routing.md invariante #1: grafo → memoria → código, ' +
-			'siempre. Si ya se investigó por otro medio, se puede continuar.',
-	);
+  ask(
+    `Primer edit de código de la sesión y no se ve búsqueda en: ${missing.join(' ni en ')}. ` +
+      'Orden de roymasoft-ai: memoria, grafo, grep. Si ya se investigó por otro medio (p. ej. un subagente), se puede continuar.',
+  );
 }
 
 try {
-	main();
+  main();
 } catch {
-	allow();
+  // fail-open
 }
 process.exit(0);
