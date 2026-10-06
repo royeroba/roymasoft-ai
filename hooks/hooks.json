@@ -1,5 +1,5 @@
 {
-  "description": "roymasoft-ai: instala/cablea Engram y CodeGraph y aplica sus reglas (estilo gentle-ai); pide confirmación en commit/stage y exige memoria + grafo antes del primer edit de código",
+  "description": "roymasoft-ai: instala/cablea Engram y CodeGraph y aplica sus reglas (estilo gentle-ai); pide confirmación en commit/stage y ante secretos evidentes, y exige memoria + grafo antes del primer edit de código",
   "hooks": {
     "SessionStart": [
       {
@@ -33,6 +33,11 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pretooluse-search-gate.mjs\"",
             "timeout": 10,
             "statusMessage": "Verificando orden de búsqueda..."
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/pretooluse-secrets.mjs\"",
+            "timeout": 5
           }
         ]
       }

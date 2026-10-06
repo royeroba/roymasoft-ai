@@ -122,6 +122,15 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 - Un ticket que enlaza Figma ofrece encadenar `/consult-figma-roy`. `/create-pr-roy` reutiliza el contexto del ticket.
 - `styles-roy` (CSS/SCSS/Sass con BEM, CSS moderno, Tailwind al día, responsive validado contra los breakpoints del proyecto) es la skill de estilos del plugin: la usan `/hu-roy`, `/spec-roy` y `/consult-figma-roy`. Es un despachador con `references/` (bem, modern-css, tailwind, responsive) y detecta el enfoque del proyecto sin suponerlo.
 
+## 11d. Ingeniería integral (SPEC 01)
+
+- Ocho skills de dominio, todas en inglés y con sufijo `-roy`: `testing-roy`, `security-roy`, `typescript-roy`, `database-roy`, `frontend-roy`, `backend-roy`, `performance-roy` y `delivery-roy`. Cada una es un despachador (`SKILL.md` corto) con `references/` y un `references/checklist.md` verificable.
+- Contenido solo de fuentes oficiales verificadas (Anthropic, OpenAI, Cursor, Google, OWASP, Node.js, TypeScript, React, Vue, W3C, PostgreSQL, MongoDB, AWS, Redis, Docker, GitHub); cada sección cita su fuente y la fecha de verificación. Sin versiones ni proporciones fijas.
+- `rules/behavior.md` solo trae el enrutado ("Dominios") y los disparadores de seguridad; el detalle va en las skills para no engordar el contexto siempre cargado.
+- `rdd-roy` pasa los checklists de los dominios tocados y `agents/reviewer.md` los comprueba ítem por ítem.
+- `scripts/validate-skills.mjs` valida las reglas objetivas de las skills y el formato de los evals. `hooks/pretooluse-secrets.mjs` pide confirmación (`ask`) ante secretos evidentes en Write, Edit y MultiEdit; su regresión está en `scripts/test-secrets-hook.mjs`.
+- Spec completo y su registro: `specs/01-ingenieria-integral.md`.
+
 ## 12. Lo que no se toma
 
 - De gentle-ai: GGA y los revisores 4R, `gentle-ai review ...` (binario propio), commits por unidad de trabajo, espejo completo del documento en Engram, delegación obligatoria por reglas largas, telemetría y registro de skills.
