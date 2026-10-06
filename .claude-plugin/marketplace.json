@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "roymasoft",
+  "description": "Marketplace personal de roymasoft-ai",
+  "owner": {
+    "name": "Anibal Royero"
+  },
+  "plugins": [
+    {
+      "name": "roymasoft-ai",
+      "description": "Mi harness de IA para Claude Code: flujos de trabajo, memoria y exploración de código.",
+      "version": "0.3.0",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
