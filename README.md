@@ -7,7 +7,7 @@ Plugin de Claude Code con mi harness de IA. En reconstrucción: ver `evals/` par
 ```
 .claude-plugin/   plugin.json + marketplace.json
 skills/           skills del plugin (flujos ODD/SDD/TDD/ping-pong/RDD)
-commands/         slash commands (enrutador /hu)
+commands/         slash commands (enrutador /hu-roy)
 agents/           subagentes
 hooks/            hooks.json y scripts
 evals/            rúbrica y casos de medición

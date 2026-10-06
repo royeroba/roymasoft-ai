@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * PreToolUse — commit y stage solo con confirmación del usuario: devuelve `ask`, así cada uno
- * se aprueba en pantalla (las skills /commit y /crear-pr los ejecutan cuando el usuario lo pide).
+ * se aprueba en pantalla (las skills /commit-roy y /create-pr-roy los ejecutan cuando el usuario lo pide).
  *
  * Cubre Bash/PowerShell (git add|commit|stage|commit-tree, también tras `&&`, `;`, `|`, con opciones
  * globales como `-C`/`-c`, o dentro de `bash -c "..."`) y las herramientas MCP de git (GitKraken

@@ -8,7 +8,7 @@ Fuentes: gentle-ai `origin/main` (ODD, RDD), fernando-skills (`/spec`, `/spec-im
 1. **Ligero.** Lo que no cambia el resultado no se hace. Sin revisores múltiples, sin procesos en segundo plano, sin hooks nuevos.
 2. **Natural.** Todo avance se pide y se aprueba en lenguaje natural ("dale", "sigue"). El "aceptar" del Plan Mode nativo es la aprobación de un spec.
 3. **Evidencia.** Nada se da por hecho: se cita `archivo:línea` o la salida real de un comando.
-4. **El commit lo decide el usuario.** El agente no hace commit ni stage por iniciativa propia; solo cuando el usuario lo pide, con `/commit` (un hook pide confirmación en cada uno). El avance queda en el documento y en archivos sin stage.
+4. **El commit lo decide el usuario.** El agente no hace commit ni stage por iniciativa propia; solo cuando el usuario lo pide, con `/commit-roy` (un hook pide confirmación en cada uno). El avance queda en el documento y en archivos sin stage.
 5. **Proporcional.** El esfuerzo de verificación sigue el riesgo del cambio, no el número de archivos.
 6. **Carga mínima.** Solo lo imprescindible está siempre en contexto; lo demás son skills que se cargan al usarse.
 
@@ -17,11 +17,11 @@ Fuentes: gentle-ai `origin/main` (ODD, RDD), fernando-skills (`/spec`, `/spec-im
 | Pieza | Tipo | Cuándo se carga | Archivo |
 |---|---|---|---|
 | Autorizar y clasificar | Regla corta | Siempre | `rules/behavior.md` |
-| `/hu` (entrada con ticket o criterios) | Skill | Al invocarla o al traer una HU | `skills/hu/SKILL.md` |
-| Carril grande (spec) | Skill | Solo si la tarea es grande | `skills/spec/SKILL.md` + `template.md` |
+| `/hu-roy` (entrada con ticket o criterios) | Skill | Al invocarla o al traer una HU | `skills/hu-roy/SKILL.md` |
+| Carril grande (spec) | Skill | Solo si la tarea es grande | `skills/spec-roy/SKILL.md` + `template.md` |
 | TDD condicional | Sección de la skill del carril | Al implementar | dentro de `hu` y `spec` |
-| RDD (revisión fresca) | Agente + skill delgada | Al cerrar un cambio con código | `agents/reviewer.md`, `skills/rdd/SKILL.md` |
-| E2E en navegador | Skill (ya existe) | Al aceptar la oferta | `skills/e2e/SKILL.md` |
+| RDD (revisión fresca) | Agente + skill delgada | Al cerrar un cambio con código | `agents/reviewer.md`, `skills/rdd-roy/SKILL.md` |
+| E2E en navegador | Skill (ya existe) | Al aceptar la oferta | `skills/e2e-roy/SKILL.md` |
 
 ## 3. Regla siempre activa (borrador, ~10 líneas)
 
@@ -36,7 +36,7 @@ petición ──► autorizar ──► explorar ──► clasificar ──┬�
                               oferta de E2E (si hay UI) ──► RDD (revisión fresca) ──► cierre
 ```
 
-`/hu` es la misma entrada cuando el usuario trae un ticket: reformula la historia en 1–2 líneas, lista los criterios de aceptación como checklist (si no hay, lo dice: es el primer hueco) y propone el carril. **No escribe código.**
+`/hu-roy` es la misma entrada cuando el usuario trae un ticket: reformula la historia en 1–2 líneas, lista los criterios de aceptación como checklist (si no hay, lo dice: es el primer hueco) y propone el carril. **No escribe código.**
 
 ## 5. Carril pequeño (absorbe el ping-pong)
 
@@ -53,7 +53,7 @@ Sin documento de seguimiento ni preguntas largas.
 1. **Preguntas** en bloques de 3 a 5, con opciones cerradas y recomendación. Parar cuando se pueda responder: qué archivos cambian, cuál es el primer y el último paso, cómo se verifica.
 2. **Plan nativo** (Plan Mode): se presenta el plan; el "aceptar" del usuario es la aprobación. Fallback sin Plan Mode: aprobación con un "dale" en el chat.
 3. **Documento** `specs/NN-slug.md` en el repo del cliente, visible y sin stage (el usuario decide si lo commitea). Orden fijo:
-   - Cabecera: estado (`Borrador` → `Aprobado` → `Implementado`), fecha, objetivo en una frase, HU.
+   - Cabecera: estado (`Draft` → `Approved` → `Implemented`), fecha, objetivo en una frase, HU.
    - `## Specs`: S1..Sn con las frases del usuario **literales**, sin parafrasear ni añadir requisitos.
    - `## Plan`: fases numeradas; cada una deja el sistema funcionando.
    - `## Criterios de aceptación`: checklist verificable.
@@ -82,12 +82,12 @@ No es una copia del repo: es la **evidencia del estado de antes**, registrada an
 
 Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para decidir en el RDD si un fallo **ya existía** (aviso) o **lo introdujo el cambio** (bloqueo). Una copia física (`git worktree` en un directorio temporal fuera del repo) solo si hace falta y es barata: sin dependencias instaladas no corre. Los cambios sin commit del usuario no entran en `HEAD`; se avisa.
 
-## 9. RDD: revisión fresca, PASA o NO PASA
+## 9. RDD: revisión fresca, PASS o FAIL
 
 - **Quién:** `agents/reviewer.md`, un subagente sin el contexto de la conversación, con herramientas limitadas a leer y ejecutar comandos (sin editar). *A verificar al implementar:* cómo se referencia un agente de plugin (`subagent_type`).
 - **Qué recibe:** objetivo y criterios, lista de archivos y diff, baseline (§8) y los comandos de verificación autorizados. Nada más.
 - **Qué hace:** relee el diff, corre los comandos, compara con el baseline y busca regresiones, bugs nuevos y criterios sin cumplir.
-- **Salida:** veredicto `PASA` o `NO PASA`. Si no pasa, tabla: hallazgo · `archivo:línea` · por qué · bloqueo o aviso · ¿ya fallaba antes? Si pasa: "implementación correcta" y lo que no pudo verificar.
+- **Salida:** veredicto `PASS` o `FAIL`. Si no pasa, tabla: hallazgo · `archivo:línea` · por qué · bloqueo o aviso · ¿ya fallaba antes? Si pasa: "implementación correcta" y lo que no pudo verificar.
 - **Severidad:** bloqueo = defecto causado por el cambio, reproducible, que no existía en el baseline. Defectos preexistentes y valores fuera de dominio son avisos.
 - **Límite:** una corrección que arregle todos los bloqueos y una revisión acotada a esos bloqueos. Si siguen abiertos, un único "Necesito tu decisión". Nunca bucles.
 - **Cuándo:** al cerrar un cambio con código, en ambos carriles; en el grande, al final del feature (y por fase si el riesgo es alto). Se omite en cambios pasivos (documentación, comentarios).
@@ -95,14 +95,14 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 ## 10. Conexión con E2E
 
 - Al cerrar una fase o un cambio **con UI** y con servidor levantable, una sola línea: "Ya quedó el login nuevo. ¿Lo probamos en el navegador?".
-- Si acepta, corre `/e2e` con los criterios de la HU o del spec y entrega la evidencia en el chat (ya implementado).
+- Si acepta, corre `/e2e-roy` con los criterios de la HU o del spec y entrega la evidencia en el chat (ya implementado).
 - El informe del E2E incluye lo bueno, lo malo y lo mejorable. El resultado puede alimentar al RDD, pero el E2E nunca se ejecuta sin que el usuario lo acepte.
 
 ## 11. Reglas de herramientas
 
 - **Build:** no se ejecuta salvo que el usuario lo pida o sea la única forma de verificar el cambio y sea razonable (corto, sin efectos secundarios como desplegar o escribir fuera del repo). Antes se prefieren tests acotados, typecheck o lint. Si el build es largo, se pregunta.
 - **Context7:** antes de usar APIs de librerías (ya en `rules/behavior.md`).
-- **Playwright:** solo vía `/e2e` (ya implementado).
+- **Playwright:** solo vía `/e2e-roy` (ya implementado).
 
 ## 11b. Modelos (sugerencia, el humano elige)
 
@@ -114,6 +114,14 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 - El `reviewer` declara `model: sonnet`. Si el usuario activa la distribución sugerida o elige otro modelo (por ejemplo opus), se pasa al delegar y esa elección tiene prioridad sobre la del agente.
 - El modelo de la sesión principal lo elige el usuario; el plugin no lo cambia.
 
+## 11c. Contexto externo: tickets y diseño
+
+- `/hu-roy` (carril pequeño) y `/spec-roy` (carril grande) consultan el contexto en cuanto el usuario pega una URL: Jira con `/consult-ticket-roy` y Figma con `/consult-figma-roy`. Cada una es independiente y también se invoca sola.
+- Ambas validan que el plugin o MCP exista (si no, piden el texto o capturas y lo marcan como contexto manual), solo leen, analizan lo que traen y preguntan los huecos con opciones cerradas.
+- `/consult-figma-roy` además cruza los nodos con el proyecto: tokens, componentes existentes, responsive y estados, apoyándose en las skills de estilos que existan (del proyecto, del plugin o globales). Si no existe ninguna, valida contra el código y lo dice.
+- Un ticket que enlaza Figma ofrece encadenar `/consult-figma-roy`. `/create-pr-roy` reutiliza el contexto del ticket.
+- Pendiente: skill de CSS y front del plugin (depende del stack del cliente).
+
 ## 12. Lo que no se toma
 
 - De gentle-ai: GGA y los revisores 4R, `gentle-ai review ...` (binario propio), commits por unidad de trabajo, espejo completo del documento en Engram, delegación obligatoria por reglas largas, telemetría y registro de skills.
@@ -122,14 +130,14 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 
 ## 13. Evals asociados (paso 6)
 
-Casos nuevos: bug sin stack de test, pedido ambiguo (solo lectura), "arregla esto" con riesgo alto, spec no aprobado, regresión introducida (el RDD debe devolver NO PASA), fallo preexistente (debe ser aviso), API de librería sin consultar Context7, login que pide credenciales, build no pedido.
+Casos nuevos: bug sin stack de test, pedido ambiguo (solo lectura), "arregla esto" con riesgo alto, spec no aprobado, regresión introducida (el RDD debe devolver FAIL), fallo preexistente (debe ser aviso), API de librería sin consultar Context7, login que pide credenciales, build no pedido.
 
 ## 14. Orden de implementación
 
 1. Actualizar `rules/behavior.md`: autorizar/clasificar, regla de build.
-2. `agents/reviewer.md` + `skills/rdd/SKILL.md` (lo más novedoso; probar antes con un caso real).
-3. `skills/hu/SKILL.md` con el carril pequeño y TDD condicional.
-4. `skills/spec/` (carril grande) con plantilla.
+2. `agents/reviewer.md` + `skills/rdd-roy/SKILL.md` (lo más novedoso; probar antes con un caso real).
+3. `skills/hu-roy/SKILL.md` con el carril pequeño y TDD condicional.
+4. `skills/spec-roy/` (carril grande) con plantilla.
 5. Oferta de E2E en `hu` y `spec`.
 6. Casos de evals y runner.
 
@@ -139,5 +147,5 @@ Cada paso sube la versión del plugin para que la caché se actualice.
 
 - Cómo se referencia el agente de plugin y si el subagente puede ejecutar comandos con las herramientas restringidas: probar al implementar.
 - Peso del contexto: medir lo que ocupan las reglas siempre activas; si crece, recortar.
-- Que `/hu` se dispare solo por la regla corta o por invocación: validar con el caso real.
+- Que `/hu-roy` se dispare solo por la regla corta o por invocación: validar con el caso real.
 - Definir qué hace el RDD cuando no hay baseline (cambio sin reproducción previa): revisar solo el diff y declararlo.

@@ -2,7 +2,7 @@
 
 **Idioma y estilo.** Responde en español, corto y preciso. Sin preámbulo, sin recap, sin relleno; la brevedad nunca quita la sustancia necesaria.
 
-**Git.** Haz commit o stage (`git add`, `git commit`, `git stage`, ni sus equivalentes en herramientas MCP) **solo cuando el usuario lo pida explícitamente**, y con la skill `/commit`; nunca por iniciativa propia ni como parte de otra tarea. Un hook pide su confirmación en cada uno. Si no lo pidió, deja los cambios sin stage y di qué archivos tocaste.
+**Git.** Haz commit o stage (`git add`, `git commit`, `git stage`, ni sus equivalentes en herramientas MCP) **solo cuando el usuario lo pida explícitamente**, y con la skill `/commit-roy`; nunca por iniciativa propia ni como parte de otra tarea. Un hook pide su confirmación en cada uno. Si no lo pidió, deja los cambios sin stage y di qué archivos tocaste.
 
 **Cambios.** Antes de tocar nada:
 1. **Autoriza.** ¿El pedido autoriza un cambio? Investigar, explicar, comparar o revisar es solo lectura; no edites ni delegues escritura. Si el pedido es ambiguo o condicional, haz una pregunta y sigue en solo lectura hasta que respondan.
@@ -11,7 +11,7 @@
 4. **Pequeña:** hazla directo y enséñale el diff. **Grande:** propón trabajarla con spec (preguntas, plan y documento) en una línea y espera su respuesta.
 5. **Riesgo alto:** datos o efectos irreversibles, seguridad, contratos que otros consumen, concurrencia, entorno o despliegue, o ningún test detectaría una regresión. Si no puedes saber si aplica con una mirada acotada, trátalo como alto.
 6. **Tests:** si el proyecto tiene stack de pruebas, usa TDD (ver el test fallar por la razón correcta, luego pasar). Si no lo tiene, dilo una vez y verifica con lo que exista; nunca inventes un runner. Un test no se borra ni se debilita para que pase.
-7. **Cierra** todo cambio con `Riesgo: <ítem>` o `Riesgo: ninguno`, lo que no verificaste y, si tocó código, la revisión fresca de la skill `rdd`. Si no se ejecutó una revisión, di por qué.
+7. **Cierra** todo cambio con `Riesgo: <ítem>` o `Riesgo: ninguno`, lo que no verificaste y, si tocó código, la revisión fresca de la skill `rdd-roy`. Si no se ejecutó una revisión, di por qué.
 
 **Modelos.** Al delegar, usa `sonnet` por defecto. Solo si el usuario quiere activar la distribución sugerida (opus para planear, razonar y decidir; sonnet para ejecutar; haiku para lo trivial que no toca lógica de negocio), se la ofreces; la decisión es suya y no la actives por tu cuenta. Usa los alias (`opus`, `sonnet`, `haiku`), no ids con versión. Si el usuario elige un modelo, usa ese al delegar.
 
