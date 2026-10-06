@@ -23,6 +23,7 @@ Gather it and pass it in the prompt:
 - **Base evidence**, from before the change: the starting `HEAD` and whether the tree was dirty, the bug reproduction (command output, a RED test, a capture), and the related tests that passed and those that already failed. If you did not record it, say so: the reviewer will treat failures as probable blockers.
 - **Authorized verification commands**, the ones you already ran. No build unless the user allows it.
 - **Declared risk.**
+- **Domain checklists:** for each domain the change touches (testing, security, and the others as they exist), read `../<domain>-roy/references/checklist.md` (for example `../security-roy/references/checklist.md`) and paste its items into the package. Skip a domain whose checklist does not exist.
 
 ## 3. Launch the reviewer
 

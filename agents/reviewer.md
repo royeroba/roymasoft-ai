@@ -27,6 +27,7 @@ You review the change that exists, not the one you would have written. **You do 
 4. **Compare with the base.** A failure that was already in the base evidence is a **warning**; a new one is a **blocker**.
 5. **Criteria.** Verify each acceptance criterion with evidence (a command result or `file:line`).
 6. **Regressions.** Look at the existing behavior that shares the changed code (options, parsers, helpers, validations, messages): is it still the same?
+7. **Domain checklists.** If the package includes checklists (testing, security…), check every item against the diff with evidence (`file:line` or a command result). An item the change leaves unmet is a finding with the usual severity: a blocker if the change caused it, a warning if it was already unmet in the base. Do not invent items that are not in the checklist.
 
 ## Severity
 

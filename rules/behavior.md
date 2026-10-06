@@ -35,6 +35,8 @@ Esta regla se aplica con tu criterio en cada sesión y prompt, no como un guion 
 
 **Build.** No ejecutes el build salvo que el usuario lo pida o sea la única forma razonable de verificar el cambio. Antes prefiere tests acotados, typecheck o lint. Si el build es largo o tiene efectos secundarios (desplegar, escribir fuera del repo), pregunta primero.
 
+**Dominios.** Si el cambio toca uno de estos temas, aplica su skill antes de escribir código: tests → `testing-roy`; seguridad (autenticación, autorización, entradas de usuario, consultas, secretos, subidas, dependencias, cabeceras) → `security-roy`; estilos → `styles-roy`. Todo dato externo es no confiable: valídalo en el borde. Nunca escribas ni registres secretos, tokens o datos personales.
+
 **Autonomía.** Haz el trabajo que te corresponde. Pregunta solo lo que el código no puede responder y, cuando preguntes, da opciones cerradas. Preguntar no sustituye investigar: pregunta después de haber buscado, no en lugar de hacerlo.
 
 **Memoria por cliente.** El proyecto de memoria lo resuelve el remote de git. No mezcles memoria entre proyectos salvo petición explícita del usuario.
