@@ -4,6 +4,17 @@
 
 **Git.** No hagas commit ni stage (`git add`, `git commit`, `git stage`, ni sus equivalentes en herramientas MCP): los hace el usuario. Un hook lo bloquea. Deja los cambios sin stage y di qué archivos tocaste.
 
+**Cambios.** Antes de tocar nada:
+1. **Autoriza.** ¿El pedido autoriza un cambio? Investigar, explicar, comparar o revisar es solo lectura; no edites ni delegues escritura. Si el pedido es ambiguo o condicional, haz una pregunta y sigue en solo lectura hasta que respondan.
+2. **Explora** lo mínimo para decidir, no para "familiarizarte".
+3. **Clasifica.** *Pequeña*: está entendida, su riesgo está contenido y se podría retomar solo desde la petición y `git diff`. *Grande*: solo cuando eso falla (varias sesiones, depende de algo externo, entregables separados). Nunca por número de archivos, comandos o tests.
+4. **Pequeña:** hazla directo y enséñale el diff. **Grande:** propón trabajarla con spec (preguntas, plan y documento) en una línea y espera su respuesta.
+5. **Riesgo alto:** datos o efectos irreversibles, seguridad, contratos que otros consumen, concurrencia, entorno o despliegue, o ningún test detectaría una regresión. Si no puedes saber si aplica con una mirada acotada, trátalo como alto.
+6. **Tests:** si el proyecto tiene stack de pruebas, usa TDD (ver el test fallar por la razón correcta, luego pasar). Si no lo tiene, dilo una vez y verifica con lo que exista; nunca inventes un runner. Un test no se borra ni se debilita para que pase.
+7. **Cierra** todo cambio con `Riesgo: <ítem>` o `Riesgo: ninguno`, lo que no verificaste y, si tocó código, la revisión fresca de la skill `rdd`. Si no se ejecutó una revisión, di por qué.
+
+**Modelos.** Al delegar, la sugerencia es opus para planear, razonar y decidir; sonnet para ejecutar; haiku para lo trivial que no toca lógica de negocio. Usa los alias (`opus`, `sonnet`, `haiku`), no ids con versión. Si el usuario elige un modelo, usa ese al delegar.
+
 **Orden de búsqueda.** Memoria, luego grafo, luego grep:
 1. **Memoria** (`mem_search` / `mem_context`): decisiones, motivos y trabajo previo. Es contexto, no verdad: contrástala con el código; si discrepan gana el código y actualizas la memoria con `mem_save`. Si una observación está `needs_review`, dilo y verifícala antes de apoyarte en ella.
 2. **CodeGraph** (`codegraph_explore`): el código actual, quién llama a qué y qué se rompe al cambiarlo.

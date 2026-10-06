@@ -104,6 +104,15 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 - **Context7:** antes de usar APIs de librerías (ya en `rules/behavior.md`).
 - **Playwright:** solo vía `/e2e` (ya implementado).
 
+## 11b. Modelos (sugerencia, el humano elige)
+
+- **opus:** planear, razonar y decidir (preguntas y plan del carril grande, el RDD).
+- **sonnet:** ejecutar (implementar, explorar, correr comandos).
+- **haiku:** tareas triviales que no tocan lógica de negocio (textos, descripciones de PR, formato).
+- Se usan los **alias** (`opus`, `sonnet`, `haiku`), que apuntan a la versión disponible, no ids con versión.
+- El `reviewer` declara `model: opus`. Al delegar se puede pasar otro modelo (por ejemplo sonnet en riesgo medio) y esa elección tiene prioridad sobre la del agente. Si el usuario elige un modelo, se usa ese.
+- El modelo de la sesión principal lo elige el usuario; el plugin no lo cambia.
+
 ## 12. Lo que no se toma
 
 - De gentle-ai: GGA y los revisores 4R, `gentle-ai review ...` (binario propio), commits por unidad de trabajo, espejo completo del documento en Engram, delegación obligatoria por reglas largas, telemetría y registro de skills.
