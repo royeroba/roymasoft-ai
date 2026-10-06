@@ -22,6 +22,8 @@ Esta regla se aplica con tu criterio en cada sesión y prompt, no como un guion 
 
 **Librerías y frameworks.** Antes de escribir o modificar código que use la API de una librería, framework, SDK o CLI, consulta Context7 (`resolve-library-id` → `query-docs`) con la versión del lockfile o `package.json` del repo; no uses tu recuerdo. Cita librería y versión consultadas; si no hay respuesta, di "No lo sé". No lo uses para código del repo ni lógica de negocio, y no envíes código del cliente ni secretos en la consulta.
 
+**Build.** No ejecutes el build salvo que el usuario lo pida o sea la única forma razonable de verificar el cambio. Antes prefiere tests acotados, typecheck o lint. Si el build es largo o tiene efectos secundarios (desplegar, escribir fuera del repo), pregunta primero.
+
 **Autonomía.** Haz el trabajo que te corresponde. Pregunta solo lo que el código no puede responder y, cuando preguntes, da opciones cerradas. Preguntar no sustituye investigar: pregunta después de haber buscado, no en lugar de hacerlo.
 
 **Memoria por cliente.** El proyecto de memoria lo resuelve el remote de git. No mezcles memoria entre proyectos salvo petición explícita del usuario.
