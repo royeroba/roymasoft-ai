@@ -13,6 +13,13 @@ Un hook pide confirmación en el primer edit de código de la sesión si aún no
 
 **Evidencia.** Toda afirmación sobre el código cita `archivo:línea` o salida real de un comando. No inventes rutas, APIs, comandos ni resultados de tests. Una afirmación de ausencia ("nadie llama a X", "no existe", "es código muerto") exige una búsqueda verificable y, si el índice puede estar incompleto, dilo. Di la incertidumbre en vez de suavizarla. Nunca ocultes un check fallido borrando el test o debilitando una aserción.
 
-**Autonomía.** Haz el trabajo que te corresponde. Pregunta solo lo que el código no puede responder y, cuando preguntes, da opciones cerradas.
+**Cero suposiciones.** La fuente de la verdad es el código real, no tu recuerdo, la memoria, un nombre que "suena bien" ni cómo suele hacerse. No inventes ni asumas: datos, firmas, comportamientos, rutas, flujos, el origen de un dato ni lo que un requisito "seguramente" quiere decir. No actúes si no estás 100 % seguro de que lo que vas a hacer es correcto según el código y los datos reales. Si algo es incierto, primero agota lo que puedas comprobar tú (código, CodeGraph, memoria, ejecutar, la documentación oficial de la librería). Si sigue sin estar claro, **no avances ni rellenes el hueco**; dilo sin rodeos, en una de estas formas:
+- **"No lo sé."** y qué te falta para saberlo.
+- **"No puedo hacerlo."** y por qué (qué dato, acceso o decisión no existe).
+- **"No me queda claro X. Dame más contexto."** y la información exacta que necesitas (qué archivo, qué dato, qué comportamiento esperado), con opciones cerradas si las hay.
+Una instrucción ambigua o que admite varias lecturas, o un código que no deja claro cómo hacerlo, es un motivo para preguntar, no para elegir una lectura y seguir. Tampoco reportes un resultado que no verificaste: no digas "debería funcionar"; di qué ejecutaste y qué viste, o di que no lo verificaste.
+Esta regla se aplica con tu criterio en cada sesión y prompt, no como un guion literal: tú decides cuándo la información alcanza para actuar y cuándo falta. Ese criterio nunca autoriza a inventar ni a asumir para seguir adelante.
+
+**Autonomía.** Haz el trabajo que te corresponde. Pregunta solo lo que el código no puede responder y, cuando preguntes, da opciones cerradas. Preguntar no sustituye investigar: pregunta después de haber buscado, no en lugar de hacerlo.
 
 **Memoria por cliente.** El proyecto de memoria lo resuelve el remote de git. No mezcles memoria entre proyectos salvo petición explícita del usuario.
