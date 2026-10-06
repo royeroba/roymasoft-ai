@@ -1,18 +1,19 @@
 ---
 name: commit
-description: "Redacta el mensaje de commit en Conventional Commits para los cambios actuales. Trigger: el usuario pide 'haz el commit', 'commitea', 'mensaje de commit', 'qué mensaje le pongo' o 'prepara el commit'. Lee el diff, propone tipo, scope y descripción, y entrega el mensaje listo; el commit lo ejecuta el usuario, no tú."
+description: "Hace el commit de los cambios actuales con mensaje en Conventional Commits. Trigger: el usuario pide 'haz el commit', 'commitea', 'mensaje de commit', 'qué mensaje le pongo' o 'prepara el commit'. Lee el diff, propone tipo, scope y descripción, muestra el mensaje y, con el visto bueno del usuario, hace el stage y el commit."
 disable-model-invocation: false
 argument-hint: "opcional: contexto o ticket (por ejemplo ABC-123)"
 ---
 
-# /commit — Mensaje de commit (Conventional Commits)
+# /commit — Commit en Conventional Commits
 
-Lees el cambio y entregas un mensaje en [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/). **No ejecutas `git add`, `git commit`, `git stage` ni `push`**: el commit lo hace el usuario y un hook lo bloquea. Aunque pida "hazlo tú", explica que la regla del plugin lo impide y entrégale el mensaje y el comando.
+Lees el cambio, redactas un mensaje en [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) y, con el visto bueno del usuario, haces el stage y el commit. **Nunca haces `git push`** (eso lo cubre `/crear-pr`). Un hook pide confirmación en pantalla en cada `git add` y `git commit`: es lo esperado, no lo evites.
 
 ## Cuándo usar / cuándo no
 
-- Úsala cuando pidan hacer, preparar o redactar un commit, o el mensaje de uno.
+- Úsala cuando pidan hacer, preparar o redactar un commit, o el mensaje de uno. Si solo piden el mensaje, entrégalo sin ejecutar nada.
 - No la uses para amend, rebase, squash ni para abrir un PR; para eso, dilo y pregunta.
+- Nunca la dispares por iniciativa propia ni al terminar otra tarea.
 
 ## 1. Lee el cambio (solo lectura)
 
@@ -69,13 +70,20 @@ Fixed stuff and updated files.
 ```
 Falla porque no tiene tipo, está en pasado, no dice qué se arregló y no es verificable.
 
-## 4. Entrega
+## 4. Muestra y confirma
 
-1. Muestra el mensaje en un bloque de código.
-2. Da el comando para que el usuario lo ejecute, en un bloque `bash` aparte, con `git commit -m "<línea>"` si es de una línea o con un archivo de mensaje si tiene cuerpo.
-3. Lista los archivos que irían en el commit y cualquier archivo que **no** debería ir.
+1. Muestra el mensaje en un bloque de código, los archivos que irían en el commit y cualquier archivo que **no** debería ir.
+2. Pregunta: "¿Hago el commit así?". Sin un sí explícito, no ejecutes nada. Si pidió solo el mensaje, termina aquí.
 
-## 5. Alertas
+## 5. Ejecuta
+
+1. Haz el stage **solo de los archivos listados** (`git add <archivos>`), nunca `git add .` ni `-A`, y no incluyas archivos con secretos.
+2. `git commit` con el mensaje confirmado. Si tiene cuerpo, usa un archivo de mensaje temporal fuera del repo y bórralo después. Nunca `--no-verify`.
+3. Si un hook de git falla, muestra el error y detente: no reintentes con otro mensaje ni saltándote el hook.
+4. Con varios commits, ejecútalos uno por uno en el orden propuesto.
+5. Muestra `git log --oneline -n` con lo creado. Deja sin stage todo lo que no pertenezca al commit.
+
+## 6. Alertas
 
 - Si el diff incluye secretos (`.env`, llaves, tokens, credenciales), **no redactes el commit**: avísalo primero.
 - Si hay archivos generados, binarios o lockfiles sin relación, señálalos.
@@ -84,7 +92,9 @@ Falla porque no tiene tipo, está en pasado, no dice qué se arregló y no es ve
 ## Checklist final
 
 - [ ] Leí el diff real, no supuse
-- [ ] No ejecuté `git add`, `git commit` ni `git stage`
+- [ ] No ejecuté `git add` ni `git commit` sin el sí explícito del usuario
+- [ ] Stage solo de los archivos listados, sin `git add .` ni `--no-verify`
+- [ ] No hice `git push`
 - [ ] Tipo correcto según el efecto
 - [ ] Descripción en imperativo, minúscula, sin punto, 72 caracteres o menos
 - [ ] `BREAKING CHANGE` si el cambio rompe compatibilidad

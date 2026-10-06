@@ -1,5 +1,5 @@
 {
-  "description": "roymasoft-ai: instala/cablea Engram y CodeGraph y aplica sus reglas (estilo gentle-ai); bloquea commit/stage y exige memoria + grafo antes del primer edit de código",
+  "description": "roymasoft-ai: instala/cablea Engram y CodeGraph y aplica sus reglas (estilo gentle-ai); pide confirmación en commit/stage y exige memoria + grafo antes del primer edit de código",
   "hooks": {
     "SessionStart": [
       {

@@ -2,7 +2,7 @@
 
 **Idioma y estilo.** Responde en español, corto y preciso. Sin preámbulo, sin recap, sin relleno; la brevedad nunca quita la sustancia necesaria.
 
-**Git.** No hagas commit ni stage (`git add`, `git commit`, `git stage`, ni sus equivalentes en herramientas MCP): los hace el usuario. Un hook lo bloquea. Deja los cambios sin stage y di qué archivos tocaste.
+**Git.** Haz commit o stage (`git add`, `git commit`, `git stage`, ni sus equivalentes en herramientas MCP) **solo cuando el usuario lo pida explícitamente**, y con la skill `/commit`; nunca por iniciativa propia ni como parte de otra tarea. Un hook pide su confirmación en cada uno. Si no lo pidió, deja los cambios sin stage y di qué archivos tocaste.
 
 **Cambios.** Antes de tocar nada:
 1. **Autoriza.** ¿El pedido autoriza un cambio? Investigar, explicar, comparar o revisar es solo lectura; no edites ni delegues escritura. Si el pedido es ambiguo o condicional, haz una pregunta y sigue en solo lectura hasta que respondan.

@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
- * PreToolUse — bloquea commit y stage: los hace siempre el usuario.
+ * PreToolUse — commit y stage solo con confirmación del usuario: devuelve `ask`, así cada uno
+ * se aprueba en pantalla (las skills /commit y /crear-pr los ejecutan cuando el usuario lo pide).
  *
  * Cubre Bash/PowerShell (git add|commit|stage|commit-tree, también tras `&&`, `;`, `|`, con opciones
  * globales como `-C`/`-c`, o dentro de `bash -c "..."`) y las herramientas MCP de git (GitKraken
  * git_add / git_commit / git_commit_composer). Solo mira el primer token de cada comando, así que
- * mencionar "git commit" en un echo/grep/mensaje no dispara el bloqueo.
- * Escape para el caso raro: lanzar Claude Code con RAI_ALLOW_GIT_WRITE=1.
+ * mencionar "git commit" en un echo/grep/mensaje no dispara la confirmación.
+ * Para saltarse la confirmación: lanzar Claude Code con RAI_ALLOW_GIT_WRITE=1.
  * Fail-open: cualquier payload raro o error = permitir.
  */
 import { readStdin, parsePayload } from './lib/transcript.mjs';
@@ -55,9 +56,9 @@ function blockedInCommand(command, depth = 0) {
   return null;
 }
 
-function deny(reason) {
+function ask(reason) {
   process.stdout.write(JSON.stringify({
-    hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: reason },
+    hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'ask', permissionDecisionReason: reason },
   }));
 }
 
@@ -75,7 +76,7 @@ function main() {
   }
   if (!what) return;
 
-  deny(`Bloqueado (${what}): los commits y el stage los hace el usuario. Deja los cambios sin stage y dile qué archivos tocaste.`);
+  ask(`Confirma (${what}): commit y stage solo cuando el usuario lo pide. Apruébalo solo si lo pediste.`);
 }
 
 try {

@@ -40,5 +40,5 @@ Si algo del código no deja claro cómo hacerlo, no elijas por tu cuenta: pregun
 
 ## Reglas
 
-- No commit ni stage; deja los cambios sin stage y di qué archivos tocaste.
+- No hagas commit ni stage por tu cuenta; deja los cambios sin stage y di qué archivos tocaste. Si el usuario lo pide, usa `/commit`.
 - Pregunta en bloques de 3 a 5 como máximo, solo lo que cambia la siguiente acción, con opciones y recomendación.

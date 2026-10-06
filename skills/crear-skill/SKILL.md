@@ -60,7 +60,7 @@ Falla porque no dice cuándo usarla ni qué entrega: Claude no puede decidir si 
 - Corre `claude plugin validate .` en la raíz del repo.
 - Sube la versión en `.claude-plugin/plugin.json` y `marketplace.json` si la caché debe actualizarse (el repo no lo hace solo).
 - Prueba el disparo con 2 o 3 frases reales del usuario. Para medirlo de forma repetible, un caso de eval con grader `tool_used: Skill` y `claude plugin eval`.
-- No hagas commit ni stage. Muestra los archivos tocados.
+- No hagas commit ni stage por tu cuenta (solo si el usuario lo pide, con `/commit`). Muestra los archivos tocados.
 
 ## 5. Checklist final
 

@@ -56,10 +56,10 @@ Reglas durante la implementación:
 
 ## Fase 6 — Cierre
 
-Cuando todas las fases estén hechas: verifica los criterios de aceptación uno a uno con evidencia, `Riesgo:`, y revisión `rdd` sobre el feature completo (por fase si el riesgo es alto). Con el "ok" del usuario, cambia el estado a `Implementado`. Recuerda que el commit lo hace él.
+Cuando todas las fases estén hechas: verifica los criterios de aceptación uno a uno con evidencia, `Riesgo:`, y revisión `rdd` sobre el feature completo (por fase si el riesgo es alto). Con el "ok" del usuario, cambia el estado a `Implementado`. El commit solo si lo pide, con `/commit`.
 
 ## Reglas
 
 - Estados: `Borrador` → `Aprobado` → `Implementado` (u `Obsoleto`). Los cambia el agente **solo tras la respuesta explícita del usuario**, en lenguaje natural; el usuario no tiene que editar el archivo.
-- No commit, no stage, no crear ramas: eso lo decide el usuario.
+- No hagas commit ni stage por tu cuenta (solo si el usuario lo pide, con `/commit`) ni crees ramas: eso lo decide él.
 - Guarda en memoria solo las decisiones (guardado proactivo), no una copia del documento.

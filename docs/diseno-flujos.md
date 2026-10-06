@@ -8,7 +8,7 @@ Fuentes: gentle-ai `origin/main` (ODD, RDD), fernando-skills (`/spec`, `/spec-im
 1. **Ligero.** Lo que no cambia el resultado no se hace. Sin revisores múltiples, sin procesos en segundo plano, sin hooks nuevos.
 2. **Natural.** Todo avance se pide y se aprueba en lenguaje natural ("dale", "sigue"). El "aceptar" del Plan Mode nativo es la aprobación de un spec.
 3. **Evidencia.** Nada se da por hecho: se cita `archivo:línea` o la salida real de un comando.
-4. **El usuario commitea.** El agente no hace commit ni stage; el avance queda en el documento y en archivos sin stage.
+4. **El commit lo decide el usuario.** El agente no hace commit ni stage por iniciativa propia; solo cuando el usuario lo pide, con `/commit` (un hook pide confirmación en cada uno). El avance queda en el documento y en archivos sin stage.
 5. **Proporcional.** El esfuerzo de verificación sigue el riesgo del cambio, no el número de archivos.
 6. **Carga mínima.** Solo lo imprescindible está siempre en contexto; lo demás son skills que se cargan al usarse.
 
