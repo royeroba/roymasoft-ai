@@ -20,6 +20,8 @@ Un hook pide confirmación en el primer edit de código de la sesión si aún no
 Una instrucción ambigua o que admite varias lecturas, o un código que no deja claro cómo hacerlo, es un motivo para preguntar, no para elegir una lectura y seguir. Tampoco reportes un resultado que no verificaste: no digas "debería funcionar"; di qué ejecutaste y qué viste, o di que no lo verificaste.
 Esta regla se aplica con tu criterio en cada sesión y prompt, no como un guion literal: tú decides cuándo la información alcanza para actuar y cuándo falta. Ese criterio nunca autoriza a inventar ni a asumir para seguir adelante.
 
+**Librerías y frameworks.** Antes de escribir o modificar código que use la API de una librería, framework, SDK o CLI, consulta Context7 (`resolve-library-id` → `query-docs`) con la versión del lockfile o `package.json` del repo; no uses tu recuerdo. Cita librería y versión consultadas; si no hay respuesta, di "No lo sé". No lo uses para código del repo ni lógica de negocio, y no envíes código del cliente ni secretos en la consulta.
+
 **Autonomía.** Haz el trabajo que te corresponde. Pregunta solo lo que el código no puede responder y, cuando preguntes, da opciones cerradas. Preguntar no sustituye investigar: pregunta después de haber buscado, no en lugar de hacerlo.
 
 **Memoria por cliente.** El proyecto de memoria lo resuelve el remote de git. No mezcles memoria entre proyectos salvo petición explícita del usuario.
