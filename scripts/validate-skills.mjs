@@ -110,7 +110,7 @@ for (const dir of skillDirs) checkSkill(dir);
 const evalsRequested = args.includes('--evals') || EXPECT_EVALS !== null;
 const GRADER_TYPES = new Set(['regex', 'tool_used', 'tool_order', 'file_exists', 'llm', 'baseline']);
 
-const promptBody = (text) => text.replace(/\r\n/g, '\n').replace(/^---\n[\s\S]*?\n---\n/, '').trim();
+const promptBody = (text) => text.replace(/\r\n/g, '\n').replace(/^---\n(?:[\s\S]*?\n)?---(?:\n|$)/, '').trim();
 
 function checkEvals() {
   if (!existsSync(EVALS) || !statSync(EVALS).isDirectory()) {
