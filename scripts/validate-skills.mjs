@@ -9,13 +9,15 @@
  * Engineering skills (ENGINEERING_SKILLS): plus `references/` one level deep, each reference <= 100 lines,
  * every non-checklist reference has a `Last verified: YYYY-MM-DD` line and every `##` section a `Source: <URL>` line, and `references/checklist.md`
  * has at least 5 `- [ ]` items.
+ * Links: every backticked relative path to a `.md` file that starts with `references/` or `../` (in each skill's
+ * .md files, its references/ and _shared/) must exist. Paths with a `<placeholder>` are skipped.
  * Evals (`claude plugin eval` layout): each folder under evals/ (except results/) has a non-empty `prompt.md`
  * and `graders/` with at least one .md grader whose frontmatter `type` is a known grader type.
  * Warns when a skill has no `fires-<skill>` case.
  * Exit code 1 when any error is found. Warnings (version-like numbers in references, skills without an eval) do not fail.
  */
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -50,6 +52,16 @@ function frontmatter(text) {
   return out;
 }
 
+const REL_MD = /`((?:\.\.\/|references\/)[^`\s<>]*?\.md)(?:#[^`\s]*)?`/g;
+const mdFiles = (dir) => (existsSync(dir) ? readdirSync(dir).filter((n) => n.endsWith('.md')).map((n) => join(dir, n)) : []);
+
+function checkLinks(file) {
+  const where = `skills/${relative(ROOT, file).replace(/\\/g, '/')}`;
+  for (const m of readFileSync(file, 'utf8').matchAll(REL_MD)) {
+    if (!existsSync(join(dirname(file), m[1]))) err(where, `broken path \`${m[1]}\` (file not found)`);
+  }
+}
+
 function checkSkill(dir) {
   const where = `skills/${dir}`;
   const file = join(ROOT, dir, 'SKILL.md');
@@ -70,6 +82,7 @@ function checkSkill(dir) {
   if (SPANISH.test(text)) err(where, 'Spanish text found in SKILL.md (skills are written in English)');
 
   const refDir = join(ROOT, dir, 'references');
+  for (const f of [...mdFiles(join(ROOT, dir)), ...mdFiles(refDir)]) checkLinks(f);
   if (!ENGINEERING_SKILLS.has(dir)) return;
   if (!existsSync(refDir)) return err(where, 'missing references/ folder');
 
@@ -107,6 +120,7 @@ if (!existsSync(ROOT) || !statSync(ROOT).isDirectory()) {
 }
 const skillDirs = readdirSync(ROOT).filter((d) => !d.startsWith('_') && !d.startsWith('.') && statSync(join(ROOT, d)).isDirectory());
 for (const dir of skillDirs) checkSkill(dir);
+for (const f of mdFiles(join(ROOT, '_shared'))) checkLinks(f);
 const evalsRequested = args.includes('--evals') || EXPECT_EVALS !== null;
 const GRADER_TYPES = new Set(['regex', 'tool_used', 'tool_order', 'file_exists', 'llm', 'baseline']);
 
