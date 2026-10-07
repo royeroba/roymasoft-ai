@@ -43,8 +43,12 @@ Source: https://cheatsheetseries.owasp.org/cheatsheets/Nodejs_Security_Cheat_She
 
 Design controls in, not on: limit request sizes, rate-limit sensitive and business flows, and apply least privilege from the start.
 
+For a new feature that accepts input, changes access or stores sensitive data, name its trust boundaries first and run STRIDE (spoofing, tampering, repudiation, information disclosure, denial of service, elevation of privilege) over each one. Write abuse cases (a way to use the feature that the implementer did not expect) next to the use cases and cover each with a test or an acceptance criterion.
+
 Source: https://cheatsheetseries.owasp.org/cheatsheets/Nodejs_Security_Cheat_Sheet.html
 Source: https://api-security.owasp.org/editions/2023/en/0x11-t10
+Source: https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html
+Source: https://cheatsheetseries.owasp.org/cheatsheets/Abuse_Case_Cheat_Sheet.html
 
 ## A07 Authentication Failures
 

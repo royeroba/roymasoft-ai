@@ -13,4 +13,5 @@ Verifiable items for the author and for the reviewer. An unmet item caused by th
 - [ ] Dependencies come from the lockfile (`npm ci`), were audited when changed, and no unexpected package was added.
 - [ ] After an uncaught exception the process logs, cleans up and exits; it never resumes.
 - [ ] Passwords and secret comparisons use the platform's crypto (`scrypt`, `timingSafeEqual`), not custom code.
+- [ ] A new feature that accepts input, changes access or stores sensitive data has its trust boundaries named and its abuse cases covered by a test or acceptance criterion.
 - [ ] The ASVS target level (default L2, minimum L1) was stated and what was not verified was reported.
