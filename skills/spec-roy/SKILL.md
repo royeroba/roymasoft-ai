@@ -1,6 +1,6 @@
 ---
 name: spec-roy
-description: "Large lane: designs and executes a feature with a spec. Trigger: the user accepts 'with spec', types /spec-roy, or asks to plan a large feature before coding ('write a spec for this', 'plan this feature', 'let's do it with a spec'). Asks questions, presents the plan (Plan Mode), saves specs/NN-slug.md and implements in phases with pauses."
+description: "Large lane: designs and executes a feature with a spec. Trigger: the user accepts 'with spec', types /spec-roy, or asks explicitly to plan before coding, in any language ('plan mode', 'write a spec for this', 'plan this feature', 'let's do it with a spec', 'modo plan', 'planea', 'planifica', 'especifica', 'hazlo con spec'). Enters the native Plan Mode, asks questions with AskUserQuestion, presents the plan with ExitPlanMode, saves specs/NN-slug.md and implements in phases with pauses."
 disable-model-invocation: false
 argument-hint: "short description of the feature, or NN-slug of an existing spec to resume it"
 ---
@@ -17,15 +17,23 @@ A spec is the contract execution starts from: if it is vague, the code improvise
 - Otherwise, start at phase 1. Look at `specs/` to number the new one and to copy the **language** and conventions of the existing specs.
 - Existing specs may use Spanish status values: `Borrador` = Draft, `Aprobado` = Approved, `Implementado` = Implemented, `Obsoleto` = Obsolete. Keep the language the repo's specs already use.
 
+## Enter Plan Mode (before phase 1)
+
+Phases 1 to 3 run inside the agent's **native Plan Mode**, never as a plan written in the chat.
+
+1. `EnterPlanMode`, `ExitPlanMode` and `AskUserQuestion` may be deferred: load them with a **single** `ToolSearch` (`select:EnterPlanMode,ExitPlanMode,AskUserQuestion`).
+2. Call `EnterPlanMode` now, unless the session is already in Plan Mode. Plan Mode is read-only, which matches "no code in phases 1 and 2".
+3. Only if `ToolSearch` does not return those tools, say so in one line and use the chat fallback of each phase.
+
 ## Phase 1 — Context
 
-If there is a Jira URL or key, invoke `/consult-ticket-roy`; if there is a Figma URL, or the ticket links one, `/consult-figma-roy`. Their gaps and questions feed phase 2. If `/hu-roy` already consulted them, reuse that context instead of fetching it again.
+If there is a Jira URL or key, invoke `/consult-ticket-roy`; if there is a Figma URL, or the ticket links one, `/consult-figma-roy`; if there is a Notion, Google Drive, Docs or Gmail URL, `/consult-docs-roy`. Their gaps and questions feed phase 2. If `/hu-roy` already consulted them, reuse that context instead of fetching it again.
 
 Read the project's memory file (`CLAUDE.md`, `AGENTS.md`, `README.md`, whichever exists first) and, following the rules' search order, whatever the feature touches. If the goal does not fit in one sentence, or touches decisions in 4 or more domains, propose splitting it into two specs before continuing.
 
 ## Phase 2 — Questions
 
-Detect ambiguities and **ask, do not assume**. Blocks of 3 to 5, with 2 to 4 options and your recommendation (use `AskUserQuestion` if available). Categories: scope (what is in and what is **not**), data, integration, persistence, UX and error states, risks, decisions already closed. If something opens a Pandora's box, propose leaving it for another spec.
+Detect ambiguities and **ask, do not assume**. Blocks of 3 to 5, with 2 to 4 options and your recommendation, always with `AskUserQuestion`; plain chat questions only in the fallback. Categories: scope (what is in and what is **not**), data, integration, persistence, UX and error states, risks, decisions already closed. If something opens a Pandora's box, propose leaving it for another spec.
 
 Stop when you can answer without assuming: which files appear or change, what the first and the last step are, and how to verify that it is finished.
 
@@ -33,8 +41,8 @@ Stop when you can answer without assuming: which files appear or change, what th
 
 Write the full spec following `template.md`: **Specs** with the user's phrases **verbatim** (S1..Sn, without paraphrasing or adding requirements), **Plan** in phases that leave the system working, verifiable **Criteria**, decisions and risks.
 
-- Present it with **Plan Mode** (`EnterPlanMode` / `ExitPlanMode`) if available: the user's "accept" is the approval.
-- Without Plan Mode: show it in the chat and ask for a go-ahead.
+- Write it to the plan file that Plan Mode indicates and present it with `ExitPlanMode`: the user's "accept" is the approval.
+- Fallback without Plan Mode: show it in the chat and ask for a go-ahead.
 - If the user asks for changes, adjust and present again. Never mark a spec as approved yourself without that answer.
 
 ## Phase 4 — Save
