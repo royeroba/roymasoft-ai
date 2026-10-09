@@ -14,13 +14,13 @@ You fetch the design's nodes and **check them against the project's real code**:
 - Use it when there is a Figma URL or when asked to review a design. `/hu-roy` and `/spec-roy` invoke it as soon as one appears, or when `/consult-ticket-roy` finds a link.
 - Do not use it to create or edit files in Figma, nor for FigJam or Slides; say so.
 
-## 1. Validate the tool
+## 1. Sweep the connectors
 
-Search with ToolSearch (`figma`) and use the Figma plugin or MCP that shows up, preferring the official plugin. Do not assume tool names.
+Follow `../_shared/connectors.md`: try every official Figma option (plugin, claude.ai connector, desktop MCP) until one is signed in. One that asks for authentication or fails is not a stop: try the next.
 
-- If the server asks for authentication, say so: they have to authorize it themselves (`/mcp` or the claude.ai connectors). **Do not ask for tokens or codes.**
-- Before calling `get_design_context`, load the `figma:figma-design-to-code` skill: it is mandatory.
-- If there is no Figma tool, ask for screenshots or exports of the frame and mark the result as **manual context**, with no exact tokens. **Never claim to be able to read a system that is not connected.**
+- **Do not ask for tokens or codes.** Authorizing is the user's job (`/mcp` or the claude.ai connectors).
+- Before calling `get_design_context`, load the `figma:figma-design-to-code` skill if it exists: it is mandatory.
+- If no official option works, give the recommended secure option (connectors.md §4) and ask for screenshots or exports of the frame and mark the result as **manual context**, with no exact tokens. **Never claim to be able to read a system that is not connected.**
 
 ## 2. Fetch the nodes
 
@@ -73,7 +73,7 @@ If the tool fails, there is no permission or the node does not exist, state the 
 
 ## Final checklist
 
-- [ ] Figma tool validated, or context marked as manual
+- [ ] Official Figma options swept, or context marked as manual
 - [ ] I wrote nothing in Figma
 - [ ] A specific node or frame, not the whole file
 - [ ] Tokens matched with the project, not hardcoded

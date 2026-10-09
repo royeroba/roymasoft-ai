@@ -8,7 +8,7 @@
 1. **Autoriza.** ¿El pedido autoriza un cambio? Investigar, explicar, comparar o revisar es solo lectura; no edites ni delegues escritura. Si el pedido es ambiguo o condicional, haz una pregunta y sigue en solo lectura hasta que respondan.
 2. **Explora** lo mínimo para decidir, no para "familiarizarte".
 3. **Clasifica.** *Pequeña*: está entendida, su riesgo está contenido y se podría retomar solo desde la petición y `git diff`. *Grande*: solo cuando eso falla (varias sesiones, depende de algo externo, entregables separados). Nunca por número de archivos, comandos o tests.
-4. **Pequeña:** hazla directo y enséñale el diff. **Grande:** propón trabajarla con spec (preguntas, plan y documento) en una línea y espera su respuesta.
+4. **Pequeña:** hazla directo y enséñale el diff. **Grande:** propón trabajarla con spec (preguntas, plan y documento) en una línea y espera su respuesta. **Si el usuario ya pidió planear** ("modo plan", "planea", "planifica", "planificación", "especifica", "haz un spec", "plan mode" o equivalentes), no clasifiques ni preguntes: invoca `spec-roy` directo, que usa el Plan Mode nativo; nunca armes el plan ni sus preguntas como texto en el chat.
 5. **Riesgo alto:** datos o efectos irreversibles, seguridad, contratos que otros consumen, concurrencia, entorno o despliegue, o ningún test detectaría una regresión. Si no puedes saber si aplica con una mirada acotada, trátalo como alto.
 6. **Tests:** si el proyecto tiene stack de pruebas, usa TDD (ver el test fallar por la razón correcta, luego pasar). Si no lo tiene, dilo una vez y verifica con lo que exista; nunca inventes un runner. Un test no se borra ni se debilita para que pase.
 7. **Cierra** todo cambio con `Riesgo: <ítem>` o `Riesgo: ninguno`, lo que no verificaste y, si tocó código, la revisión fresca de la skill `rdd-roy`. Si no se ejecutó una revisión, di por qué.
@@ -38,6 +38,11 @@ Esta regla se aplica con tu criterio en cada sesión y prompt, no como un guion 
 **Dominios.** Si el cambio toca uno de estos temas, aplica su skill antes de escribir código: tests → `testing-roy`; seguridad (autenticación, autorización, entradas de usuario, consultas, secretos, subidas, dependencias, cabeceras) → `security-roy`; estilos → `styles-roy`; TypeScript → `typescript-roy`; bases de datos (esquemas, consultas, índices, migraciones; SQL y NoSQL) → `database-roy`; componentes React o Vue, accesibilidad y rendimiento de front → `frontend-roy`; endpoints, servicios Node y observabilidad → `backend-roy`; cualquier pedido de rendimiento → `performance-roy` (medir antes de optimizar); Dockerfile, CI y GitHub Actions → `delivery-roy`. Todo dato externo es no confiable: valídalo en el borde. Nunca escribas ni registres secretos, tokens o datos personales.
 
 **Diseño.** Sigue las convenciones del código existente y no refactorices lo que no te pidieron. DRY: una sola fuente para cada regla de negocio o dato; no unifiques código que solo se parece y puede cambiar por motivos distintos. SOLID: una responsabilidad por módulo; depende de una abstracción solo si ya hay dos implementaciones reales. Si la regla choca con la convención del repo, gana el repo.
+
+**Comentarios.** El código que escribes o modificas no lleva comentarios: se explica solo con nombres claros y funciones pequeñas. Excepciones:
+- **JSDoc** en servicios, utils, composables o hooks y funciones complejas: descripción breve, `@param` por parámetro, `@returns` y `@throws` si lanza. En TypeScript sin `{tipo}` (vive en la firma); en JavaScript con `{tipo}`.
+- **Una línea** cuando la lógica es tan compleja que el porqué no se deduce del código (por ejemplo `any` inevitable, `catch` vacío o una aserción de tipo).
+Nunca comentarios que repiten el código, código comentado ni TODO sin ticket. No borres comentarios de código que no tocas.
 
 **Autonomía.** Haz el trabajo que te corresponde. Pregunta solo lo que el código no puede responder y, cuando preguntes, da opciones cerradas. Preguntar no sustituye investigar: pregunta después de haber buscado, no en lugar de hacerlo.
 

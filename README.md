@@ -11,12 +11,12 @@ claude plugin install roymasoft-ai@roymasoft
 
 La primera sesión corre `hooks/bootstrap.mjs`: instala y cablea Engram y CodeGraph si faltan, e inyecta las reglas. Después de instalar o subir de versión, reinicia Claude Code.
 
-## Skills (18, todas `-roy`)
+## Skills (19, todas `-roy`)
 
 | Grupo | Skills |
 |---|---|
 | Flujo | `hu-roy` (entrada), `spec-roy` (tareas grandes), `rdd-roy` (revisión fresca con el agente `reviewer`), `e2e-roy` (navegador con Playwright) |
-| Git y entrega de contexto | `commit-roy`, `create-pr-roy`, `consult-ticket-roy` (Jira), `consult-figma-roy` |
+| Git y entrega de contexto | `commit-roy`, `create-pr-roy`, `consult-ticket-roy` (Jira), `consult-figma-roy`, `consult-docs-roy` (Notion, Google Drive, Docs y Gmail) |
 | Ingeniería | `testing-roy`, `security-roy`, `typescript-roy`, `database-roy`, `frontend-roy`, `backend-roy`, `performance-roy`, `delivery-roy` |
 | Estilos y meta | `styles-roy`, `create-skill-roy` |
 
@@ -35,7 +35,7 @@ Cada skill de ingeniería es un despachador corto con `references/` (fuentes ofi
 
 ```
 .claude-plugin/   plugin.json y marketplace.json
-skills/           las 18 skills (+ _shared/)
+skills/           las 19 skills (+ _shared/)
 agents/           reviewer (revisión RDD)
 hooks/            hooks.json y scripts
 rules/            reglas inyectadas en cada sesión
@@ -49,7 +49,7 @@ docs/             decisiones de diseño de los flujos
 
 ```bash
 claude plugin validate .
-node scripts/validate-skills.mjs --expect-evals 22
+node scripts/validate-skills.mjs --expect-evals 24
 node scripts/test-secrets-hook.mjs
 ```
 

@@ -99,7 +99,7 @@ Format of `claude plugin eval`: one folder per case under `evals/`, with `prompt
 
 | Kind | Folders | Grader | Cost |
 |---|---|---|---|
-| Skill fires | `fires-<skill>` (one per skill, 18) | `tool_used` on `Skill` | the agent run only, no judge |
+| Skill fires | `fires-<skill>` (one per skill, 19, plus `fires-spec-roy-natural` for planning asked in Spanish) | `tool_used` on `Skill` | the agent run only, no judge |
 | Safety | `safety-*` (4) | `llm` with concrete PASS and FAIL lines | agent run plus judge |
 
 Run by hand before bumping the plugin version, never in CI (every run is a full agent session that spends tokens):
@@ -109,4 +109,4 @@ claude plugin eval . --runs 1 --max-cost-usd <ceiling>                 # whole s
 claude plugin eval . --case "fires-hu-roy" --runs 1 --max-cost-usd 1   # one case
 ```
 
-Cases default to `runs: 1`; raise it with `--runs 3` for a release gate. A path target runs no no-plugin baseline; target the installed plugin by name (`roymasoft-ai@roymasoft`) to get the with/without delta. `node scripts/validate-skills.mjs --expect-evals 22` checks the layout and warns when a skill has no `fires-<skill>` case. When you add a skill, add its case and raise the expected count.
+Cases default to `runs: 1`; raise it with `--runs 3` for a release gate. A path target runs no no-plugin baseline; target the installed plugin by name (`roymasoft-ai@roymasoft`) to get the with/without delta. `node scripts/validate-skills.mjs --expect-evals 24` checks the layout and warns when a skill has no `fires-<skill>` case. When you add a skill, add its case and raise the expected count.

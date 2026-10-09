@@ -120,6 +120,11 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 - Ambas validan que el plugin o MCP exista (si no, piden el texto o capturas y lo marcan como contexto manual), solo leen, analizan lo que traen y preguntan los huecos con opciones cerradas.
 - `/consult-figma-roy` además cruza los nodos con el proyecto: tokens, componentes existentes, responsive y estados, apoyándose en las skills de estilos que existan (del proyecto, del plugin o globales). Si no existe ninguna, valida contra el código y lo dice.
 - Un ticket que enlaza Figma ofrece encadenar `/consult-figma-roy`. `/create-pr-roy` reutiliza el contexto del ticket.
+- `/consult-docs-roy` lee URLs de Notion, Google Drive, Docs y Gmail con el mismo patrón; solo escribe borradores, cada uno con un sí explícito, y nunca envía, comparte, mueve, borra ni edita lo existente.
+- **Conectores (v0.14.0).** `skills/_shared/connectors.md` define el barrido: se prueban todas las fuentes oficiales de cada servicio (plugins de `claude-plugins-official`, conectores de claude.ai, MCP con el endpoint oficial del proveedor, `gh`) hasta encontrar una con sesión; un fallo no detiene el barrido. Los servidores comunitarios no se usan aunque estén conectados. Si ninguno sirve, se sugiere en un solo mensaje la opción oficial más segura (OAuth en el navegador, sin tokens en archivos).
+- **PR.** El cuerpo empieza con una tabla de una fila (developer, ticket, rama) y luego resumen, lo hecho y criterios; el título no se repite.
+- **Plan Mode.** Pedir planear en lenguaje natural ("modo plan", "planea", "planifica", "especifica") invoca `spec-roy` directo; las fases 1 a 3 corren dentro del Plan Mode nativo (cargado con `ToolSearch`), con preguntas por `AskUserQuestion` y aprobación con `ExitPlanMode`.
+- **Comentarios.** Regla en `rules/behavior.md`: código nuevo o tocado sin comentarios, salvo JSDoc en servicios, utils, composables y funciones complejas; `rdd-roy` lo verifica siempre.
 - `styles-roy` (CSS/SCSS/Sass con BEM, CSS moderno, Tailwind al día, responsive validado contra los breakpoints del proyecto) es la skill de estilos del plugin: la usan `/hu-roy`, `/spec-roy` y `/consult-figma-roy`. Es un despachador con `references/` (bem, modern-css, tailwind, responsive) y detecta el enfoque del proyecto sin suponerlo.
 
 ## 11d. Ingeniería integral (SPEC 01)

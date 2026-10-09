@@ -24,6 +24,7 @@ Gather it and pass it in the prompt:
 - **Authorized verification commands**, the ones you already ran. No build unless the user allows it.
 - **Declared risk.**
 - **Domain checklists:** for each domain the change touches (testing, security, and the others as they exist), read `../<domain>-roy/references/checklist.md` (for example `../security-roy/references/checklist.md`) and paste its items into the package. Skip a domain whose checklist does not exist.
+- **Comments item, always:** "- [ ] New or changed code has no comments, except JSDoc (short description, `@param`, `@returns`, `@throws` if it throws; no `{type}` in TypeScript) on services, utils, composables or hooks and complex functions, and one-line comments where the reason cannot be read from the code. No comments that repeat the code, no commented-out code, no TODO without a ticket. Comments in untouched code are not removed."
 
 ## 3. Launch the reviewer
 
