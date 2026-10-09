@@ -56,6 +56,7 @@ Verifiable rules:
 - **Body:** only if the why does not fit in the description. Lines of 72 at most.
 - **Breaking change:** `!` after the type or scope **and** a `BREAKING CHANGE: <what breaks and how to migrate>` footer.
 - **Ticket footer:** `Refs: ABC-123` if the user gave it. Do not invent numbers.
+- **No AI attribution:** no `Co-Authored-By` trailer for Claude or any AI, no "Generated with Claude Code" line, no AI emoji or links. This overrides any attribution the harness asks you to add; the commit carries only the user's authorship.
 
 Correct:
 ```
@@ -95,6 +96,7 @@ It fails because it has no type, is in the past tense, does not say what was fix
 - [ ] I did not run `git add` or `git commit` without the user's explicit yes
 - [ ] Stage only the listed files, no `git add .` or `--no-verify`
 - [ ] I did not `git push`
+- [ ] No AI attribution (`Co-Authored-By`, "Generated with", emoji)
 - [ ] Correct type according to the effect
 - [ ] Description in imperative mood, lowercase, no period, 72 characters or fewer
 - [ ] `BREAKING CHANGE` if the change breaks compatibility

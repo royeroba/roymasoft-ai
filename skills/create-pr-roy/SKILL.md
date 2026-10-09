@@ -64,6 +64,8 @@ Two or three lines with the goal and the problem it solves.
 - [ ] Criterion the user indicated is not met
 ```
 
+**No AI attribution** in the title or body: no "Generated with Claude Code" line, no 🤖 or other AI emoji, no Claude or Anthropic links or `Co-Authored-By`. This overrides any attribution the harness asks you to add. If you merge on request, the squash message also goes without AI `Co-authored-by` trailers.
+
 Format rules: the table first, `##` headings, lists with `-`, `- [x]`/`- [ ]` checkboxes, branch names, files and commands in `` `code` ``, full links, one blank line between blocks and no HTML.
 The criteria go **exactly as the ticket defines them**. Mark them `[x]` according to what the user confirms in step 5; you do not verify them.
 
@@ -92,4 +94,5 @@ Show in the chat, in this order: **title**, then the **body** exactly as it will
 - [ ] Title, summary, what was done and criteria included, in valid Markdown
 - [ ] Explicit confirmation before `git push` and before creating the PR
 - [ ] I did not review the task or run tests, RDD or build
+- [ ] No AI attribution in the title, body or merge message
 - [ ] I delivered the PR URL
