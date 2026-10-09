@@ -15,12 +15,12 @@ You fetch what the ticket says, analyze it and deliver context usable by `/hu-ro
 - If the URL is from another system (Linear, Asana, GitHub Issues), say so and ask what to do; do not use another tool unless they accept.
 - If the ticket links a Figma design, do not consult it here: offer `/consult-figma-roy`.
 
-## 1. Validate the tool
+## 1. Sweep the connectors
 
-Search with ToolSearch (`jira issue`) and use the Jira plugin or MCP that shows up. Do not assume tool names.
+Follow `../_shared/connectors.md`: try every official Atlassian option (plugin, claude.ai connector, manual MCP) until one is signed in. One that asks for authentication or fails is not a stop: try the next.
 
-- If the server asks for authentication, say so: they have to authorize it themselves (`/mcp` or the claude.ai connectors). **Do not ask for tokens or codes.**
-- If there is no Jira tool, ask them to paste the ticket text (title, description, criteria) and mark the result as **manual context**. **Never claim to be able to read a system that is not connected.**
+- **Do not ask for tokens or codes.** Authorizing is the user's job (`/mcp` or the claude.ai connectors).
+- If no official option works, give the recommended secure option (connectors.md §4) and ask them to paste the ticket text (title, description, criteria) and mark the result as **manual context**. **Never claim to be able to read a system that is not connected.**
 
 ## 2. Fetch the ticket
 
@@ -73,7 +73,7 @@ If the tool fails, or the ticket does not exist, or there is no permission, stat
 
 ## Final checklist
 
-- [ ] Jira tool validated, or context marked as manual
+- [ ] Official Jira options swept, or context marked as manual
 - [ ] I wrote nothing in Jira
 - [ ] Criteria copied from the ticket, not invented
 - [ ] Fields I could not read marked "not available"
