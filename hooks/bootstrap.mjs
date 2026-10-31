@@ -2,15 +2,19 @@
 // SessionStart: deja Engram y CodeGraph instalados y cableados como lo hace gentle-ai,
 // e inyecta sus reglas como contexto. Idempotente y fail-open (siempre exit 0).
 // Todo en un solo proceso y en orden: dos hooks en paralelo se pisarían al editar ~/.claude.json.
-//   Engram:    binario (descarga verificada o go install) -> MCP de usuario -> plugin engram@engram
+//   Engram:    binario (descarga verificada o go install) -> MCP de usuario -> plugin engram@engram,
+//              y una vez al día sube el binario y el plugin si hay versión nueva
 //   CodeGraph: CLI (npm) -> `codegraph install` (MCP + hook + permiso) -> ver ./codegraph.mjs
-//   stdout =   avisos de lo instalado + rules/behavior.md + rules/engram-protocol.md + rules/codegraph-guidance.md
+//   stdout =   avisos + rules/behavior.md + rules/engram-protocol.md + rules/codegraph-guidance.md, por prioridad
+//              y sin pasar el límite de 10.000 caracteres del hook (ver ./lib/context.mjs)
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync, copyFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, mkdtempSync, rmSync, copyFileSync, renameSync, statSync } from 'node:fs';
 import { homedir, tmpdir, platform, arch } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { codegraphGuidance, ensureCodegraph } from './codegraph.mjs';
+import { composeContext, readRule } from './lib/context.mjs';
+import { versionLess } from './lib/version.mjs';
 import { run as spawn } from './run.mjs';
 
 const ROOT = process.env.CLAUDE_PLUGIN_ROOT || join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -20,6 +24,8 @@ const INSTALL_DIR = process.env.RAI_ENGRAM_DIR
   || (WIN ? join(process.env.LOCALAPPDATA || join(homedir(), 'AppData', 'Local'), 'engram', 'bin')
           : join(homedir(), '.local', 'bin'));
 const REPO = 'Gentleman-Programming/engram';
+const UPDATE_STAMP = join(INSTALL_DIR, '.rai-update-check');
+const UPDATE_EVERY_MS = 24 * 60 * 60 * 1000;
 const notes = [];
 
 const run = (cmd, args, opts = {}) => spawn(cmd, args, opts);
@@ -56,10 +62,22 @@ async function download(url, dest) {
   writeFileSync(dest, Buffer.from(await res.arrayBuffer()));
 }
 
-async function installBinary() {
+// En Windows un exe en uso (MCP de otra sesión) no se sobrescribe ni se borra, pero sí se renombra;
+// las copias viejas se limpian cuando ya nadie las usa.
+function replaceBinary(src, dest) {
+  for (const f of readdirSync(INSTALL_DIR).filter(n => n.startsWith(`${BIN_NAME}.`) && n.endsWith('.old'))) {
+    try { rmSync(join(INSTALL_DIR, f)); } catch { /* aún en uso */ }
+  }
+  const old = existsSync(dest) ? `${dest}.${Date.now()}.old` : null;
+  if (old) renameSync(dest, old);
+  try { copyFileSync(src, dest); }
+  catch (e) { if (old) renameSync(old, dest); throw e; }
+  return old;
+}
+
+async function installBinary(version) {
   const goos = WIN ? 'windows' : platform() === 'darwin' ? 'darwin' : 'linux';
   const goarch = arch() === 'arm64' ? 'arm64' : 'amd64';
-  const version = await latestCoreVersion();
   const archive = `engram_${version}_${goos}_${goarch}${WIN ? '.zip' : '.tar.gz'}`;
   const base = `https://github.com/${REPO}/releases/download/v${version}`;
   const tmp = mkdtempSync(join(tmpdir(), 'rai-engram-'));
@@ -79,10 +97,11 @@ async function installBinary() {
     if (x.status !== 0) throw new Error(`extracción falló: ${x.stderr}`);
     mkdirSync(INSTALL_DIR, { recursive: true });
     const dest = join(INSTALL_DIR, BIN_NAME);
-    copyFileSync(join(out, BIN_NAME), dest);
+    const previous = replaceBinary(join(out, BIN_NAME), dest);
     // Una política de control de aplicaciones (Windows) puede bloquear el exe descargado: se verifica que ejecute.
     if (run(dest, ['version'], { timeout: 10_000 }).status !== 0) {
       rmSync(dest, { force: true });
+      if (previous) renameSync(previous, dest);
       throw new Error('el binario descargado no ejecuta (¿bloqueado por una política del sistema?)');
     }
     notes.push(`engram ${version} instalado en ${INSTALL_DIR}${WIN ? ' (agrégalo al PATH si no está)' : ''}.`);
@@ -127,14 +146,48 @@ function installWithGo() {
   return join(INSTALL_DIR, BIN_NAME);
 }
 
+function engramVersion(cmd) {
+  return run(cmd, ['version'], { timeout: 5_000 }).stdout?.match(/\d+\.\d+\.\d+/)?.[0] ?? null;
+}
+
+function updateDue() {
+  try { return Date.now() - statSync(UPDATE_STAMP).mtimeMs > UPDATE_EVERY_MS; } catch { return true; }
+}
+
+// Solo se sube el binario que instala este plugin; uno de otro gestor (brew, go, scoop) se avisa.
+async function updateEngram(engram) {
+  mkdirSync(INSTALL_DIR, { recursive: true });
+  writeFileSync(UPDATE_STAMP, new Date().toISOString());
+  const managed = join(INSTALL_DIR, BIN_NAME);
+  const current = engramVersion(engram);
+  const latest = await latestCoreVersion();
+  if (current && versionLess(current, latest)) {
+    if (existsSync(managed)) {
+      if (versionLess(engramVersion(managed) ?? '0.0.0', latest)) await installBinary(latest);
+      const active = engramVersion(engram);
+      if (active && versionLess(active, latest)) notes.push(`El engram del PATH sigue en ${active}: quita la otra instalación o actualízala.`);
+    } else {
+      notes.push(`engram ${current} está desactualizado (última ${latest}): actualízalo con el gestor con que lo instalaste.`);
+    }
+  }
+  const m = run('claude', ['plugin', 'marketplace', 'update', 'engram'], { shell: WIN, timeout: 120_000 });
+  const p = m.status === 0 ? run('claude', ['plugin', 'update', 'engram@engram'], { shell: WIN, timeout: 120_000 }) : m;
+  const bump = p.stdout?.match(/updated from (\S+) to (\S+)/);
+  if (bump) notes.push(`Plugin engram@engram actualizado de ${bump[1]} a ${bump[2]}. Reinicia Claude Code para activarlo.`);
+}
+
 try {
   let engram = findEngram();
   if (!engram) {
-    try { engram = await installBinary(); }
+    try { engram = await installBinary(await latestCoreVersion()); }
     catch (e) { engram = installWithGo(); notes.push(`Descarga descartada: ${e.message}.`); }
   }
   ensureMcp(engram);
   ensureEngramPlugin();
+  if (updateDue()) {
+    try { await updateEngram(engram); }
+    catch (e) { notes.push(`No pude comprobar actualizaciones de Engram: ${e.message}`); }
+  }
 } catch (err) {
   notes.push(`Bootstrap de Engram incompleto: ${err.message}`);
 }
@@ -143,10 +196,12 @@ let codegraphReady = false;
 try { codegraphReady = ensureCodegraph(notes); }
 catch (err) { notes.push(`Bootstrap de CodeGraph incompleto: ${err.message}`); }
 
-if (notes.length) console.log(`## roymasoft-ai: configuración de Engram y CodeGraph\n${notes.map(n => `- ${n}`).join('\n')}\n`);
-for (const rules of ['behavior.md', 'engram-protocol.md']) {
-  try { console.log(readFileSync(join(ROOT, 'rules', rules), 'utf8')); } catch { /* sin reglas: no bloquear */ }
+const sections = [];
+if (notes.length) sections.push({ name: 'avisos', text: `## roymasoft-ai: configuración de Engram y CodeGraph\n${notes.map(n => `- ${n}`).join('\n')}` });
+for (const [name, file] of [['reglas de trabajo', 'behavior.md'], ['protocolo de Engram', 'engram-protocol.md']]) {
+  try { sections.push({ name, text: readRule(ROOT, file) }); } catch { /* sin reglas: no bloquear */ }
 }
 // Sin CLI no se inyectan las reglas de CodeGraph: mandarían al agente a una herramienta inexistente.
-if (codegraphReady) { try { console.log(codegraphGuidance(ROOT)); } catch { /* idem */ } }
+if (codegraphReady) { try { sections.push({ name: 'reglas de CodeGraph', text: codegraphGuidance(ROOT) }); } catch { /* idem */ } }
+console.log(composeContext(sections));
 process.exit(0);

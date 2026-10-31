@@ -3,6 +3,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { homedir, platform } from 'node:os';
 import { join } from 'node:path';
+import { readRule } from './lib/context.mjs';
+import { versionLess } from './lib/version.mjs';
 import { run as spawn } from './run.mjs';
 
 const WIN = platform() === 'win32';
@@ -12,13 +14,6 @@ const LEGACY_BLOCK = /<!-- CODEGRAPH_START -->[\s\S]*?<!-- CODEGRAPH_END -->\n?/
 
 const run = (cmd, args, timeout = 60_000) => spawn(cmd, args, { timeout, shell: WIN });
 const readJson = path => { try { return JSON.parse(readFileSync(path, 'utf8')); } catch { return null; } };
-const versionLess = (a, b) => {
-  const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
-  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-    if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) < (pb[i] || 0);
-  }
-  return false;
-};
 
 function installedVersion() {
   const r = run('codegraph', ['--version'], 10_000);
@@ -73,5 +68,5 @@ export function ensureCodegraph(notes) {
 /** Reglas de CodeGraph con el comando de init del plugin ya resuelto. */
 export function codegraphGuidance(root) {
   const initCmd = `node "${join(root, 'hooks', 'codegraph-init.mjs')}" --cwd <project-root>`;
-  return readFileSync(join(root, 'rules', 'codegraph-guidance.md'), 'utf8').replaceAll('{{INIT_CMD}}', initCmd);
+  return readRule(root, 'codegraph-guidance.md').replaceAll('{{INIT_CMD}}', initCmd);
 }

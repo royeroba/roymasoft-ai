@@ -9,7 +9,7 @@ claude plugin marketplace add <ruta-o-repo>
 claude plugin install roymasoft-ai@roymasoft
 ```
 
-La primera sesión corre `hooks/bootstrap.mjs`: instala y cablea Engram y CodeGraph si faltan, e inyecta las reglas. Después de instalar o subir de versión, reinicia Claude Code.
+Cada sesión corre `hooks/bootstrap.mjs`: instala y cablea Engram y CodeGraph si faltan, una vez al día sube el binario y el plugin de Engram si hay versión nueva, e inyecta las reglas. Las reglas juntas no pasan de 9.000 caracteres (lo exige `scripts/validate-skills.mjs`): Claude Code corta la salida de un hook a 10.000 y el modelo vería solo un preview. Después de instalar o subir de versión, reinicia Claude Code.
 
 ## Skills (19, todas `-roy`)
 
@@ -26,7 +26,7 @@ Cada skill de ingeniería es un despachador corto con `references/` (fuentes ofi
 
 | Hook | Qué hace |
 |---|---|
-| `bootstrap.mjs` (SessionStart) | Instala y cablea Engram y CodeGraph; inyecta `rules/` |
+| `bootstrap.mjs` (SessionStart) | Instala, cablea y mantiene al día Engram; instala y cablea CodeGraph; inyecta `rules/` dentro del límite del hook |
 | `pretooluse-no-commit.mjs` | Pide confirmación en `git add`, `commit` y `stage` |
 | `pretooluse-search-gate.mjs` | Pide memoria y grafo antes del primer edit de código |
 | `pretooluse-secrets.mjs` | Pide confirmación ante secretos evidentes en Write, Edit y MultiEdit |
