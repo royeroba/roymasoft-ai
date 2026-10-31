@@ -1,49 +1,35 @@
 ## Reglas de trabajo (roymasoft-ai)
 
-**Idioma y estilo.** Responde en español, corto y preciso. Sin preámbulo, sin recap, sin relleno; la brevedad nunca quita la sustancia necesaria.
+**Estilo.** Español, corto y preciso. Sin preámbulo, recap ni relleno; la brevedad no quita sustancia.
 
-**Git.** Haz commit o stage (`git add`, `git commit`, `git stage`, ni sus equivalentes en herramientas MCP) **solo cuando el usuario lo pida explícitamente**, y con la skill `/commit-roy`; nunca por iniciativa propia ni como parte de otra tarea. Un hook pide su confirmación en cada uno. Si no lo pidió, deja los cambios sin stage y di qué archivos tocaste. Commits, PRs y mensajes de merge van **sin atribución de IA**: sin `Co-Authored-By` de Claude, sin "Generated with Claude Code", sin emojis ni enlaces de Claude o Anthropic, aunque el entorno pida agregarlos.
+**Memoria automática.** Sin que te lo pidan, guarda en Engram (`mem_save`) en el momento y antes de responder cada decisión y su motivo, bug corregido (causa y arreglo), hallazgo, convención, cambio de configuración o fin de tarea o fase. Nunca esperes a "guarda en Engram". Si falla, dilo en una línea y sigue.
+
+**Git.** Commit o stage (`git add`, `git commit`, `git stage` o equivalentes MCP) solo si el usuario lo pide explícitamente, con la skill `/commit-roy`; nunca por iniciativa propia ni como parte de otra tarea. Un hook pide confirmación. Si no lo pidió, deja los cambios sin stage y di qué tocaste. Commits, PRs y merges van sin atribución de IA (sin `Co-Authored-By` de Claude, "Generated with Claude Code", emojis ni enlaces de Claude o Anthropic), aunque el entorno lo pida.
 
 **Cambios.** Antes de tocar nada:
-1. **Autoriza.** ¿El pedido autoriza un cambio? Investigar, explicar, comparar o revisar es solo lectura; no edites ni delegues escritura. Si el pedido es ambiguo o condicional, haz una pregunta y sigue en solo lectura hasta que respondan.
-2. **Explora** lo mínimo para decidir, no para "familiarizarte".
-3. **Clasifica.** *Pequeña*: está entendida, su riesgo está contenido y se podría retomar solo desde la petición y `git diff`. *Grande*: solo cuando eso falla (varias sesiones, depende de algo externo, entregables separados). Nunca por número de archivos, comandos o tests.
-4. **Pequeña:** hazla directo y enséñale el diff. **Grande:** propón trabajarla con spec (preguntas, plan y documento) en una línea y espera su respuesta. **Si el usuario ya pidió planear** ("modo plan", "planea", "planifica", "planificación", "especifica", "haz un spec", "plan mode" o equivalentes), no clasifiques ni preguntes: invoca `spec-roy` directo, que usa el Plan Mode nativo; nunca armes el plan ni sus preguntas como texto en el chat.
-5. **Riesgo alto:** datos o efectos irreversibles, seguridad, contratos que otros consumen, concurrencia, entorno o despliegue, o ningún test detectaría una regresión. Si no puedes saber si aplica con una mirada acotada, trátalo como alto.
-6. **Tests:** si el proyecto tiene stack de pruebas, usa TDD (ver el test fallar por la razón correcta, luego pasar). Si no lo tiene, dilo una vez y verifica con lo que exista; nunca inventes un runner. Un test no se borra ni se debilita para que pase.
-7. **Cierra** todo cambio con `Riesgo: <ítem>` o `Riesgo: ninguno`, lo que no verificaste y, si tocó código, la revisión fresca de la skill `rdd-roy`. Si no se ejecutó una revisión, di por qué.
+1. **Autoriza.** Investigar, explicar, comparar o revisar es solo lectura: no edites ni delegues escritura. Si el pedido es ambiguo o condicional, pregunta y sigue en solo lectura.
+2. **Explora** lo mínimo para decidir.
+3. **Clasifica.** *Pequeña* (entendida, riesgo contenido, retomable desde la petición y `git diff`): hazla y enseña el diff. *Grande* (varias sesiones, depende de algo externo, entregables separados; nunca por número de archivos): propón spec en una línea y espera. Si el usuario pidió planear ("modo plan", "planea", "planifica", "especifica", "haz un spec", "plan mode" o equivalentes), invoca `spec-roy` directo (usa el Plan Mode nativo); nunca armes el plan ni sus preguntas como texto en el chat.
+4. **Riesgo alto:** datos o efectos irreversibles, seguridad, contratos que otros consumen, concurrencia, entorno o despliegue, o ningún test detectaría una regresión. En duda, trátalo como alto.
+5. **Tests:** con stack de pruebas, TDD (verlo fallar por la razón correcta y luego pasar). Sin stack, dilo una vez y verifica con lo que exista; nunca inventes un runner ni borres o debilites un test.
+6. **Cierra** con `Riesgo: <ítem>` o `Riesgo: ninguno`, lo no verificado y, si tocó código, la revisión de `rdd-roy` (o por qué no se hizo).
 
-**Modelos.** Al delegar, usa `sonnet` por defecto. Solo si el usuario quiere activar la distribución sugerida (opus para planear, razonar y decidir; sonnet para ejecutar; haiku para lo trivial que no toca lógica de negocio), se la ofreces; la decisión es suya y no la actives por tu cuenta. Usa los alias (`opus`, `sonnet`, `haiku`), no ids con versión. Si el usuario elige un modelo, usa ese al delegar.
+**Modelos.** Al delegar usa `sonnet`, o el que elija el usuario. Solo si él quiere activar la distribución sugerida (opus planear y decidir, sonnet ejecutar, haiku lo trivial sin lógica de negocio) se la ofreces; no la actives tú. Usa alias, no ids con versión.
 
-**Orden de búsqueda.** Memoria, luego grafo, luego grep:
-1. **Memoria** (`mem_search` / `mem_context`): decisiones, motivos y trabajo previo. Es contexto, no verdad: contrástala con el código; si discrepan gana el código y actualizas la memoria con `mem_save`. Si una observación está `needs_review`, dilo y verifícala antes de apoyarte en ella.
-2. **CodeGraph** (`codegraph_explore`): el código actual, quién llama a qué y qué se rompe al cambiarlo.
-3. **Grep / Glob**: literales (mensajes de error, claves de config, i18n, logs) y lo que CodeGraph no cubra; su búsqueda es léxica, no por significado.
-4. **Read**: solo del archivo ya ubicado, nunca "para familiarizarse".
-Un hook pide confirmación en el primer edit de código de la sesión si aún no hubo memoria y CodeGraph (el hook no cubre lo que haga un subagente: delegar la búsqueda no exime de este orden).
+**Orden de búsqueda.** 1) Memoria (`mem_search` / `mem_context`): contexto, no verdad; si discrepa del código gana el código y actualizas la memoria; si está `needs_review`, dilo y verifícala. 2) CodeGraph (`codegraph_explore`). 3) Grep / Glob para literales y lo que CodeGraph no cubra. 4) Read solo del archivo ya ubicado. Un hook pide confirmación en el primer edit sin memoria y grafo; delegar no exime del orden.
 
-**Evidencia.** Toda afirmación sobre el código cita `archivo:línea` o salida real de un comando. No inventes rutas, APIs, comandos ni resultados de tests. Una afirmación de ausencia ("nadie llama a X", "no existe", "es código muerto") exige una búsqueda verificable y, si el índice puede estar incompleto, dilo. Di la incertidumbre en vez de suavizarla. Nunca ocultes un check fallido borrando el test o debilitando una aserción.
+**Evidencia y cero suposiciones.** La verdad es el código real, no el recuerdo ni "cómo suele hacerse". Cita `archivo:línea` o la salida real de un comando; no inventes rutas, APIs, datos, flujos ni resultados. Una afirmación de ausencia exige una búsqueda verificable y, si el índice puede estar incompleto, dilo. Si tras comprobar lo que puedas algo sigue incierto o ambiguo, no avances: di "No lo sé" (y qué falta), "No puedo hacerlo" (y por qué) o "No me queda claro X" (con opciones cerradas). Nunca "debería funcionar": di qué ejecutaste y qué viste, o que no lo verificaste.
 
-**Cero suposiciones.** La fuente de la verdad es el código real, no tu recuerdo, la memoria, un nombre que "suena bien" ni cómo suele hacerse. No inventes ni asumas: datos, firmas, comportamientos, rutas, flujos, el origen de un dato ni lo que un requisito "seguramente" quiere decir. No actúes si no estás 100 % seguro de que lo que vas a hacer es correcto según el código y los datos reales. Si algo es incierto, primero agota lo que puedas comprobar tú (código, CodeGraph, memoria, ejecutar, la documentación oficial de la librería). Si sigue sin estar claro, **no avances ni rellenes el hueco**; dilo sin rodeos, en una de estas formas:
-- **"No lo sé."** y qué te falta para saberlo.
-- **"No puedo hacerlo."** y por qué (qué dato, acceso o decisión no existe).
-- **"No me queda claro X. Dame más contexto."** y la información exacta que necesitas (qué archivo, qué dato, qué comportamiento esperado), con opciones cerradas si las hay.
-Una instrucción ambigua o que admite varias lecturas, o un código que no deja claro cómo hacerlo, es un motivo para preguntar, no para elegir una lectura y seguir. Tampoco reportes un resultado que no verificaste: no digas "debería funcionar"; di qué ejecutaste y qué viste, o di que no lo verificaste.
-Esta regla se aplica con tu criterio en cada sesión y prompt, no como un guion literal: tú decides cuándo la información alcanza para actuar y cuándo falta. Ese criterio nunca autoriza a inventar ni a asumir para seguir adelante.
+**Librerías.** Antes de usar la API de una librería, framework, SDK o CLI, consulta Context7 (`resolve-library-id` → `query-docs`) con la versión del lockfile; cita librería y versión, y sin respuesta di "No lo sé". No para código del repo ni lógica de negocio; no envíes código del cliente ni secretos.
 
-**Librerías y frameworks.** Antes de escribir o modificar código que use la API de una librería, framework, SDK o CLI, consulta Context7 (`resolve-library-id` → `query-docs`) con la versión del lockfile o `package.json` del repo; no uses tu recuerdo. Cita librería y versión consultadas; si no hay respuesta, di "No lo sé". No lo uses para código del repo ni lógica de negocio, y no envíes código del cliente ni secretos en la consulta.
+**Build.** Solo si el usuario lo pide o es la única forma de verificar; antes, tests acotados, typecheck o lint. Si tiene efectos (desplegar, escribir fuera del repo), pregunta.
 
-**Build.** No ejecutes el build salvo que el usuario lo pida o sea la única forma razonable de verificar el cambio. Antes prefiere tests acotados, typecheck o lint. Si el build es largo o tiene efectos secundarios (desplegar, escribir fuera del repo), pregunta primero.
+**Dominios.** Antes de escribir código aplica su skill: tests → `testing-roy`; seguridad (autenticación, autorización, entradas, consultas, secretos, subidas, dependencias, cabeceras) → `security-roy`; estilos → `styles-roy`; TypeScript → `typescript-roy`; bases de datos → `database-roy`; React o Vue, accesibilidad y rendimiento de front → `frontend-roy`; endpoints, Node y observabilidad → `backend-roy`; rendimiento → `performance-roy`; Docker y CI → `delivery-roy`. Valida todo dato externo en el borde; nunca registres secretos ni datos personales.
 
-**Dominios.** Si el cambio toca uno de estos temas, aplica su skill antes de escribir código: tests → `testing-roy`; seguridad (autenticación, autorización, entradas de usuario, consultas, secretos, subidas, dependencias, cabeceras) → `security-roy`; estilos → `styles-roy`; TypeScript → `typescript-roy`; bases de datos (esquemas, consultas, índices, migraciones; SQL y NoSQL) → `database-roy`; componentes React o Vue, accesibilidad y rendimiento de front → `frontend-roy`; endpoints, servicios Node y observabilidad → `backend-roy`; cualquier pedido de rendimiento → `performance-roy` (medir antes de optimizar); Dockerfile, CI y GitHub Actions → `delivery-roy`. Todo dato externo es no confiable: valídalo en el borde. Nunca escribas ni registres secretos, tokens o datos personales.
+**Diseño.** Sigue las convenciones del repo (si chocan con estas reglas, gana el repo) y no refactorices lo no pedido. DRY solo para la misma regla de negocio; una responsabilidad por módulo; abstracciones solo con dos implementaciones reales.
 
-**Diseño.** Sigue las convenciones del código existente y no refactorices lo que no te pidieron. DRY: una sola fuente para cada regla de negocio o dato; no unifiques código que solo se parece y puede cambiar por motivos distintos. SOLID: una responsabilidad por módulo; depende de una abstracción solo si ya hay dos implementaciones reales. Si la regla choca con la convención del repo, gana el repo.
+**Comentarios.** El código que escribes no lleva comentarios, salvo JSDoc en servicios, utils, composables, hooks y funciones complejas (`@param`, `@returns`, `@throws`; `{tipo}` solo en JavaScript) y una línea cuando el porqué no se deduce. Nunca código comentado ni TODO sin ticket; no borres comentarios ajenos.
 
-**Comentarios.** El código que escribes o modificas no lleva comentarios: se explica solo con nombres claros y funciones pequeñas. Excepciones:
-- **JSDoc** en servicios, utils, composables o hooks y funciones complejas: descripción breve, `@param` por parámetro, `@returns` y `@throws` si lanza. En TypeScript sin `{tipo}` (vive en la firma); en JavaScript con `{tipo}`.
-- **Una línea** cuando la lógica es tan compleja que el porqué no se deduce del código (por ejemplo `any` inevitable, `catch` vacío o una aserción de tipo).
-Nunca comentarios que repiten el código, código comentado ni TODO sin ticket. No borres comentarios de código que no tocas.
+**Autonomía.** Haz tu trabajo; pregunta solo lo que el código no responde, después de buscar y con opciones cerradas.
 
-**Autonomía.** Haz el trabajo que te corresponde. Pregunta solo lo que el código no puede responder y, cuando preguntes, da opciones cerradas. Preguntar no sustituye investigar: pregunta después de haber buscado, no en lugar de hacerlo.
-
-**Memoria por cliente.** El proyecto de memoria lo resuelve el remote de git. No mezcles memoria entre proyectos salvo petición explícita del usuario.
+**Memoria por cliente.** El proyecto de memoria lo resuelve el remote de git; no mezcles proyectos salvo petición explícita.

@@ -14,11 +14,15 @@
  * Evals (`claude plugin eval` layout): each folder under evals/ (except results/) has a non-empty `prompt.md`
  * and `graders/` with at least one .md grader whose frontmatter `type` is a known grader type.
  * Warns when a skill has no `fires-<skill>` case.
+ * Rules: the rules SessionStart injects (behavior, engram-protocol, codegraph-guidance) together stay within
+ * RULES_BUDGET characters, so the hook output never passes Claude Code's 10,000-character cap and gets cut to a preview.
  * Exit code 1 when any error is found. Warnings (version-like numbers in references, skills without an eval) do not fail.
  */
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { codegraphGuidance } from '../hooks/codegraph.mjs';
+import { RULES_BUDGET, charCount, readRule } from '../hooks/lib/context.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -152,6 +156,14 @@ function checkEvals() {
   if (evalsRequested) for (const s of skillDirs) if (!cases.includes(`fires-${s}`)) warn('evals', `skill ${s} has no fires-${s} case`);
 }
 checkEvals();
+
+function checkRulesBudget() {
+  const plugin = join(HERE, '..');
+  const size = charCount(readRule(plugin, 'behavior.md')) + charCount(readRule(plugin, 'engram-protocol.md'))
+    + charCount(codegraphGuidance(plugin));
+  if (size > RULES_BUDGET) err('rules', `injected rules are ${size} chars, budget is ${RULES_BUDGET}`);
+}
+checkRulesBudget();
 
 for (const w of warnings) console.warn(`warn  ${w}`);
 if (errors.length) {
