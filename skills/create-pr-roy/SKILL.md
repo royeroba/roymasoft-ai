@@ -26,7 +26,7 @@ Follow `../_shared/connectors.md`: try every official GitHub option (GitHub MCP,
 ## 2. Branch state (read-only)
 
 1. `git branch --show-current`, `git status --short` and `git log <base>..HEAD --oneline`. If you are on the base branch or there are no new commits, say so and finish.
-2. **If there are uncommitted changes:** invoke `/commit-roy` (it proposes the message, asks for the yes and makes the commit) and **continue when it finishes**. Do not run `git add` or `git commit` on your own outside that skill.
+2. **If there are uncommitted changes:** invoke `/commit-roy` (it proposes the message and makes the commit, pausing only on alerts) and **continue when it finishes**. Do not run `git add` or `git commit` on your own outside that skill.
 3. Infer the **parent branch** with `git reflog`, the upstream (`git rev-parse --abbrev-ref @{u}`) and `git merge-base` against `origin/dev`, `origin/main`, `origin/master` and the other long-lived remote branches.
 
 ## 3. Infer and ask
@@ -88,7 +88,7 @@ Show in the chat, in this order: **title**, then the **body** exactly as it will
 
 - [ ] Official GitHub options swept (connectors.md); Jira swept or ticket asked for
 - [ ] Body starts with the developer, ticket and branch table
-- [ ] No uncommitted changes remain (`/commit-roy` made them with the user's yes)
+- [ ] No uncommitted changes remain (`/commit-roy` made them)
 - [ ] Target branch confirmed by the user
 - [ ] Developer and ticket present, inferred or asked for
 - [ ] Title, summary, what was done and criteria included, in valid Markdown
