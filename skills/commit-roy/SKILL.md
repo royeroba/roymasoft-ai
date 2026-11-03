@@ -1,13 +1,13 @@
 ---
 name: commit-roy
-description: "Commits the current changes with a Conventional Commits message. Trigger: the user asks to 'make the commit', 'commit this', 'commit message', 'what message should I use' or 'prepare the commit'. Reads the diff, proposes type, scope and description, shows the message and, with the user's go-ahead, stages and commits."
+description: "Commits the current changes with a Conventional Commits message. Trigger: the user asks to 'make the commit', 'commit this', 'commit message', 'what message should I use' or 'prepare the commit'. Reads the diff, proposes type, scope and description, shows the message and stages and commits; it pauses for a yes only when there is an alert."
 disable-model-invocation: false
 argument-hint: "optional: context or ticket (for example ABC-123)"
 ---
 
 # /commit-roy — Commit with Conventional Commits
 
-You read the change, write a message in [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) and, with the user's go-ahead, stage and commit. **You never run `git push`** (that is covered by `/create-pr-roy`). A hook asks for confirmation on screen on every `git add` and `git commit`: that is expected, do not work around it.
+You read the change, write a message in [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) and stage and commit: the user's request to commit is the authorization, you do not ask again unless step 4 says to pause. **You never run `git push`** (that is covered by `/create-pr-roy`). A hook asks for confirmation on screen on every `git add` and `git commit`: that is expected, do not work around it.
 
 ## When to use / when not
 
@@ -71,10 +71,11 @@ Fixed stuff and updated files.
 ```
 It fails because it has no type, is in the past tense, does not say what was fixed and is not verifiable.
 
-## 4. Show and confirm
+## 4. Show, then commit
 
-1. Show the message in a code block, the files that would go in the commit and any file that should **not** go.
-2. Ask: "Shall I make the commit like this?". Without an explicit yes, execute nothing. If they asked only for the message, stop here.
+1. Show the message in a code block, the files that go in the commit and any file that should **not** go. The hook then shows the same on screen for approval.
+2. If they asked only for the message, stop here and execute nothing.
+3. Otherwise go straight to step 5 without asking. **Pause and ask for a yes** only when there is an alert: secrets or files that should not go, a diff that mixes purposes (propose the split first), nothing staged (basing it on the working tree), or a change whose purpose you do not understand.
 
 ## 5. Execute
 
@@ -93,7 +94,7 @@ It fails because it has no type, is in the past tense, does not say what was fix
 ## Final checklist
 
 - [ ] I read the real diff, I did not assume
-- [ ] I did not run `git add` or `git commit` without the user's explicit yes
+- [ ] I ran `git add` and `git commit` only because the user asked for the commit, and paused for a yes on any alert
 - [ ] Stage only the listed files, no `git add .` or `--no-verify`
 - [ ] I did not `git push`
 - [ ] No AI attribution (`Co-Authored-By`, "Generated with", emoji)
