@@ -1,6 +1,6 @@
 ---
 name: create-pr-roy
-description: "Pushes the branch and opens the Pull Request for finished work, with a title, task summary, what was done, acceptance criteria, developer and ticket. Trigger: the user asks to 'create the PR', 'push the PR', 'open the pull request', 'create the PR for what was done' or 'push the branch and make the PR'. Asks what it cannot infer and confirms before pushing. It reviews nothing: it assumes the task was already tested and passed the RDD."
+description: "Pushes the branch and opens the Pull Request for finished work, with a title, task summary, what was done, acceptance criteria, developer and ticket. Trigger: the user asks to 'create the PR', 'push the PR', 'open the pull request', 'create the PR for what was done' or 'push the branch and make the PR'. Asks what it cannot infer and pauses for a yes only when something is unclear. It reviews nothing: it assumes the task was already tested and passed the RDD."
 disable-model-invocation: false
 argument-hint: "optional: ticket, ticket URL or target branch"
 ---
@@ -31,11 +31,11 @@ Follow `../_shared/connectors.md`: try every official GitHub option (GitHub MCP,
 
 ## 3. Infer and ask
 
-Ask with **closed options** and only what is not clear. **Always** the target branch.
+Ask with **closed options** and only what is not clear. The target branch is asked only if the parent branch is ambiguous or the user did not name one; otherwise state it and go on.
 
 | Data | How you infer it | Question |
 |---|---|---|
-| **Target branch** | The parent branch from step 2.3 | Always: "The parent branch looks like `dev`; does the PR go to `dev` or to another?" |
+| **Target branch** | The parent branch from step 2.3 | Only if ambiguous or not named: "The parent branch looks like `dev`; does the PR go to `dev` or to another?" |
 | **Developer** | `git config user.name` and the authors of `<base>..HEAD` | Only if there are several or none: "What is the name of the developer of this task?" |
 | **Ticket** | Branch (`ABC-123-...`), commit messages, argument; then Jira if available | If it does not show up: "Give me the ticket or the URL of the ticket that was done" |
 | **Acceptance criteria** | From the Jira ticket | If there is no Jira or criteria: "Send me the acceptance criteria" |
@@ -73,9 +73,11 @@ Correct: `- [x] The user can sign in with SSO`
 Incorrect: `- [x] Everything works fine`
 It fails because it is neither a criterion from the ticket nor verifiable.
 
-## 5. Confirm before pushing
+## 5. Show, then push
 
-Show in the chat, in this order: **title**, then the **body** exactly as it will be published (table with developer, ticket and branches first, then the sections). Ask: "Shall I push the branch and create the PR like this? Is any criterion not met?". Do not push anything without an explicit yes.
+Show in the chat, in this order: **title**, then the **body** exactly as it will be published (table with developer, ticket and branches first, then the sections). The user's request for the PR is the authorization: go straight to step 6 without asking again.
+
+**Pause and ask for a yes** only if something is unclear: the target branch, the developer, the ticket or the acceptance criteria could not be inferred and the user has not answered, or the user has not said which criteria are met. Those stay closed-option questions from step 3. Never push or create anything while one is open.
 
 ## 6. Push and create
 
@@ -89,10 +91,10 @@ Show in the chat, in this order: **title**, then the **body** exactly as it will
 - [ ] Official GitHub options swept (connectors.md); Jira swept or ticket asked for
 - [ ] Body starts with the developer, ticket and branch table
 - [ ] No uncommitted changes remain (`/commit-roy` made them)
-- [ ] Target branch confirmed by the user
+- [ ] Target branch named by the user or inferred without ambiguity
 - [ ] Developer and ticket present, inferred or asked for
 - [ ] Title, summary, what was done and criteria included, in valid Markdown
-- [ ] Explicit confirmation before `git push` and before creating the PR
+- [ ] Pushed and created the PR only because the user asked, and paused for a yes while any datum was unclear
 - [ ] I did not review the task or run tests, RDD or build
 - [ ] No AI attribution in the title, body or merge message
 - [ ] I delivered the PR URL
