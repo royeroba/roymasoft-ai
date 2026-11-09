@@ -33,15 +33,17 @@ const run = (cmd, args, opts = {}) => spawn(cmd, args, opts);
 const MIN_MAJOR = 3; // los hooks de engram@engram usan `engram hook ...`, que no existe en la línea 1.x/2.x
 
 /**
- * Indica si un binario de Engram ejecuta y es de la línea soportada (>= MIN_MAJOR).
+ * Indica si un binario de Engram ejecuta y no es de una línea anterior a MIN_MAJOR.
+ * Un binario que ejecuta pero no imprime versión (build de desarrollo) se acepta: solo se
+ * rechaza lo que se demuestra viejo. El plazo cubre el primer arranque lento en Windows.
  * @param {string} cmd Comando o ruta del ejecutable.
  * @returns {boolean}
  */
 function usable(cmd) {
-  const r = run(cmd, ['version'], { timeout: 5_000 });
+  const r = run(cmd, ['version'], { timeout: 15_000 });
   if (r.status !== 0) return false;
   const major = Number(r.stdout?.match(/(\d+)\.\d+\.\d+/)?.[1]);
-  return Number.isFinite(major) && major >= MIN_MAJOR;
+  return Number.isNaN(major) || major >= MIN_MAJOR;
 }
 
 function findEngram() {
