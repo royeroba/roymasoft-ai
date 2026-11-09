@@ -127,7 +127,7 @@ async function installBinary(version) {
 }
 
 function readJson(path) {
-  try { return JSON.parse(readFileSync(path, 'utf8')); } catch { return null; }
+  try { return JSON.parse(readFileSync(path, 'utf8').replace(/^﻿/, '')); } catch { return null; }
 }
 
 function ensureMcp(engramCmd) {
