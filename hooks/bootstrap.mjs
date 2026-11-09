@@ -135,6 +135,38 @@ function ensureEngramPlugin() {
     : 'No pude instalar engram@engram: ejecuta `claude plugin marketplace add Gentleman-Programming/engram` y `claude plugin install engram@engram`.');
 }
 
+const MEMORY_WRITE_TOOLS = [
+  'mem_save', 'mem_update', 'mem_review', 'mem_save_prompt', 'mem_pin', 'mem_unpin',
+  'mem_session_summary', 'mem_session_start', 'mem_session_end', 'mem_capture_passive',
+  'mem_judge', 'mem_compare',
+];
+
+/**
+ * Permite sin aviso las herramientas de escritura de memoria de Engram (misma lista finita que
+ * `engram setup claude-code --allow-memory-writes`), editando permissions.allow sin ejecutar el binario.
+ * Idempotente; RAI_NO_MEMORY_ALLOW=1 lo desactiva. Si settings.json no es JSON válido no lo toca.
+ */
+function ensureMemoryWritePermissions() {
+  if (process.env.RAI_NO_MEMORY_ALLOW === '1') return;
+  const path = join(homedir(), '.claude', 'settings.json');
+  const exists = existsSync(path);
+  const settings = exists ? readJson(path) : {};
+  if (!settings || typeof settings !== 'object' || Array.isArray(settings)) return;
+  const permissions = settings.permissions ?? {};
+  if (typeof permissions !== 'object' || Array.isArray(permissions)) return;
+  const allow = permissions.allow ?? [];
+  if (!Array.isArray(allow)) return;
+  const have = new Set(allow);
+  const missing = ['mcp__engram__', 'mcp__plugin_engram_engram__']
+    .flatMap(prefix => MEMORY_WRITE_TOOLS.map(t => prefix + t))
+    .filter(entry => !have.has(entry));
+  if (!missing.length) return;
+  settings.permissions = { ...permissions, allow: [...allow, ...missing] };
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, `${JSON.stringify(settings, null, 2)}\n`);
+  notes.push(`Permisos de escritura de memoria de Engram añadidos a ~/.claude/settings.json (${missing.length}); desactívalo con RAI_NO_MEMORY_ALLOW=1.`);
+}
+
 // Alternativa si la descarga falla: compilar localmente con Go (mismo módulo que usa gentle-ai).
 function installWithGo() {
   if (run('go', ['version'], { timeout: 5_000 }).status !== 0) throw new Error('sin Go para compilar engram');
@@ -184,6 +216,8 @@ try {
   }
   ensureMcp(engram);
   ensureEngramPlugin();
+  try { ensureMemoryWritePermissions(); }
+  catch (e) { notes.push(`No pude añadir los permisos de memoria de Engram: ${e.message}`); }
   if (updateDue()) {
     try { await updateEngram(engram); }
     catch (e) { notes.push(`No pude comprobar actualizaciones de Engram: ${e.message}`); }

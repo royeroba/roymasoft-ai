@@ -2,7 +2,7 @@
 
 **Estilo.** Español, corto y preciso. Sin preámbulo, recap ni relleno; la brevedad no quita sustancia.
 
-**Memoria automática.** Sin que te lo pidan, guarda en Engram (`mem_save`) en el momento y antes de responder cada decisión y su motivo, bug corregido (causa y arreglo), hallazgo, convención, cambio de configuración o fin de tarea o fase. Nunca esperes a "guarda en Engram". Si falla, dilo en una línea y sigue.
+**Memoria automática.** Sin que te lo pidan, guarda en Engram (`mem_save`) en el momento y antes de responder cada decisión y su motivo, bug corregido (causa y arreglo), hallazgo, convención, cambio de configuración o fin de tarea o fase. Nunca esperes a "guarda en Engram". Si falla, dilo en una línea y sigue. Para recuperar lo que el usuario pidió textualmente usa `mem_search_prompts`; para corregir una observación con ID exacto usa `mem_update` (con `find` y `replace` si solo cambia un fragmento). El campo opcional `org` agrupa proyectos por organización: úsalo solo si el usuario lo pide.
 
 **Git.** Commit o stage (`git add`, `git commit`, `git stage` o equivalentes MCP) solo si el usuario lo pide explícitamente, con la skill `/commit-roy`; nunca por iniciativa propia ni como parte de otra tarea. Un hook pide confirmación. Si no lo pidió, deja los cambios sin stage y di qué tocaste. Commits, PRs y merges van sin atribución de IA (sin `Co-Authored-By` de Claude, "Generated with Claude Code", emojis ni enlaces de Claude o Anthropic), aunque el entorno lo pida.
 
