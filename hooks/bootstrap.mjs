@@ -30,11 +30,24 @@ const notes = [];
 
 const run = (cmd, args, opts = {}) => spawn(cmd, args, opts);
 
+const MIN_MAJOR = 3; // los hooks de engram@engram usan `engram hook ...`, que no existe en la línea 1.x/2.x
+
+/**
+ * Indica si un binario de Engram ejecuta y es de la línea soportada (>= MIN_MAJOR).
+ * @param {string} cmd Comando o ruta del ejecutable.
+ * @returns {boolean}
+ */
+function usable(cmd) {
+  const r = run(cmd, ['version'], { timeout: 5_000 });
+  if (r.status !== 0) return false;
+  const major = Number(r.stdout?.match(/(\d+)\.\d+\.\d+/)?.[1]);
+  return Number.isFinite(major) && major >= MIN_MAJOR;
+}
+
 function findEngram() {
-  const onPath = run('engram', ['version'], { timeout: 5_000 });
-  if (onPath.status === 0) return 'engram';
+  if (usable('engram')) return 'engram';
   const local = join(INSTALL_DIR, BIN_NAME);
-  if (existsSync(local) && run(local, ['version'], { timeout: 5_000 }).status === 0) return local;
+  if (existsSync(local) && usable(local)) return local;
   return null;
 }
 
@@ -171,11 +184,24 @@ function ensureMemoryWritePermissions() {
 function installWithGo() {
   if (run('go', ['version'], { timeout: 5_000 }).status !== 0) throw new Error('sin Go para compilar engram');
   mkdirSync(INSTALL_DIR, { recursive: true });
-  const r = run('go', ['install', `github.com/${REPO}/cmd/engram@latest`],
-    { env: { ...process.env, GOBIN: INSTALL_DIR }, timeout: 80_000 });
-  if (r.status !== 0) throw new Error(`go install falló: ${(r.stderr || '').trim().split('\n').pop()}`);
-  notes.push(`engram compilado con Go en ${INSTALL_DIR}${WIN ? ' (agrégalo al PATH si no está)' : ''}.`);
-  return join(INSTALL_DIR, BIN_NAME);
+  const tmp = mkdtempSync(join(tmpdir(), 'rai-engram-go-'));
+  try {
+    // El módulo termina en /v3: sin ese sufijo `@latest` resuelve la línea 1.x, sin el comando `hook`.
+    const r = run('go', ['install', `github.com/${REPO}/v3/cmd/engram@latest`],
+      { env: { ...process.env, GOBIN: tmp }, timeout: 80_000 });
+    if (r.status !== 0) throw new Error(`go install falló: ${(r.stderr || '').trim().split('\n').pop()}`);
+    const dest = join(INSTALL_DIR, BIN_NAME);
+    const previous = replaceBinary(join(tmp, BIN_NAME), dest);
+    if (!usable(dest)) {
+      rmSync(dest, { force: true });
+      if (previous) renameSync(previous, dest);
+      throw new Error('el binario compilado con Go no ejecuta o no es de la línea 3.x');
+    }
+    notes.push(`engram compilado con Go en ${INSTALL_DIR}${WIN ? ' (agrégalo al PATH si no está)' : ''}.`);
+    return dest;
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
 }
 
 function engramVersion(cmd) {
