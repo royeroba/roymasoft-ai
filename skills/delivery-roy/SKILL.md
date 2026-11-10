@@ -1,6 +1,6 @@
 ---
 name: delivery-roy
-description: "Guides building and reviewing delivery configuration: Dockerfiles, container setup for Node.js, CI pipelines and GitHub Actions workflows, with secure, reproducible and least-privilege defaults. Trigger: the user asks to write or change a Dockerfile, docker-compose file, CI pipeline or GitHub Actions workflow, 'containerize this', 'add CI', 'run tests in CI', 'deploy workflow', 'pin the actions', or a change edits Dockerfile, .dockerignore or .github/workflows files."
+description: "Guides building and reviewing delivery configuration: Dockerfiles, container setup for Node.js, CI pipelines and GitHub Actions workflows, with secure, reproducible and least-privilege defaults. Trigger: the user asks to write or change a Dockerfile, docker-compose file, CI pipeline or GitHub Actions workflow, 'containerize this', 'add CI', 'run tests in CI', 'deploy workflow', 'pin the actions', 'deploy checklist', 'release plan', 'rollback plan', 'is this ready to ship', or a change edits Dockerfile, .dockerignore or .github/workflows files."
 disable-model-invocation: false
 argument-hint: "the Dockerfile, pipeline or workflow to write or review"
 ---
@@ -24,6 +24,7 @@ Find the existing `Dockerfile`, `.dockerignore`, `docker-compose*`, the CI syste
 |---|---|
 | Dockerfile, images, containers for Node.js | `references/docker.md` |
 | CI pipelines, GitHub Actions, secrets, tokens | `references/ci.md` |
+| Release plan: before, during and after a deploy, rollback triggers, smoke tests, reversible migrations | `references/release.md` |
 | Before closing | `references/checklist.md` |
 
 ## 3. Rules for every pipeline and image

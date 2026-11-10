@@ -1,6 +1,6 @@
 ---
 name: frontend-roy
-description: "Guides building and reviewing frontend components in React and Vue: framework idioms, state and effects, accessibility (WCAG 2.2) and frontend performance (Core Web Vitals, bundle size, rendering). Trigger: the user asks to build, refactor or review a component or page, 'React component', 'Vue component', 'useEffect', 'accessibility', 'a11y', 'ARIA', 'keyboard navigation', 'slow render', 'Core Web Vitals', 'bundle size', or a change edits .tsx, .jsx or .vue files."
+description: "Guides building and reviewing frontend components in React and Vue: framework idioms, state and effects, accessibility (WCAG 2.2) and frontend performance (Core Web Vitals, bundle size, rendering). Trigger: the user asks to build, refactor or review a component or page, 'React component', 'Vue component', 'useEffect', 'accessibility', 'a11y', 'ARIA', 'keyboard navigation', 'audit accessibility', 'empty state', 'loading state', 'error message', 'button text', 'slow render', 'Core Web Vitals', 'bundle size', or a change edits .tsx, .jsx or .vue files."
 disable-model-invocation: false
 argument-hint: "the component, page or problem"
 ---
@@ -24,7 +24,8 @@ Read `package.json` and the lockfile for the framework (React, Vue, other) and i
 |---|---|
 | React components, hooks, effects | `references/react.md` |
 | Vue components, reactivity, rendering cost | `references/vue.md` |
-| Semantics, keyboard, focus, ARIA, WCAG 2.2 | `references/accessibility.md` |
+| Semantics, keyboard, focus, ARIA, WCAG 2.2, auditing a page | `references/accessibility.md` |
+| Loading, empty, error and long-content states; error, button and confirmation copy | `references/ui-states.md` |
 | Core Web Vitals, bundle size, loading | `references/performance.md` |
 | Before closing | `references/checklist.md` |
 
@@ -39,7 +40,7 @@ Read `package.json` and the lockfile for the framework (React, Vue, other) and i
 
 ## 4. Verify
 
-Run the repo's lint (with the framework's lint plugin if present), the typecheck and the related tests, and report the results. Offer `/e2e-roy` when the change touches UI, and `design:accessibility-review` if a formal accessibility audit is wanted. Say what was not verified (real devices, screen readers, field performance data).
+Run the repo's lint (with the framework's lint plugin if present), the typecheck and the related tests, and report the results. Offer `/e2e-roy` when the change touches UI, and the audit procedure of `references/accessibility.md` if a formal accessibility audit is wanted. Say what was not verified (real devices, screen readers, field performance data).
 
 Correct (React):
 ```tsx

@@ -9,6 +9,8 @@ Verifiable items for the author and for the reviewer. An unmet item caused by th
 - [ ] Interactive controls are native elements or have the roles, names and keyboard behavior they promise.
 - [ ] Every interactive control has an accessible name, is reachable by keyboard and shows a visible focus indicator.
 - [ ] Focused elements are not hidden by sticky UI, dragging has an alternative, and targets meet the minimum size (WCAG 2.2 AA).
+- [ ] Loading, empty, error and long-content states are handled, or the missing ones were named (`ui-states.md`).
+- [ ] Error messages say what happened and how to fix it; buttons name the outcome; confirmations name the object and consequence.
 - [ ] Any performance change is backed by a before-and-after measurement of a named metric.
 - [ ] New routes or heavy features are code-split, and added dependencies are tree-shakeable.
 - [ ] Long lists are virtualized or paginated where they can grow large.
