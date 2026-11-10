@@ -102,7 +102,7 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 
 - **Build:** no se ejecuta salvo que el usuario lo pida o sea la única forma de verificar el cambio y sea razonable (corto, sin efectos secundarios como desplegar o escribir fuera del repo). Antes se prefieren tests acotados, typecheck o lint. Si el build es largo, se pregunta.
 - **Context7:** antes de usar APIs de librerías (ya en `rules/behavior.md`).
-- **Playwright:** solo vía `/browser-test-roy` (ya implementado).
+- **Navegador (Playwright y Claude in Chrome):** solo vía `/browser-test-roy`, que usa Playwright por defecto, Chrome si hace falta tu sesión iniciada, y cambia de una a otra solo si la elegida no responde (ya implementado).
 
 ## 11b. Modelos (sugerencia, el humano elige)
 

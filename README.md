@@ -15,7 +15,7 @@ Cada sesión corre `hooks/bootstrap.mjs`: instala y cablea Engram y CodeGraph si
 
 | Grupo | Skills |
 |---|---|
-| Flujo | `implement-ticket-roy` (entrada), `plan-feature-roy` (tareas grandes), `regression-review-roy` (revisión fresca con el agente `reviewer`), `browser-test-roy` (navegador con Playwright) |
+| Flujo | `implement-ticket-roy` (entrada), `plan-feature-roy` (tareas grandes), `regression-review-roy` (revisión fresca con el agente `reviewer`), `browser-test-roy` (navegador con Playwright o Claude in Chrome) |
 | Git y entrega de contexto | `commit-roy`, `create-pr-roy`, `read-ticket-roy` (Jira), `read-figma-roy`, `read-shared-docs-roy` (Notion, Google Drive, Docs y Gmail) |
 | Ingeniería | `testing-roy`, `security-roy`, `typescript-roy`, `database-roy`, `frontend-roy`, `backend-roy`, `performance-roy`, `docker-ci-roy`, `seo-roy` (SEO técnico de sitios públicos en Nuxt) |
 | Diseño e investigación | `design-review-roy` (crítica de un diseño o de la página construida), `user-research-roy` (planear y sintetizar investigación con usuarios) |
