@@ -135,6 +135,7 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 - `rdd-roy` pasa los checklists de los dominios tocados y `agents/reviewer.md` los comprueba ítem por ítem.
 - `scripts/validate-skills.mjs` valida las reglas objetivas de las skills y el formato de los evals. `hooks/pretooluse-secrets.mjs` pide confirmación (`ask`) ante secretos evidentes en Write, Edit y MultiEdit; su regresión está en `scripts/test-secrets-hook.mjs`.
 - Spec completo y su registro: `specs/01-ingenieria-integral.md`.
+- **SEO (SPEC 03).** `seo-roy` es la novena skill de dominio: SEO técnico de sitios públicos en Nuxt (rastreo, indexación, datos estructurados, módulos Nuxt SEO) con 4 referencias de fuentes oficiales de Google, Nuxt y Nuxt SEO, y un caso de eval. No cubre keyword research ni redacción. Spec y registro: `specs/03-skill-seo-roy.md`.
 
 ## 12. Lo que no se toma
 
