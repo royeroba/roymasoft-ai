@@ -11,13 +11,13 @@ claude plugin install roymasoft-ai@roymasoft
 
 Cada sesión corre `hooks/bootstrap.mjs`: instala y cablea Engram y CodeGraph si faltan, una vez al día sube el binario y el plugin de Engram si hay versión nueva, e inyecta las reglas. Las reglas juntas no pasan de 9.000 caracteres (lo exige `scripts/validate-skills.mjs`): Claude Code corta la salida de un hook a 10.000 y el modelo vería solo un preview. Después de instalar o subir de versión, reinicia Claude Code.
 
-## Skills (19, todas `-roy`)
+## Skills (20, todas `-roy`)
 
 | Grupo | Skills |
 |---|---|
 | Flujo | `hu-roy` (entrada), `spec-roy` (tareas grandes), `rdd-roy` (revisión fresca con el agente `reviewer`), `e2e-roy` (navegador con Playwright) |
 | Git y entrega de contexto | `commit-roy`, `create-pr-roy`, `consult-ticket-roy` (Jira), `consult-figma-roy`, `consult-docs-roy` (Notion, Google Drive, Docs y Gmail) |
-| Ingeniería | `testing-roy`, `security-roy`, `typescript-roy`, `database-roy`, `frontend-roy`, `backend-roy`, `performance-roy`, `delivery-roy` |
+| Ingeniería | `testing-roy`, `security-roy`, `typescript-roy`, `database-roy`, `frontend-roy`, `backend-roy`, `performance-roy`, `delivery-roy`, `seo-roy` (SEO técnico de sitios públicos en Nuxt) |
 | Estilos y meta | `styles-roy`, `create-skill-roy` |
 
 Cada skill de ingeniería es un despachador corto con `references/` (fuentes oficiales, con fecha de verificación) y un `checklist.md`.
@@ -35,7 +35,7 @@ Cada skill de ingeniería es un despachador corto con `references/` (fuentes ofi
 
 ```
 .claude-plugin/   plugin.json y marketplace.json
-skills/           las 19 skills (+ _shared/)
+skills/           las 20 skills (+ _shared/)
 agents/           reviewer (revisión RDD)
 hooks/            hooks.json y scripts
 rules/            reglas inyectadas en cada sesión
@@ -49,7 +49,7 @@ docs/             decisiones de diseño de los flujos
 
 ```bash
 claude plugin validate .
-node scripts/validate-skills.mjs --expect-evals 24
+node scripts/validate-skills.mjs --expect-evals 25
 node scripts/test-secrets-hook.mjs
 ```
 

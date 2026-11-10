@@ -32,7 +32,7 @@ Detect it without assuming: a `test` script in `package.json`, a runner config (
 
 1. `Riesgo: <item>` or `Riesgo: ninguno`, per the rules' high-risk list (the `Riesgo:` label is literal).
 2. What you did not verify, and why.
-3. If it touched code: fresh review with the `rdd-roy` skill.
+3. If it touched code with high risk, or in the large lane: fresh review with the `rdd-roy` skill. In the small lane with `Riesgo: ninguno`, say in one line that you skipped it.
 4. E2E offer if it applies (section 4).
 
 ## 4. E2E offer

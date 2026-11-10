@@ -13,7 +13,7 @@ const PACKAGE = '@colbymchenry/codegraph@latest';
 const LEGACY_BLOCK = /<!-- CODEGRAPH_START -->[\s\S]*?<!-- CODEGRAPH_END -->\n?/;
 
 const run = (cmd, args, timeout = 60_000) => spawn(cmd, args, { timeout, shell: WIN });
-const readJson = path => { try { return JSON.parse(readFileSync(path, 'utf8')); } catch { return null; } };
+const readJson = path => { try { return JSON.parse(readFileSync(path, 'utf8').replace(/^﻿/, '')); } catch { return null; } };
 
 function installedVersion() {
   const r = run('codegraph', ['--version'], 10_000);

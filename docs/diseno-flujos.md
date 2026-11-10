@@ -90,7 +90,7 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 - **Salida:** veredicto `PASS` o `FAIL`. Si no pasa, tabla: hallazgo · `archivo:línea` · por qué · bloqueo o aviso · ¿ya fallaba antes? Si pasa: "implementación correcta" y lo que no pudo verificar.
 - **Severidad:** bloqueo = defecto causado por el cambio, reproducible, que no existía en el baseline. Defectos preexistentes y valores fuera de dominio son avisos.
 - **Límite:** una corrección que arregle todos los bloqueos y una revisión acotada a esos bloqueos. Si siguen abiertos, un único "Necesito tu decisión". Nunca bucles.
-- **Cuándo:** al cerrar un cambio con código, en ambos carriles; en el grande, al final del feature (y por fase si el riesgo es alto). Se omite en cambios pasivos (documentación, comentarios).
+- **Cuándo:** proporcional al riesgo (principio 5). Siempre con riesgo alto y en el carril grande, al final del feature (y por fase si el riesgo es alto). En el carril pequeño con `Riesgo: ninguno` se omite y se dice en una línea, igual que en cambios pasivos (documentación, comentarios). Si el usuario la pide, siempre se hace.
 
 ## 10. Conexión con E2E
 
@@ -124,7 +124,7 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 - **Conectores (v0.14.0).** `skills/_shared/connectors.md` define el barrido: se prueban todas las fuentes oficiales de cada servicio (plugins de `claude-plugins-official`, conectores de claude.ai, MCP con el endpoint oficial del proveedor, `gh`) hasta encontrar una con sesión; un fallo no detiene el barrido. Los servidores comunitarios no se usan aunque estén conectados. Si ninguno sirve, se sugiere en un solo mensaje la opción oficial más segura (OAuth en el navegador, sin tokens en archivos).
 - **PR.** El cuerpo empieza con una tabla de una fila (developer, ticket, rama) y luego resumen, lo hecho y criterios; el título no se repite.
 - **Plan Mode.** Pedir planear en lenguaje natural ("modo plan", "planea", "planifica", "especifica") invoca `spec-roy` directo; las fases 1 a 3 corren dentro del Plan Mode nativo (cargado con `ToolSearch`), con preguntas por `AskUserQuestion` y aprobación con `ExitPlanMode`.
-- **Comentarios.** Regla en `rules/behavior.md`: código nuevo o tocado sin comentarios, salvo JSDoc en servicios, utils, composables y funciones complejas; `rdd-roy` lo verifica siempre.
+- **Comentarios.** Regla en `rules/behavior.md`: código nuevo o tocado sin comentarios, salvo JSDoc en servicios, utils, composables y funciones complejas; `rdd-roy` lo verifica cada vez que se ejecuta.
 - `styles-roy` (CSS/SCSS/Sass con BEM, CSS moderno, Tailwind al día, responsive validado contra los breakpoints del proyecto) es la skill de estilos del plugin: la usan `/hu-roy`, `/spec-roy` y `/consult-figma-roy`. Es un despachador con `references/` (bem, modern-css, tailwind, responsive) y detecta el enfoque del proyecto sin suponerlo.
 
 ## 11d. Ingeniería integral (SPEC 01)
@@ -135,6 +135,7 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 - `rdd-roy` pasa los checklists de los dominios tocados y `agents/reviewer.md` los comprueba ítem por ítem.
 - `scripts/validate-skills.mjs` valida las reglas objetivas de las skills y el formato de los evals. `hooks/pretooluse-secrets.mjs` pide confirmación (`ask`) ante secretos evidentes en Write, Edit y MultiEdit; su regresión está en `scripts/test-secrets-hook.mjs`.
 - Spec completo y su registro: `specs/01-ingenieria-integral.md`.
+- **SEO (SPEC 03).** `seo-roy` es la novena skill de dominio: SEO técnico de sitios públicos en Nuxt (rastreo, indexación, datos estructurados, módulos Nuxt SEO) con 4 referencias de fuentes oficiales de Google, Nuxt y Nuxt SEO, y un caso de eval. No cubre keyword research ni redacción. Spec y registro: `specs/03-skill-seo-roy.md`.
 
 ## 12. Lo que no se toma
 

@@ -36,7 +36,7 @@ const EXPECT_EVALS = opt('--expect-evals', null);
 
 const ENGINEERING_SKILLS = new Set([
   'testing-roy', 'security-roy', 'typescript-roy', 'database-roy',
-  'frontend-roy', 'backend-roy', 'performance-roy', 'delivery-roy',
+  'frontend-roy', 'backend-roy', 'performance-roy', 'delivery-roy', 'seo-roy',
 ]);
 const SPANISH = /[áéíóúñÁÉÍÓÚÑ¿¡]/;
 const errors = [];

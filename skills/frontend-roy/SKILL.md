@@ -12,7 +12,7 @@ You build and review frontend code with the official framework guidance and acce
 ## When to use / when not
 
 - Use it whenever components, state handling, accessibility or frontend performance are written or reviewed.
-- Do not use it for CSS, SCSS or Tailwind (that is `/styles-roy`), for tests (that is `/testing-roy`) or for XSS and CSP (that is `/security-roy`).
+- Do not use it for CSS, SCSS or Tailwind (that is `/styles-roy`), for tests (that is `/testing-roy`), for XSS and CSP (that is `/security-roy`) or for indexing in Google, sitemap and structured data (that is `/seo-roy`; apply it too on public pages that must be indexed).
 
 ## 1. Detect (never assume)
 

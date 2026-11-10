@@ -1,6 +1,6 @@
 ---
 name: rdd-roy
-description: "Fresh-context regression review when closing a change that touches code. Trigger: you finished a change that touches code, or the user asks 'check that we did not break anything', 'regression review', 'RDD', 'review this change' or 'pass or fail'. Launches a subagent without the conversation context that returns PASS or FAIL with a table."
+description: "Fresh-context regression review when closing a high-risk change or a large feature that touches code. Trigger: you finished a high-risk change or a large feature that touches code, or the user asks 'check that we did not break anything', 'regression review', 'RDD', 'review this change' or 'pass or fail'. Launches a subagent without the conversation context that returns PASS or FAIL with a table."
 disable-model-invocation: false
 argument-hint: "optional: what to review (defaults to the current change)"
 ---
@@ -12,7 +12,8 @@ A subagent without your context reviews what was done, compares it with the evid
 ## 1. Does it apply?
 
 - Skip it for **passive** changes (documentation, comments, images with no executable effect) and say so in one line.
-- For everything else, run it when closing the change. In a feature split into phases, at the end of the feature, and per phase if the risk is high.
+- Skip it in the small lane when the closing is `Riesgo: ninguno`, and say so in one line ("no fresh review: no risk").
+- Otherwise run it when closing the change: always for high risk (the rules' list) and for a large feature, where it runs at the end of the feature, and per phase if the risk is high. If the user asks for it, always run it.
 
 ## 2. Build the package (nothing from the conversation)
 

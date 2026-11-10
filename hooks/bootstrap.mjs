@@ -30,11 +30,26 @@ const notes = [];
 
 const run = (cmd, args, opts = {}) => spawn(cmd, args, opts);
 
+const MIN_MAJOR = 3; // los hooks de engram@engram usan `engram hook ...`, que no existe en la línea 1.x/2.x
+
+/**
+ * Indica si un binario de Engram ejecuta y no es de una línea anterior a MIN_MAJOR.
+ * Un binario que ejecuta pero no imprime versión (build de desarrollo) se acepta: solo se
+ * rechaza lo que se demuestra viejo. El plazo cubre el primer arranque lento en Windows.
+ * @param {string} cmd Comando o ruta del ejecutable.
+ * @returns {boolean}
+ */
+function usable(cmd) {
+  const r = run(cmd, ['version'], { timeout: 15_000 });
+  if (r.status !== 0) return false;
+  const major = Number(r.stdout?.match(/(\d+)\.\d+\.\d+/)?.[1]);
+  return Number.isNaN(major) || major >= MIN_MAJOR;
+}
+
 function findEngram() {
-  const onPath = run('engram', ['version'], { timeout: 5_000 });
-  if (onPath.status === 0) return 'engram';
+  if (usable('engram')) return 'engram';
   const local = join(INSTALL_DIR, BIN_NAME);
-  if (existsSync(local) && run(local, ['version'], { timeout: 5_000 }).status === 0) return local;
+  if (existsSync(local) && usable(local)) return local;
   return null;
 }
 
@@ -112,7 +127,7 @@ async function installBinary(version) {
 }
 
 function readJson(path) {
-  try { return JSON.parse(readFileSync(path, 'utf8')); } catch { return null; }
+  try { return JSON.parse(readFileSync(path, 'utf8').replace(/^﻿/, '')); } catch { return null; }
 }
 
 function ensureMcp(engramCmd) {
@@ -135,15 +150,60 @@ function ensureEngramPlugin() {
     : 'No pude instalar engram@engram: ejecuta `claude plugin marketplace add Gentleman-Programming/engram` y `claude plugin install engram@engram`.');
 }
 
+const MEMORY_WRITE_TOOLS = [
+  'mem_save', 'mem_update', 'mem_review', 'mem_save_prompt', 'mem_pin', 'mem_unpin',
+  'mem_session_summary', 'mem_session_start', 'mem_session_end', 'mem_capture_passive',
+  'mem_judge', 'mem_compare',
+];
+
+/**
+ * Permite sin aviso las herramientas de escritura de memoria de Engram (misma lista finita que
+ * `engram setup claude-code --allow-memory-writes`), editando permissions.allow sin ejecutar el binario.
+ * Idempotente; RAI_NO_MEMORY_ALLOW=1 lo desactiva. Si settings.json no es JSON válido no lo toca.
+ */
+function ensureMemoryWritePermissions() {
+  if (process.env.RAI_NO_MEMORY_ALLOW === '1') return;
+  const path = join(homedir(), '.claude', 'settings.json');
+  const exists = existsSync(path);
+  const settings = exists ? readJson(path) : {};
+  if (!settings || typeof settings !== 'object' || Array.isArray(settings)) return;
+  const permissions = settings.permissions ?? {};
+  if (typeof permissions !== 'object' || Array.isArray(permissions)) return;
+  const allow = permissions.allow ?? [];
+  if (!Array.isArray(allow)) return;
+  const have = new Set(allow);
+  const missing = ['mcp__engram__', 'mcp__plugin_engram_engram__']
+    .flatMap(prefix => MEMORY_WRITE_TOOLS.map(t => prefix + t))
+    .filter(entry => !have.has(entry));
+  if (!missing.length) return;
+  settings.permissions = { ...permissions, allow: [...allow, ...missing] };
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, `${JSON.stringify(settings, null, 2)}\n`);
+  notes.push(`Permisos de escritura de memoria de Engram añadidos a ~/.claude/settings.json (${missing.length}); desactívalo con RAI_NO_MEMORY_ALLOW=1.`);
+}
+
 // Alternativa si la descarga falla: compilar localmente con Go (mismo módulo que usa gentle-ai).
 function installWithGo() {
   if (run('go', ['version'], { timeout: 5_000 }).status !== 0) throw new Error('sin Go para compilar engram');
   mkdirSync(INSTALL_DIR, { recursive: true });
-  const r = run('go', ['install', `github.com/${REPO}/cmd/engram@latest`],
-    { env: { ...process.env, GOBIN: INSTALL_DIR }, timeout: 80_000 });
-  if (r.status !== 0) throw new Error(`go install falló: ${(r.stderr || '').trim().split('\n').pop()}`);
-  notes.push(`engram compilado con Go en ${INSTALL_DIR}${WIN ? ' (agrégalo al PATH si no está)' : ''}.`);
-  return join(INSTALL_DIR, BIN_NAME);
+  const tmp = mkdtempSync(join(tmpdir(), 'rai-engram-go-'));
+  try {
+    // El módulo termina en /v3: sin ese sufijo `@latest` resuelve la línea 1.x, sin el comando `hook`.
+    const r = run('go', ['install', `github.com/${REPO}/v3/cmd/engram@latest`],
+      { env: { ...process.env, GOBIN: tmp }, timeout: 80_000 });
+    if (r.status !== 0) throw new Error(`go install falló: ${(r.stderr || '').trim().split('\n').pop()}`);
+    const dest = join(INSTALL_DIR, BIN_NAME);
+    const previous = replaceBinary(join(tmp, BIN_NAME), dest);
+    if (!usable(dest)) {
+      rmSync(dest, { force: true });
+      if (previous) renameSync(previous, dest);
+      throw new Error('el binario compilado con Go no ejecuta o no es de la línea 3.x');
+    }
+    notes.push(`engram compilado con Go en ${INSTALL_DIR}${WIN ? ' (agrégalo al PATH si no está)' : ''}.`);
+    return dest;
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
 }
 
 function engramVersion(cmd) {
@@ -184,6 +244,8 @@ try {
   }
   ensureMcp(engram);
   ensureEngramPlugin();
+  try { ensureMemoryWritePermissions(); }
+  catch (e) { notes.push(`No pude añadir los permisos de memoria de Engram: ${e.message}`); }
   if (updateDue()) {
     try { await updateEngram(engram); }
     catch (e) { notes.push(`No pude comprobar actualizaciones de Engram: ${e.message}`); }
