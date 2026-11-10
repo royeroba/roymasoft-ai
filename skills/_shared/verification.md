@@ -41,3 +41,4 @@ Only when the change (or the phase) touches UI (views, components, routes, style
 
 - If they accept: the `browser-test-roy` skill with the story's or the spec's criteria.
 - Do not offer if there is no UI, if it was already tested, or if the user said no. Never run it without their acceptance.
+- After a browser test where every criterion passed and the work has a Jira key, `browser-test-roy` offers `ticket-evidence-roy` in one line. This holds when `implement-ticket-roy` or `plan-feature-roy` closes through a browser test too. Do not offer it in any other case, and never publish to Jira without the user's explicit yes.

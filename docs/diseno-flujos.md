@@ -97,12 +97,13 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 - Al cerrar una fase o un cambio **con UI** y con servidor levantable, una sola línea: "Ya quedó el login nuevo. ¿Lo probamos en el navegador?".
 - Si acepta, corre `/browser-test-roy` con los criterios de la HU o del spec y entrega la evidencia en el chat (ya implementado).
 - El informe del E2E incluye lo bueno, lo malo y lo mejorable. El resultado puede alimentar al RDD, pero el E2E nunca se ejecuta sin que el usuario lo acepte.
+- Si todos los criterios pasaron y el trabajo tiene clave de Jira, `/browser-test-roy` ofrece en una línea `/ticket-evidence-roy`: un comentario sencillo en el ticket con 3 o 4 capturas de su carpeta de evidencia. Nunca publica sin un sí explícito, no cambia el estado del ticket y, si la prueba fue con Chrome (sin capturas en disco), ofrece repetirla con Playwright.
 
 ## 11. Reglas de herramientas
 
 - **Build:** no se ejecuta salvo que el usuario lo pida o sea la única forma de verificar el cambio y sea razonable (corto, sin efectos secundarios como desplegar o escribir fuera del repo). Antes se prefieren tests acotados, typecheck o lint. Si el build es largo, se pregunta.
 - **Context7:** antes de usar APIs de librerías (ya en `rules/behavior.md`).
-- **Playwright:** solo vía `/browser-test-roy` (ya implementado).
+- **Navegador (Playwright y Claude in Chrome):** solo vía `/browser-test-roy`, que usa Playwright por defecto, Chrome si hace falta tu sesión iniciada, y cambia de una a otra solo si la elegida no responde (ya implementado).
 
 ## 11b. Modelos (sugerencia, el humano elige)
 
