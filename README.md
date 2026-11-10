@@ -2,7 +2,7 @@
 
 Plugin de Claude Code con mi forma de trabajar: reglas, 27 skills, hooks de seguridad y un agente revisor. Incluye memoria entre sesiones con Engram y exploración de código con CodeGraph.
 
-Versión actual: 0.19.0 (ver `.claude-plugin/plugin.json`). Licencia: MIT.
+Versión actual: 0.20.0 (ver `.claude-plugin/plugin.json`). Licencia: MIT.
 
 ## Qué incluye
 
