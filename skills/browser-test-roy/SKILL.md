@@ -59,6 +59,7 @@ context." with closed options.
 - Console and network: without `filename`, so they come back as text.
 - Report a table: criterion · ✅/❌ · what was observed, and the path of the evidence folder.
 - Final verdict: "Meets N of M criteria", and what you **could not** verify.
+- If every criterion passed, the work has a Jira key and Playwright left screenshots on disk, offer in **one line**: "Shall I leave this evidence in the Jira ticket?". Run `/ticket-evidence-roy` only if they accept.
 
 ## 5. Failures
 

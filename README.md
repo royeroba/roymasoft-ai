@@ -11,12 +11,12 @@ claude plugin install roymasoft-ai@roymasoft
 
 Cada sesión corre `hooks/bootstrap.mjs`: instala y cablea Engram y CodeGraph si faltan, una vez al día sube el binario y el plugin de Engram si hay versión nueva, e inyecta las reglas. Las reglas juntas no pasan de 9.000 caracteres (lo exige `scripts/validate-skills.mjs`): Claude Code corta la salida de un hook a 10.000 y el modelo vería solo un preview. Después de instalar o subir de versión, reinicia Claude Code.
 
-## Skills (25, todas `-roy`)
+## Skills (26, todas `-roy`)
 
 | Grupo | Skills |
 |---|---|
 | Flujo | `implement-ticket-roy` (entrada), `plan-feature-roy` (tareas grandes), `regression-review-roy` (revisión fresca con el agente `reviewer`), `browser-test-roy` (navegador con Playwright o Claude in Chrome) |
-| Git y entrega de contexto | `commit-roy`, `create-pr-roy`, `read-ticket-roy` (Jira), `read-figma-roy`, `read-shared-docs-roy` (Notion, Google Drive, Docs y Gmail) |
+| Git y entrega de contexto | `commit-roy`, `create-pr-roy`, `read-ticket-roy` (Jira), `ticket-evidence-roy` (comentario sencillo en Jira con 3 o 4 capturas), `read-figma-roy`, `read-shared-docs-roy` (Notion, Google Drive, Docs y Gmail) |
 | Ingeniería | `testing-roy`, `security-roy`, `typescript-roy`, `database-roy`, `frontend-roy`, `backend-roy`, `performance-roy`, `docker-ci-roy`, `seo-roy` (SEO técnico de sitios públicos en Nuxt) |
 | Diseño e investigación | `design-review-roy` (crítica de un diseño o de la página construida), `user-research-roy` (planear y sintetizar investigación con usuarios) |
 | Mantenimiento y docs | `tech-debt-roy` (auditoría de deuda con prioridad), `write-docs-roy` (README, API, runbooks), `standup-roy` (daily desde git y Jira) |
@@ -37,7 +37,7 @@ Cada skill de ingeniería es un despachador corto con `references/` (fuentes ofi
 
 ```
 .claude-plugin/   plugin.json y marketplace.json
-skills/           las 25 skills (+ _shared/)
+skills/           las 26 skills (+ _shared/)
 agents/           reviewer (revisión RDD)
 hooks/            hooks.json y scripts
 rules/            reglas inyectadas en cada sesión
@@ -51,7 +51,7 @@ docs/             decisiones de diseño de los flujos
 
 ```bash
 claude plugin validate .
-node scripts/validate-skills.mjs --expect-evals 30
+node scripts/validate-skills.mjs --expect-evals 33
 node scripts/test-secrets-hook.mjs
 ```
 
