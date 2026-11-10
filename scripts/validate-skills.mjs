@@ -16,12 +16,13 @@
  * Warns when a skill has no `fires-<skill>` case.
  * References: every `<name>-roy` token in README.md, rules/, docs/, agents/, skills/ and evals/ must be an existing
  * skill folder (`--repo <dir>` points the scan at another checkout; specs/ is skipped, it is history).
+ * Catalog: docs/skills.md has a `### \`name\`` heading for every skill folder (checked only for the repo's own skills/).
  * Rules: the rules SessionStart injects (behavior, engram-protocol, codegraph-guidance) together stay within
  * RULES_BUDGET characters, so the hook output never passes Claude Code's 10,000-character cap and gets cut to a preview.
  * Exit code 1 when any error is found. Warnings (version-like numbers in references, skills without an eval) do not fail.
  */
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { dirname, join, relative } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { codegraphGuidance } from '../hooks/codegraph.mjs';
 import { RULES_BUDGET, charCount, readRule } from '../hooks/lib/context.mjs';
@@ -199,6 +200,19 @@ function checkSkillReferences() {
   }
 }
 checkSkillReferences();
+
+/**
+ * Keeps docs/skills.md in step with skills/: every skill folder must have its own `### \`name\`` heading.
+ * Skipped when --root points outside <repo>/skills, because the catalog describes the repo's own skills.
+ */
+function checkCatalog() {
+  if (resolve(ROOT) !== resolve(join(REPO, 'skills'))) return;
+  const catalog = join(REPO, 'docs', 'skills.md');
+  if (!existsSync(catalog)) return err('docs/skills.md', 'catalog not found');
+  const text = readFileSync(catalog, 'utf8');
+  for (const s of skillDirs) if (!new RegExp(`^###\\s+\`${s}\`\\s*$`, 'm').test(text)) err('docs/skills.md', `skill ${s} has no "### \`${s}\`" heading in the catalog`);
+}
+checkCatalog();
 
 function checkRulesBudget() {
   const plugin = join(HERE, '..');
