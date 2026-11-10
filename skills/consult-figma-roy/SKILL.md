@@ -38,7 +38,7 @@ Take the file identifier and the node identifier from the URL, as the tool asks 
 4. **Components.** Match every relevant node with the components that already exist (find them with CodeGraph): **reuse**, **extend** or **new**.
 5. **Responsive.** Get the project's breakpoints. See which sizes the design has (mobile, tablet, desktop). Translate auto-layout and constraints (fill, hug, wrap) to flex or grid. Check long content and the states: hover, focus, disabled, loading, error and empty.
 
-If the design has doubtful accessibility (contrast, touch sizes), offer `design:accessibility-review`; do not run it unless asked.
+If the design has doubtful accessibility (contrast, touch sizes), offer the accessibility audit of `/frontend-roy` (its accessibility reference) and, for a design opinion, `/design-critique-roy`; do not run them unless asked.
 
 Correct: "Button color `#1D4ED8`: close to `--color-primary-600` (`#1E40AF`); visible difference. Existing token or new value?"
 Incorrect: "I used `#1D4ED8` directly on the button."

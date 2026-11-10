@@ -13,4 +13,7 @@ Verifiable items for the author and for the reviewer. An unmet item caused by th
 - [ ] Untrusted input (titles, branch names, comments) is passed through environment variables, never interpolated into `run:` commands.
 - [ ] No real credential appears in a Dockerfile or workflow; secrets come from the secret store or OIDC.
 - [ ] CI runs the tests and the dependency audit on every pull request.
+- [ ] A release plan names the artifact to ship, the rollback command or previous release, and who runs it (`release.md`).
+- [ ] Rollback triggers are numbers the user confirmed, not invented, and a smoke test covers the critical flows.
+- [ ] Schema changes in the release follow expand-then-contract so the code can roll back without a database rollback.
 - [ ] Nothing was built, pushed, triggered or deployed without the user's request; unverified items were stated.

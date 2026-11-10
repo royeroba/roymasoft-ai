@@ -33,3 +33,39 @@ Source: https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/
 - Say what cannot be verified by code reading (screen reader behavior, real devices).
 
 Source: https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/
+
+## Auditing a page or component
+
+Automated tools cannot judge accessibility alone, so audit in this order and say which steps you could not do:
+
+1. **Automated scan** of the rendered page, if the repo already has a checker; read its findings, do not trust a clean result as proof.
+2. **Keyboard only:** tab through everything. Every control is reachable and operable, the focus order follows the visual order, the focus is always visible, nothing traps it (modals included) and Escape closes what opened.
+3. **Contrast:** measure the real colors, do not eyeball them.
+4. **Zoom and text size:** zoom to 200% and enlarge the text; nothing is cut off or overlaps.
+5. **Names and structure:** headings in order, landmarks, every control and image with a name or alt text, every field with a label.
+6. **Screen reader:** needs a real one (NVDA, VoiceOver); if unavailable, list the flows still to test.
+
+Source: https://www.w3.org/WAI/test-evaluate/preliminary/
+
+## Numbers to check (WCAG 2.2 AA)
+
+- Contrast: 4.5:1 for normal text, 3:1 for large text (1.4.3).
+- Text resizes to 200% without loss of content or function (1.4.4), and content reflows at a 320 CSS pixel width without two-dimensional scrolling (1.4.10).
+- Target size: at least 24 by 24 CSS pixels, with the criterion's exceptions (2.5.8). 44 by 44 is the AAA criterion (2.5.5), not a requirement for AA.
+
+Source: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
+Source: https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html
+Source: https://www.w3.org/WAI/WCAG22/Understanding/reflow.html
+Source: https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html
+
+## Findings report (plugin format)
+
+One row per finding, anchored to something checkable: `file:line` or a selector, never "the form".
+
+| # | Where | Criterion | Severity | Fix |
+|---|---|---|---|---|
+| 1 | `src/Modal.vue:42` | 2.1.2 No Keyboard Trap | Critical | Return focus to the trigger and close on Escape |
+
+Severity (the plugin's own scale): **Critical** blocks a task for a group of users (keyboard trap, unlabeled required field); **Major** makes it hard but has a workaround (weak contrast, missing focus style); **Minor** is polish. End with the steps not verified.
+
+Source: https://www.w3.org/WAI/test-evaluate/
