@@ -12,7 +12,7 @@ You decide **what to test, at which level and how**, following the repo's own st
 ## When to use / when not
 
 - Use it whenever tests are written, changed, reviewed or diagnosed, or when a change needs a test strategy.
-- Do not use it to run a browser walkthrough of a feature (that is `/e2e-roy`) or to review a whole change (that is `/rdd-roy`).
+- Do not use it to run a browser walkthrough of a feature (that is `/browser-test-roy`) or to review a whole change (that is `/regression-review-roy`).
 
 ## 1. Detect the stack (never assume)
 
@@ -38,7 +38,7 @@ Read `package.json` scripts, the runner config (Vitest, Jest, Playwright, `node:
 
 ## 4. Verify
 
-Run the related tests and report command and result. Offer `/e2e-roy` in one line when the change touches UI. Report what you could not verify (real browsers, real services, CI-only failures).
+Run the related tests and report command and result. Offer `/browser-test-roy` in one line when the change touches UI. Report what you could not verify (real browsers, real services, CI-only failures).
 
 Correct (Testing Library style):
 ```ts

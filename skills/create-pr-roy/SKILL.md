@@ -40,7 +40,7 @@ Ask with **closed options** and only what is not clear. The target branch is ask
 | **Ticket** | Branch (`ABC-123-...`), commit messages, argument; then Jira if available | If it does not show up: "Give me the ticket or the URL of the ticket that was done" |
 | **Acceptance criteria** | From the Jira ticket | If there is no Jira or criteria: "Send me the acceptance criteria" |
 
-With the ticket, fetch its title, description and criteria from Jira with `/consult-ticket-roy`, or reuse the context already consulted in this conversation. Do not invent any.
+With the ticket, fetch its title, description and criteria from Jira with `/read-ticket-roy`, or reuse the context already consulted in this conversation. Do not invent any.
 
 ## 4. Write
 

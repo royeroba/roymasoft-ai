@@ -27,7 +27,7 @@ If it is a rule, say so, propose where it goes and **do not create a skill**. A 
 
 - Check that nothing equivalent already exists (`skills/`, `rules/`, global skills). If it does, propose extending it.
 - Confirm with the user: what triggers the skill, what it delivers and what it does **not** do. If the request is ambiguous, ask with closed options.
-- **Type:** *workflow* (steps in a fixed order, like `/rdd-roy`) or *dispatcher* (many conventions: a short `SKILL.md` that routes to `references/<topic>.md`).
+- **Type:** *workflow* (steps in a fixed order, like `/regression-review-roy`) or *dispatcher* (many conventions: a short `SKILL.md` that routes to `references/<topic>.md`).
 
 ## 3. Write the `SKILL.md`
 

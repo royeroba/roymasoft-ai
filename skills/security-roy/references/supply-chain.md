@@ -28,6 +28,6 @@ Source: https://csrc.nist.gov/projects/ssdf
 
 ## CI and containers
 
-Hardening of GitHub Actions workflows and Dockerfiles lives in `/delivery-roy`; keep dependency rules here and pipeline rules there.
+Hardening of GitHub Actions workflows and Dockerfiles lives in `/docker-ci-roy`; keep dependency rules here and pipeline rules there.
 
 Source: https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions

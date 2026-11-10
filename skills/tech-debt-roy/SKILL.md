@@ -7,12 +7,12 @@ argument-hint: "optional: a folder or area to audit"
 
 # /tech-debt-roy — Find the debt, rank it, plan it
 
-You find debt with evidence, score it and propose an order. **You only read and report**: you do not refactor, open tickets or touch dependencies. Fixing an item is a separate request (`/hu-roy`, or `/spec-roy` for a large one).
+You find debt with evidence, score it and propose an order. **You only read and report**: you do not refactor, open tickets or touch dependencies. Fixing an item is a separate request (`/implement-ticket-roy`, or `/plan-feature-roy` for a large one).
 
 ## When to use / when not
 
 - Use it for a debt audit, to choose what to clean up first or to judge the health of an area.
-- Do not use it to review one change (that is `/rdd-roy`), to find a specific bug or for performance work (that is `/performance-roy`).
+- Do not use it to review one change (that is `/regression-review-roy`), to find a specific bug or for performance work (that is `/performance-roy`).
 
 ## 1. Scope
 
@@ -29,7 +29,7 @@ Follow the rules' search order (memory, CodeGraph, grep). Every finding cites a 
 | Dependency | `npm outdated` and `npm audit` (read-only; say that they query the registry), unmaintained or duplicated packages |
 | Architecture | Modules with many callers and mixed responsibilities (`codegraph_explore` callers and impact), circular imports |
 | Documentation | README without install, run or test steps that `package.json` scripts support; outdated or missing docs for public modules |
-| Infrastructure | No CI, unpinned base images or actions, no health or logging setup (see `/delivery-roy`, `/backend-roy`) |
+| Infrastructure | No CI, unpinned base images or actions, no health or logging setup (see `/docker-ci-roy`, `/backend-roy`) |
 
 Do not run anything with side effects. Cap the list at the ten most relevant findings; say how many more there were.
 
