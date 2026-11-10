@@ -14,6 +14,8 @@
  * Evals (`claude plugin eval` layout): each folder under evals/ (except results/) has a non-empty `prompt.md`
  * and `graders/` with at least one .md grader whose frontmatter `type` is a known grader type.
  * Warns when a skill has no `fires-<skill>` case.
+ * References: every `<name>-roy` token in README.md, rules/, docs/, agents/, skills/ and evals/ must be an existing
+ * skill folder (`--repo <dir>` points the scan at another checkout; specs/ is skipped, it is history).
  * Rules: the rules SessionStart injects (behavior, engram-protocol, codegraph-guidance) together stay within
  * RULES_BUDGET characters, so the hook output never passes Claude Code's 10,000-character cap and gets cut to a preview.
  * Exit code 1 when any error is found. Warnings (version-like numbers in references, skills without an eval) do not fail.
@@ -33,10 +35,11 @@ const opt = (name, fallback) => {
 const ROOT = opt('--root', join(HERE, '..', 'skills'));
 const EVALS = opt('--evals', join(HERE, '..', 'evals'));
 const EXPECT_EVALS = opt('--expect-evals', null);
+const REPO = opt('--repo', join(HERE, '..'));
 
 const ENGINEERING_SKILLS = new Set([
   'testing-roy', 'security-roy', 'typescript-roy', 'database-roy',
-  'frontend-roy', 'backend-roy', 'performance-roy', 'delivery-roy', 'seo-roy',
+  'frontend-roy', 'backend-roy', 'performance-roy', 'docker-ci-roy', 'seo-roy',
 ]);
 const SPANISH = /[áéíóúñÁÉÍÓÚÑ¿¡]/;
 const errors = [];
@@ -156,6 +159,46 @@ function checkEvals() {
   if (evalsRequested) for (const s of skillDirs) if (!cases.includes(`fires-${s}`)) warn('evals', `skill ${s} has no fires-${s} case`);
 }
 checkEvals();
+
+const ROY_TOKEN = /(?<![\w-])([a-z0-9]+(?:-[a-z0-9]+)*-roy)(?:-natural)?(?![\w-])/g;
+
+/**
+ * Lists the .md files under a folder, recursively.
+ * @param {string} dir
+ * @returns {string[]}
+ */
+function walkMd(dir) {
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) return e.name === 'results' ? [] : walkMd(p);
+    return e.name.endsWith('.md') ? [p] : [];
+  });
+}
+
+/**
+ * Regression guard for renames: every `<name>-roy` token in the docs, rules, agents, skills and evals must
+ * resolve to a skill folder (optionally behind the `fires-` prefix of an eval case or its `-natural` variant).
+ * specs/ is excluded: specs are historical records.
+ */
+function checkSkillReferences() {
+  const known = new Set(skillDirs);
+  const files = [
+    join(REPO, 'README.md'),
+    ...['rules', 'docs', 'agents', 'skills', 'evals'].flatMap((d) => walkMd(join(REPO, d))),
+  ].filter((f) => existsSync(f));
+  for (const file of files) {
+    const where = relative(REPO, file).replace(/\\/g, '/');
+    const missing = new Set();
+    for (const m of readFileSync(file, 'utf8').matchAll(ROY_TOKEN)) {
+      if (/^\d+-/.test(m[1])) continue;
+      const name = m[1].replace(/^fires-/, '');
+      if (!known.has(name)) missing.add(m[1]);
+    }
+    for (const name of missing) err(where, `references \`${name}\`, which is not a skill folder`);
+  }
+}
+checkSkillReferences();
 
 function checkRulesBudget() {
   const plugin = join(HERE, '..');

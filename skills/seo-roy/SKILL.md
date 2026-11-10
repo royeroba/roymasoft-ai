@@ -12,7 +12,7 @@ You build and review public pages with the official Google Search Central, Nuxt 
 ## When to use / when not
 
 - Use it for public pages that should appear in Google: head tags, canonical, robots, sitemap, status codes, structured data, languages and the Nuxt SEO modules.
-- Do not use it for components, accessibility or Core Web Vitals measurement (that is `/frontend-roy` and `/performance-roy`), CSS (that is `/styles-roy`) or XSS and CSP (that is `/security-roy`).
+- Do not use it for components, accessibility or Core Web Vitals measurement (that is `/frontend-roy` and `/performance-roy`), CSS (that is `/css-styling-roy`) or XSS and CSP (that is `/security-roy`).
 - Private or logged-in apps such as dashboards are not indexed: say so instead of adding SEO.
 - Keyword research, copywriting and commercial SEO tools are out of scope; say so.
 

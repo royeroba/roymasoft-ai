@@ -12,7 +12,7 @@ You write docs a new person can follow, and every fact in them comes from the co
 ## When to use / when not
 
 - Use it to create or update a README, an API reference, a runbook, an onboarding guide or an architecture note.
-- Do not use it to read docs from Notion or Drive (that is `/consult-docs-roy`), for code comments (the rules cover them) or for a spec of a feature (that is `/spec-roy`).
+- Do not use it to read docs from Notion or Drive (that is `/read-shared-docs-roy`), for code comments (the rules cover them) or for a spec of a feature (that is `/plan-feature-roy`).
 
 ## 1. Detect and decide
 

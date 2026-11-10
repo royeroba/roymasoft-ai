@@ -9,10 +9,10 @@
 **Cambios.** Antes de tocar nada:
 1. **Autoriza.** Investigar, explicar, comparar o revisar es solo lectura: no edites ni delegues escritura. Si el pedido es ambiguo o condicional, pregunta y sigue en solo lectura.
 2. **Explora** lo mínimo para decidir.
-3. **Clasifica.** *Pequeña* (entendida, riesgo contenido, retomable desde la petición y `git diff`): hazla y enseña el diff. *Grande* (varias sesiones, depende de algo externo, entregables separados; nunca por número de archivos): propón spec en una línea y espera. Si el usuario pidió planear ("modo plan", "planea", "planifica", "especifica", "haz un spec", "plan mode" o equivalentes), invoca `spec-roy` directo (Plan Mode nativo); nunca armes el plan ni sus preguntas como texto en el chat.
+3. **Clasifica.** *Pequeña* (entendida, riesgo contenido, retomable desde la petición y `git diff`): hazla y enseña el diff. *Grande* (varias sesiones, depende de algo externo, entregables separados; nunca por número de archivos): propón spec en una línea y espera. Si el usuario pidió planear ("modo plan", "planea", "planifica", "especifica", "haz un spec", "plan mode" o equivalentes), invoca `plan-feature-roy` directo (Plan Mode nativo); nunca armes el plan ni sus preguntas como texto en el chat.
 4. **Riesgo alto:** datos o efectos irreversibles, seguridad, contratos que otros consumen, concurrencia, entorno o despliegue, o ningún test detectaría una regresión. En duda, trátalo como alto.
 5. **Tests:** con stack de pruebas, TDD (verlo fallar por la razón correcta y luego pasar). Sin stack, dilo una vez y verifica con lo que exista; nunca inventes un runner ni borres o debilites un test.
-6. **Cierra** con `Riesgo: <ítem>` o `Riesgo: ninguno`, lo no verificado y `rdd-roy` si tocó código con riesgo alto o en carril grande; si la omites, di por qué.
+6. **Cierra** con `Riesgo: <ítem>` o `Riesgo: ninguno`, lo no verificado y `regression-review-roy` si tocó código con riesgo alto o en carril grande; si la omites, di por qué.
 
 **Modelos.** Al delegar usa `sonnet` o el que elija el usuario, con alias, no ids con versión. La distribución sugerida (opus planear y decidir, sonnet ejecutar, haiku lo trivial sin lógica de negocio) solo se la ofreces; no la actives tú.
 
@@ -24,9 +24,9 @@
 
 **Build.** Solo si el usuario lo pide o es la única forma de verificar; antes, tests acotados, typecheck o lint. Si tiene efectos (desplegar, escribir fuera del repo), pregunta.
 
-**Dominios.** Antes de escribir código aplica su skill: tests → `testing-roy`; seguridad (autenticación, autorización, entradas, consultas, secretos, subidas, dependencias, cabeceras) → `security-roy`; estilos → `styles-roy`; TypeScript → `typescript-roy`; bases de datos → `database-roy`; React o Vue, accesibilidad y rendimiento de front → `frontend-roy`; endpoints, Node y observabilidad → `backend-roy`; rendimiento → `performance-roy`; Docker y CI → `delivery-roy`. Valida todo dato externo en el borde; nunca registres secretos ni datos personales.
+**Dominios.** Antes de escribir código aplica su skill: tests → `testing-roy`; seguridad (autenticación, autorización, entradas, consultas, secretos, subidas, dependencias, cabeceras) → `security-roy`; estilos → `css-styling-roy`; TypeScript → `typescript-roy`; bases de datos → `database-roy`; React o Vue, accesibilidad y rendimiento de front → `frontend-roy`; endpoints, Node y observabilidad → `backend-roy`; rendimiento → `performance-roy`; Docker y CI → `docker-ci-roy`. Valida todo dato externo en el borde; nunca registres secretos ni datos personales.
 
-**Diseño.** Sigue las convenciones del repo (si chocan con estas reglas, gana el repo) y no refactorices lo no pedido. DRY solo para la misma regla de negocio; una responsabilidad por módulo; abstracciones solo con dos implementaciones reales.
+**Diseño.** Sigue las convenciones del repo (ganan si chocan con estas reglas) y no refactorices lo no pedido. DRY solo para la misma regla de negocio; una responsabilidad por módulo; abstracciones solo con dos implementaciones reales.
 
 **Comentarios.** El código que escribes no lleva comentarios, salvo JSDoc en servicios, utils, composables, hooks y funciones complejas (`@param`, `@returns`, `@throws`; `{tipo}` solo en JavaScript) y una línea cuando el porqué no se deduce. Nunca código comentado ni TODO sin ticket; no borres comentarios ajenos.
 

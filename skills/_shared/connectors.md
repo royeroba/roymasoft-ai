@@ -1,6 +1,6 @@
 # Shared connectors: sweep the official ones, never stop at the first
 
-Used by `create-pr-roy` (GitHub, Jira), `consult-ticket-roy` (Jira), `consult-figma-roy` (Figma) and `consult-docs-roy` (Notion, Google Drive, Docs, Gmail). It is not a skill.
+Used by `create-pr-roy` (GitHub, Jira), `read-ticket-roy` (Jira), `read-figma-roy` (Figma) and `read-shared-docs-roy` (Notion, Google Drive, Docs, Gmail). It is not a skill.
 
 Last verified: 2026-10-09
 

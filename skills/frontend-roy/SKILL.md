@@ -12,7 +12,7 @@ You build and review frontend code with the official framework guidance and acce
 ## When to use / when not
 
 - Use it whenever components, state handling, accessibility or frontend performance are written or reviewed.
-- Do not use it for CSS, SCSS or Tailwind (that is `/styles-roy`), for tests (that is `/testing-roy`), for XSS and CSP (that is `/security-roy`) or for indexing in Google, sitemap and structured data (that is `/seo-roy`; apply it too on public pages that must be indexed).
+- Do not use it for CSS, SCSS or Tailwind (that is `/css-styling-roy`), for tests (that is `/testing-roy`), for XSS and CSP (that is `/security-roy`) or for indexing in Google, sitemap and structured data (that is `/seo-roy`; apply it too on public pages that must be indexed).
 
 ## 1. Detect (never assume)
 
@@ -40,7 +40,7 @@ Read `package.json` and the lockfile for the framework (React, Vue, other) and i
 
 ## 4. Verify
 
-Run the repo's lint (with the framework's lint plugin if present), the typecheck and the related tests, and report the results. Offer `/e2e-roy` when the change touches UI, and the audit procedure of `references/accessibility.md` if a formal accessibility audit is wanted. Say what was not verified (real devices, screen readers, field performance data).
+Run the repo's lint (with the framework's lint plugin if present), the typecheck and the related tests, and report the results. Offer `/browser-test-roy` when the change touches UI, and the audit procedure of `references/accessibility.md` if a formal accessibility audit is wanted. Say what was not verified (real devices, screen readers, field performance data).
 
 Correct (React):
 ```tsx

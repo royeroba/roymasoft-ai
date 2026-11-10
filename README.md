@@ -15,12 +15,12 @@ Cada sesión corre `hooks/bootstrap.mjs`: instala y cablea Engram y CodeGraph si
 
 | Grupo | Skills |
 |---|---|
-| Flujo | `hu-roy` (entrada), `spec-roy` (tareas grandes), `rdd-roy` (revisión fresca con el agente `reviewer`), `e2e-roy` (navegador con Playwright) |
-| Git y entrega de contexto | `commit-roy`, `create-pr-roy`, `consult-ticket-roy` (Jira), `consult-figma-roy`, `consult-docs-roy` (Notion, Google Drive, Docs y Gmail) |
-| Ingeniería | `testing-roy`, `security-roy`, `typescript-roy`, `database-roy`, `frontend-roy`, `backend-roy`, `performance-roy`, `delivery-roy`, `seo-roy` (SEO técnico de sitios públicos en Nuxt) |
-| Diseño e investigación | `design-critique-roy` (crítica de un diseño o de la página construida), `research-roy` (planear y sintetizar investigación con usuarios) |
+| Flujo | `implement-ticket-roy` (entrada), `plan-feature-roy` (tareas grandes), `regression-review-roy` (revisión fresca con el agente `reviewer`), `browser-test-roy` (navegador con Playwright) |
+| Git y entrega de contexto | `commit-roy`, `create-pr-roy`, `read-ticket-roy` (Jira), `read-figma-roy`, `read-shared-docs-roy` (Notion, Google Drive, Docs y Gmail) |
+| Ingeniería | `testing-roy`, `security-roy`, `typescript-roy`, `database-roy`, `frontend-roy`, `backend-roy`, `performance-roy`, `docker-ci-roy`, `seo-roy` (SEO técnico de sitios públicos en Nuxt) |
+| Diseño e investigación | `design-review-roy` (crítica de un diseño o de la página construida), `user-research-roy` (planear y sintetizar investigación con usuarios) |
 | Mantenimiento y docs | `tech-debt-roy` (auditoría de deuda con prioridad), `write-docs-roy` (README, API, runbooks), `standup-roy` (daily desde git y Jira) |
-| Estilos y meta | `styles-roy`, `create-skill-roy` |
+| Estilos y meta | `css-styling-roy`, `create-skill-roy` |
 
 Cada skill de ingeniería es un despachador corto con `references/` (fuentes oficiales, con fecha de verificación) y un `checklist.md`.
 

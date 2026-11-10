@@ -17,11 +17,11 @@ Fuentes: gentle-ai `origin/main` (ODD, RDD), fernando-skills (`/spec`, `/spec-im
 | Pieza | Tipo | Cuándo se carga | Archivo |
 |---|---|---|---|
 | Autorizar y clasificar | Regla corta | Siempre | `rules/behavior.md` |
-| `/hu-roy` (entrada con ticket o criterios) | Skill | Al invocarla o al traer una HU | `skills/hu-roy/SKILL.md` |
-| Carril grande (spec) | Skill | Solo si la tarea es grande | `skills/spec-roy/SKILL.md` + `template.md` |
+| `/implement-ticket-roy` (entrada con ticket o criterios) | Skill | Al invocarla o al traer una HU | `skills/implement-ticket-roy/SKILL.md` |
+| Carril grande (spec) | Skill | Solo si la tarea es grande | `skills/plan-feature-roy/SKILL.md` + `template.md` |
 | TDD condicional | Sección de la skill del carril | Al implementar | dentro de `hu` y `spec` |
-| RDD (revisión fresca) | Agente + skill delgada | Al cerrar un cambio con código | `agents/reviewer.md`, `skills/rdd-roy/SKILL.md` |
-| E2E en navegador | Skill (ya existe) | Al aceptar la oferta | `skills/e2e-roy/SKILL.md` |
+| RDD (revisión fresca) | Agente + skill delgada | Al cerrar un cambio con código | `agents/reviewer.md`, `skills/regression-review-roy/SKILL.md` |
+| E2E en navegador | Skill (ya existe) | Al aceptar la oferta | `skills/browser-test-roy/SKILL.md` |
 
 ## 3. Regla siempre activa (borrador, ~10 líneas)
 
@@ -36,7 +36,7 @@ petición ──► autorizar ──► explorar ──► clasificar ──┬�
                               oferta de E2E (si hay UI) ──► RDD (revisión fresca) ──► cierre
 ```
 
-`/hu-roy` es la misma entrada cuando el usuario trae un ticket: reformula la historia en 1–2 líneas, lista los criterios de aceptación como checklist (si no hay, lo dice: es el primer hueco) y propone el carril. **No escribe código.**
+`/implement-ticket-roy` es la misma entrada cuando el usuario trae un ticket: reformula la historia en 1–2 líneas, lista los criterios de aceptación como checklist (si no hay, lo dice: es el primer hueco) y propone el carril. **No escribe código.**
 
 ## 5. Carril pequeño (absorbe el ping-pong)
 
@@ -95,14 +95,14 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 ## 10. Conexión con E2E
 
 - Al cerrar una fase o un cambio **con UI** y con servidor levantable, una sola línea: "Ya quedó el login nuevo. ¿Lo probamos en el navegador?".
-- Si acepta, corre `/e2e-roy` con los criterios de la HU o del spec y entrega la evidencia en el chat (ya implementado).
+- Si acepta, corre `/browser-test-roy` con los criterios de la HU o del spec y entrega la evidencia en el chat (ya implementado).
 - El informe del E2E incluye lo bueno, lo malo y lo mejorable. El resultado puede alimentar al RDD, pero el E2E nunca se ejecuta sin que el usuario lo acepte.
 
 ## 11. Reglas de herramientas
 
 - **Build:** no se ejecuta salvo que el usuario lo pida o sea la única forma de verificar el cambio y sea razonable (corto, sin efectos secundarios como desplegar o escribir fuera del repo). Antes se prefieren tests acotados, typecheck o lint. Si el build es largo, se pregunta.
 - **Context7:** antes de usar APIs de librerías (ya en `rules/behavior.md`).
-- **Playwright:** solo vía `/e2e-roy` (ya implementado).
+- **Playwright:** solo vía `/browser-test-roy` (ya implementado).
 
 ## 11b. Modelos (sugerencia, el humano elige)
 
@@ -116,23 +116,23 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 
 ## 11c. Contexto externo: tickets y diseño
 
-- `/hu-roy` (carril pequeño) y `/spec-roy` (carril grande) consultan el contexto en cuanto el usuario pega una URL: Jira con `/consult-ticket-roy` y Figma con `/consult-figma-roy`. Cada una es independiente y también se invoca sola.
+- `/implement-ticket-roy` (carril pequeño) y `/plan-feature-roy` (carril grande) consultan el contexto en cuanto el usuario pega una URL: Jira con `/read-ticket-roy` y Figma con `/read-figma-roy`. Cada una es independiente y también se invoca sola.
 - Ambas validan que el plugin o MCP exista (si no, piden el texto o capturas y lo marcan como contexto manual), solo leen, analizan lo que traen y preguntan los huecos con opciones cerradas.
-- `/consult-figma-roy` además cruza los nodos con el proyecto: tokens, componentes existentes, responsive y estados, apoyándose en las skills de estilos que existan (del proyecto, del plugin o globales). Si no existe ninguna, valida contra el código y lo dice.
-- Un ticket que enlaza Figma ofrece encadenar `/consult-figma-roy`. `/create-pr-roy` reutiliza el contexto del ticket.
-- `/consult-docs-roy` lee URLs de Notion, Google Drive, Docs y Gmail con el mismo patrón; solo escribe borradores, cada uno con un sí explícito, y nunca envía, comparte, mueve, borra ni edita lo existente.
+- `/read-figma-roy` además cruza los nodos con el proyecto: tokens, componentes existentes, responsive y estados, apoyándose en las skills de estilos que existan (del proyecto, del plugin o globales). Si no existe ninguna, valida contra el código y lo dice.
+- Un ticket que enlaza Figma ofrece encadenar `/read-figma-roy`. `/create-pr-roy` reutiliza el contexto del ticket.
+- `/read-shared-docs-roy` lee URLs de Notion, Google Drive, Docs y Gmail con el mismo patrón; solo escribe borradores, cada uno con un sí explícito, y nunca envía, comparte, mueve, borra ni edita lo existente.
 - **Conectores (v0.14.0).** `skills/_shared/connectors.md` define el barrido: se prueban todas las fuentes oficiales de cada servicio (plugins de `claude-plugins-official`, conectores de claude.ai, MCP con el endpoint oficial del proveedor, `gh`) hasta encontrar una con sesión; un fallo no detiene el barrido. Los servidores comunitarios no se usan aunque estén conectados. Si ninguno sirve, se sugiere en un solo mensaje la opción oficial más segura (OAuth en el navegador, sin tokens en archivos).
 - **PR.** El cuerpo empieza con una tabla de una fila (developer, ticket, rama) y luego resumen, lo hecho y criterios; el título no se repite.
-- **Plan Mode.** Pedir planear en lenguaje natural ("modo plan", "planea", "planifica", "especifica") invoca `spec-roy` directo; las fases 1 a 3 corren dentro del Plan Mode nativo (cargado con `ToolSearch`), con preguntas por `AskUserQuestion` y aprobación con `ExitPlanMode`.
-- **Comentarios.** Regla en `rules/behavior.md`: código nuevo o tocado sin comentarios, salvo JSDoc en servicios, utils, composables y funciones complejas; `rdd-roy` lo verifica cada vez que se ejecuta.
-- `styles-roy` (CSS/SCSS/Sass con BEM, CSS moderno, Tailwind al día, responsive validado contra los breakpoints del proyecto) es la skill de estilos del plugin: la usan `/hu-roy`, `/spec-roy` y `/consult-figma-roy`. Es un despachador con `references/` (bem, modern-css, tailwind, responsive) y detecta el enfoque del proyecto sin suponerlo.
+- **Plan Mode.** Pedir planear en lenguaje natural ("modo plan", "planea", "planifica", "especifica") invoca `plan-feature-roy` directo; las fases 1 a 3 corren dentro del Plan Mode nativo (cargado con `ToolSearch`), con preguntas por `AskUserQuestion` y aprobación con `ExitPlanMode`.
+- **Comentarios.** Regla en `rules/behavior.md`: código nuevo o tocado sin comentarios, salvo JSDoc en servicios, utils, composables y funciones complejas; `regression-review-roy` lo verifica cada vez que se ejecuta.
+- `css-styling-roy` (CSS/SCSS/Sass con BEM, CSS moderno, Tailwind al día, responsive validado contra los breakpoints del proyecto) es la skill de estilos del plugin: la usan `/implement-ticket-roy`, `/plan-feature-roy` y `/read-figma-roy`. Es un despachador con `references/` (bem, modern-css, tailwind, responsive) y detecta el enfoque del proyecto sin suponerlo.
 
 ## 11d. Ingeniería integral (SPEC 01)
 
-- Ocho skills de dominio, todas en inglés y con sufijo `-roy`: `testing-roy`, `security-roy`, `typescript-roy`, `database-roy`, `frontend-roy`, `backend-roy`, `performance-roy` y `delivery-roy`. Cada una es un despachador (`SKILL.md` corto) con `references/` y un `references/checklist.md` verificable.
+- Ocho skills de dominio, todas en inglés y con sufijo `-roy`: `testing-roy`, `security-roy`, `typescript-roy`, `database-roy`, `frontend-roy`, `backend-roy`, `performance-roy` y `docker-ci-roy`. Cada una es un despachador (`SKILL.md` corto) con `references/` y un `references/checklist.md` verificable.
 - Contenido solo de fuentes oficiales verificadas (Anthropic, OpenAI, Cursor, Google, OWASP, Node.js, TypeScript, React, Vue, W3C, PostgreSQL, MongoDB, AWS, Redis, Docker, GitHub); cada sección cita su fuente y la fecha de verificación. Sin versiones ni proporciones fijas.
 - `rules/behavior.md` solo trae el enrutado ("Dominios") y los disparadores de seguridad; el detalle va en las skills para no engordar el contexto siempre cargado.
-- `rdd-roy` pasa los checklists de los dominios tocados y `agents/reviewer.md` los comprueba ítem por ítem.
+- `regression-review-roy` pasa los checklists de los dominios tocados y `agents/reviewer.md` los comprueba ítem por ítem.
 - `scripts/validate-skills.mjs` valida las reglas objetivas de las skills y el formato de los evals. `hooks/pretooluse-secrets.mjs` pide confirmación (`ask`) ante secretos evidentes en Write, Edit y MultiEdit; su regresión está en `scripts/test-secrets-hook.mjs`.
 - Spec completo y su registro: `specs/01-ingenieria-integral.md`.
 - **SEO (SPEC 03).** `seo-roy` es la novena skill de dominio: SEO técnico de sitios públicos en Nuxt (rastreo, indexación, datos estructurados, módulos Nuxt SEO) con 4 referencias de fuentes oficiales de Google, Nuxt y Nuxt SEO, y un caso de eval. No cubre keyword research ni redacción. Spec y registro: `specs/03-skill-seo-roy.md`.
@@ -145,4 +145,4 @@ Vive en el chat y, en el carril grande, en el `## Log` del spec. Sirve para deci
 
 ## 13. Evals
 
-Suite chica y manual en `evals/` (formato de `claude plugin eval`): un caso `fires-<skill>` por skill y cuatro `safety-*`. Detalle, comandos y costo en `evals/rubric.md`; el formato lo valida `scripts/validate-skills.mjs`. Los pendientes de diseño de los flujos (referencia del agente reviewer, peso del contexto, disparo de `hu-roy`) se comprueban en uso real y se registran en Engram, no aquí.
+Suite chica y manual en `evals/` (formato de `claude plugin eval`): un caso `fires-<skill>` por skill y cuatro `safety-*`. Detalle, comandos y costo en `evals/rubric.md`; el formato lo valida `scripts/validate-skills.mjs`. Los pendientes de diseño de los flujos (referencia del agente reviewer, peso del contexto, disparo de `implement-ticket-roy`) se comprueban en uso real y se registran en Engram, no aquí.

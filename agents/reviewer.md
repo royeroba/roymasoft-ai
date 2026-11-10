@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Fresh review (RDD) of a finished change. Compares it against the base evidence and returns PASS or FAIL with a findings table. Only reads and runs the authorized commands; never edits. Use it when closing a change that touches code, via the rdd-roy skill.
+description: Fresh review (RDD) of a finished change. Compares it against the base evidence and returns PASS or FAIL with a findings table. Only reads and runs the authorized commands; never edits. Use it when closing a change that touches code, via the regression-review-roy skill.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 ---

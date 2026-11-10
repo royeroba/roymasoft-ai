@@ -12,7 +12,7 @@ You build and review backend code with the official guidance cited in `reference
 ## When to use / when not
 
 - Use it whenever endpoints, middleware, services, process behavior, configuration or observability are written or reviewed.
-- Do not use it for database design (that is `/database-roy`), authentication and injection hardening (that is `/security-roy`) or containers and pipelines (that is `/delivery-roy` once it exists).
+- Do not use it for database design (that is `/database-roy`), authentication and injection hardening (that is `/security-roy`) or containers and pipelines (that is `/docker-ci-roy` once it exists).
 
 ## 1. Detect (never assume)
 
